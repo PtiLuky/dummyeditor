@@ -26,7 +26,7 @@ Project::Project(const std::string& projectFolder)
         m_domDocument.documentElement().elementsByTagName("maps");
 
     if (mapsNodes.length() > 0) {
-        m_mapsModel = new Misc::MapTreeModel(mapsNodes.at(0));
+        m_mapsModel = new MapsTreeModel(mapsNodes.at(0));
     } else {
         // XXX: Throw exception?
     }
@@ -50,7 +50,7 @@ Project::~Project()
     delete m_mapsModel;
 }
 
-Misc::MapTreeModel* Project::mapsModel()
+MapsTreeModel* Project::mapsModel()
 {
     return m_mapsModel;
 }

@@ -43,7 +43,7 @@ public:
     Project(const std::string&);
     virtual ~Project();
 
-    Misc::MapTreeModel* mapsModel();
+    MapsTreeModel* mapsModel();
     const Dummy::Local::Project& coreProject() const { return m_coreProject; }
     std::shared_ptr<Misc::MapDocument> document(const QString& mapName);
     void setModified(bool isModified) { m_isModified = isModified; }
@@ -75,7 +75,7 @@ private:
 private:
     Dummy::Local::Project m_coreProject;
     QDomDocument m_domDocument;
-    Misc::MapTreeModel* m_mapsModel;
+    MapsTreeModel* m_mapsModel;
     bool m_isModified;
     std::unique_ptr<StartingPoint> m_startingPoint;
 

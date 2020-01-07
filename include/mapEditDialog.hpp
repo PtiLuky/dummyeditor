@@ -5,18 +5,20 @@
 
 #include <QDialog>
 
-#include "editor/project.hpp"
-
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration
 //////////////////////////////////////////////////////////////////////////////
 
-namespace Dummy {
-class Map;
-}
-
 namespace Ui {
 class MapEditDialog;
+}
+
+namespace Editor {
+class Project;
+}
+
+namespace Misc {
+class MapDocument;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -27,10 +29,11 @@ class MapEditDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit MapEditDialog(std::shared_ptr<const Editor::Project> project,
-                           std::shared_ptr<Misc::MapDocument> = nullptr,
-                           QWidget* parent                    = nullptr);
+    explicit MapEditDialog(QWidget* parent = nullptr);
     ~MapEditDialog() override;
+
+    void setup(const Editor::Project& project,
+               std::shared_ptr<Misc::MapDocument> = nullptr);
 
     QString getMapName() const;
     quint16 getWidth() const;
@@ -44,7 +47,7 @@ private slots:
 
 private:
     Ui::MapEditDialog* m_ui;
-    const std::shared_ptr<const Editor::Project> m_project;
+    QString m_chipsetPath;
 };
 
 #endif MAPEDITDIALOG_H

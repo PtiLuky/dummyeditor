@@ -234,7 +234,7 @@ void MainWindow::initializeProject(const QString& projectDirectory)
 
 void MainWindow::selectCurrentMap(QModelIndex selectedIndex)
 {
-    Misc::MapTreeModel* mapModel = m_currentProject->mapsModel();
+    MapsTreeModel* mapModel = m_currentProject->mapsModel();
 
     QString mapName(mapModel->itemFromIndex(selectedIndex)->text());
     qDebug() << mapName;

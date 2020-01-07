@@ -9,22 +9,20 @@
 
 class QDomNode;
 
-namespace Misc {
-
 //////////////////////////////////////////////////////////////////////////////
 //  MapTreeModel class
+// a MapTreeModel is a wrapper around data to display in in MapsTreeView
 //////////////////////////////////////////////////////////////////////////////
 
-class MapTreeModel : public QStandardItemModel
+class MapsTreeModel : public QStandardItemModel
 {
 public:
-    MapTreeModel(const QDomNode& mapsNode);
+    MapsTreeModel(const QDomNode& mapsNode);
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role) const override;
 
 private:
-    void setupModelData(const QDomNode& mapsNode, QStandardItem* parent);
+    void XmlMapToQItem(const QDomNode& mapsNode, QStandardItem* parent);
 };
-} // namespace Misc
 
 #endif // MAPTREEMODEL_H
