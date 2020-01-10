@@ -1,3 +1,6 @@
+#include "mapsTreeView.hpp"
+
+#include <QAction>
 #include <QDebug>
 #include <QTreeWidgetItem>
 
@@ -5,8 +8,9 @@
 #include "editor/layerEvents.hpp"
 #include "editor/layerGraphic.hpp"
 #include "editor/map.hpp"
+#include "mapDocument.hpp"
 #include "mapEditDialog.hpp"
-#include "mapsTreeView.hpp"
+
 
 MapsTreeView::MapsTreeView(QWidget* parent)
     : QTreeView(parent)
@@ -85,7 +89,7 @@ void MapsTreeView::onNewMapAction()
     map->reset(dlg.getWidth(), dlg.getHeight());
 
     auto mapDocument =
-        std::make_shared<Misc::MapDocument>(*m_project, mapName, map);
+        std::make_shared<MapDocument>(*m_project, mapName, map);
 
     // XXX: For now, create one floor with four layers.
     // The layers will have for positions :
@@ -119,8 +123,7 @@ void MapsTreeView::onPropertiesAction()
     QStandardItem* item =
         m_project->mapsModel()->itemFromIndex(m_selectedModelIndex);
     qDebug() << item->text();
-    std::shared_ptr<Misc::MapDocument> mapDocument(
-        m_project->document(item->text()));
+    std::shared_ptr<MapDocument> mapDocument(m_project->document(item->text()));
     auto map(mapDocument->map());
     // XXX fix this:
 

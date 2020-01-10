@@ -7,12 +7,13 @@
 
 #include <dummy/local/project.hpp>
 
-#include "mapDocument.hpp"
 #include "mapsTreeModel.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration
 //////////////////////////////////////////////////////////////////////////////
+
+class MapDocument;
 
 namespace Editor {
 class StartingPoint;
@@ -24,15 +25,6 @@ class StartingPoint;
 class ProjectError : public std::exception
 {};
 
-class NoStartingPoint : public ProjectError
-{
-public:
-    const char* what() const noexcept override
-    {
-        return "the project has no starting point";
-    }
-};
-
 //////////////////////////////////////////////////////////////////////////////
 //  Project class
 //////////////////////////////////////////////////////////////////////////////
@@ -40,27 +32,20 @@ public:
 class Project
 {
 public:
-    Project(const std::string&);
+    Project(const std::string& folder);
     virtual ~Project();
 
+    // Getters
     MapsTreeModel* mapsModel();
     const Dummy::Local::Project& coreProject() const { return m_coreProject; }
-    std::shared_ptr<Misc::MapDocument> document(const QString& mapName);
+    std::shared_ptr<MapDocument> document(const QString& mapName);
+    QMap<QString, std::shared_ptr<MapDocument>> openedMaps() const;
+
+    // Setters
     void setModified(bool isModified) { m_isModified = isModified; }
-
-    const StartingPoint& startingPoint() const
-    {
-        if (m_startingPoint == nullptr) {
-            throw NoStartingPoint();
-        }
-        return *m_startingPoint;
-    }
-
     void setStartingPoint(const StartingPoint&);
+
     void saveProjectFile();
-
-    QMap<QString, std::shared_ptr<Misc::MapDocument>> openedMaps() const;
-
     static void create(const QString&);
     static void cleanMapName(QString& mapName);
 
@@ -79,7 +64,7 @@ private:
     bool m_isModified;
     std::unique_ptr<StartingPoint> m_startingPoint;
 
-    QMap<QString, std::shared_ptr<Misc::MapDocument>> m_openedMaps;
+    QMap<QString, std::shared_ptr<MapDocument>> m_openedMaps;
 };
 
 } // namespace Editor

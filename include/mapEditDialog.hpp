@@ -17,9 +17,7 @@ namespace Editor {
 class Project;
 }
 
-namespace Misc {
 class MapDocument;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 //  MapEditDialog class
@@ -33,7 +31,7 @@ public:
     ~MapEditDialog() override;
 
     void setup(const Editor::Project& project,
-               std::shared_ptr<Misc::MapDocument> = nullptr);
+               std::shared_ptr<MapDocument> = nullptr);
 
     QString getMapName() const;
     quint16 getWidth() const;
@@ -50,4 +48,4 @@ private:
     QString m_chipsetPath;
 };
 
-#endif MAPEDITDIALOG_H
+#endif // MAPEDITDIALOG_H

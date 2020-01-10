@@ -7,6 +7,7 @@
 
 #include "editor/map.hpp"
 #include "editor/startingPoint.hpp"
+#include "mapDocument.hpp"
 #include "mapsTreeModel.hpp"
 
 namespace Editor {
@@ -55,7 +56,7 @@ MapsTreeModel* Project::mapsModel()
     return m_mapsModel;
 }
 
-QMap<QString, std::shared_ptr<Misc::MapDocument>> Project::openedMaps() const
+QMap<QString, std::shared_ptr<MapDocument>> Project::openedMaps() const
 {
     return m_openedMaps;
 }
@@ -158,7 +159,7 @@ void Project::cleanMapName(QString& mapName)
     mapName.replace("..", "");
 }
 
-std::shared_ptr<Misc::MapDocument> Project::document(const QString& mapName)
+std::shared_ptr<MapDocument> Project::document(const QString& mapName)
 {
     QString cleantMapname(mapName);
     cleanMapName(cleantMapname);
@@ -169,7 +170,7 @@ std::shared_ptr<Misc::MapDocument> Project::document(const QString& mapName)
         map->load();
 
         auto mapDocument =
-            std::make_shared<Misc::MapDocument>(*this, cleantMapname, map);
+            std::make_shared<MapDocument>(*this, cleantMapname, map);
 
         m_openedMaps.insert(cleantMapname, mapDocument);
     }

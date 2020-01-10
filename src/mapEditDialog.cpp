@@ -6,6 +6,7 @@
 
 #include "editor/map.hpp"
 #include "editor/project.hpp"
+#include "mapDocument.hpp"
 
 
 MapEditDialog::MapEditDialog(QWidget* parent)
@@ -18,7 +19,7 @@ MapEditDialog::MapEditDialog(QWidget* parent)
 MapEditDialog::~MapEditDialog() {}
 
 void MapEditDialog::setup(const Editor::Project& project,
-                          std::shared_ptr<Misc::MapDocument> mapDocument)
+                          std::shared_ptr<MapDocument> mapDocument)
 {
     // TODO clean/reset ?
 
