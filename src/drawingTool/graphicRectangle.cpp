@@ -27,11 +27,11 @@ void GraphicRectangle::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
         qDebug() << m_rectangle;
         m_rectangle.setBottomRight(pt);
 
-        m_mapGraphicsScene.removeItem(selectionItem());
+        mapGraphScene().removeItem(selectionItem());
         drawChipsetSelectionInRectangle();
         m_hoverItem->setPos(QPoint(m_rectangle.topLeft()));
         m_hoverItem->setZValue(88888);
-        m_mapGraphicsScene.addItem(m_hoverItem);
+        mapGraphScene().addItem(m_hoverItem);
     }
 }
 
@@ -54,7 +54,7 @@ void GraphicRectangle::mapMousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
     drawChipsetSelectionInRectangle();
     m_hoverItem->setPos(QPoint(m_rectangle.topLeft()));
     m_hoverItem->setZValue(88888);
-    m_mapGraphicsScene.addItem(m_hoverItem);
+    mapGraphScene().addItem(m_hoverItem);
 }
 
 void GraphicRectangle::drawChipsetSelectionInRectangle()
@@ -76,7 +76,7 @@ void GraphicRectangle::drawChipsetSelectionInRectangle()
         }
     }
     if (nullptr != m_hoverItem) {
-        m_mapGraphicsScene.removeItem(m_hoverItem);
+        mapGraphScene().removeItem(m_hoverItem);
     }
     m_hoverItem = new QGraphicsPixmapItem(dstPixmap);
 }
@@ -92,7 +92,7 @@ void GraphicRectangle::mapMouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     m_rectangle = QRect(0, 0, 0, 0);
 
     if (nullptr != m_hoverItem) {
-        m_mapGraphicsScene.removeItem(m_hoverItem);
+        mapGraphScene().removeItem(m_hoverItem);
         m_hoverItem = nullptr;
     }
 }
@@ -139,7 +139,7 @@ void GraphicRectangle::applyChipsetSelectionInRectangle()
 
 void GraphicRectangle::applySelectionToMap(quint16 mapX, quint16 mapY)
 {
-    if (nullptr == m_visibleGraphicLayer) {
+    if (nullptr == visibleGraphicLayer()) {
         return;
     }
 
@@ -154,7 +154,7 @@ void GraphicRectangle::applySelectionToMap(quint16 mapX, quint16 mapY)
         for (quint16 i = 0; i < rectSelection().width() / 16; i++) {
             qDebug() << "CHIPSET: " << chipsetX + i << chipsetY + j;
             qDebug() << "TARGET: " << point.x() + i << point.y() + j;
-            m_visibleGraphicLayer->setTile(
+            visibleGraphicLayer()->setTile(
                 quint16(point.x() + i * 16), quint16(point.y() + j * 16),
                 (chipsetX + i) * 16, (chipsetY + j) * 16);
         }

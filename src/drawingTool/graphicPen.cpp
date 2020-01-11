@@ -25,8 +25,7 @@ void GraphicPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
     if (nullptr != selectionItem()) {
         if (m_hoverItem == nullptr
             || m_hoverItem->pixmap().toImage() != selectionPixmap().toImage()) {
-            m_hoverItem =
-                m_mapGraphicsScene.addPixmap(selectionItem()->pixmap());
+            m_hoverItem = mapGraphScene().addPixmap(selectionItem()->pixmap());
             m_hoverItem->setZValue(99999);
         }
         m_hoverItem->setPos(pt);
@@ -41,7 +40,7 @@ void GraphicPen::mapMousePressEvent(::QGraphicsSceneMouseEvent* event)
 {
     qDebug() << "Pen press.";
 
-    if (nullptr == selectionItem() || nullptr == m_visibleGraphicLayer) {
+    if (nullptr == selectionItem() || nullptr == visibleGraphicLayer()) {
         return;
     }
 
@@ -67,7 +66,7 @@ void GraphicPen::mapKeyReleaseEvent(::QKeyEvent* event)
 
 void GraphicPen::mapMouseLeaveEvent()
 {
-    m_mapGraphicsScene.removeItem(m_hoverItem);
+    mapGraphScene().removeItem(m_hoverItem);
     m_hoverItem = nullptr;
 }
 
@@ -88,12 +87,12 @@ void GraphicPen::onUnselected()
 {
     GraphicPaletteTool::onUnselected();
     if (m_hoverItem != nullptr) {
-        m_mapGraphicsScene.removeItem(m_hoverItem);
+        mapGraphScene().removeItem(m_hoverItem);
         m_hoverItem = nullptr;
     }
     qDebug() << "Remove selection item.";
     if (nullptr != selectionItem()) {
-        m_mapGraphicsScene.removeItem(selectionItem());
+        mapGraphScene().removeItem(selectionItem());
         setSelectionItem(nullptr);
     }
 }
@@ -107,7 +106,7 @@ void GraphicPen::drawPattern(QGraphicsSceneMouseEvent* event)
 
     for (int j = 0; j < height; ++j) {
         for (int i = 0; i < width; ++i) {
-            m_visibleGraphicLayer->setTile(
+            visibleGraphicLayer()->setTile(
                 quint16(point.x() - (point.x() % 16) + (i * 16)),
                 quint16(point.y() - (point.y() % 16) + (j * 16)),
                 qint16(rectSelection().x() + (i * 16)),

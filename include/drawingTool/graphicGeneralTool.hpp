@@ -42,6 +42,9 @@ signals:
     void drawingToolSelected(::DrawingTools::GraphicGeneralTool*);
 
 protected:
+    GraphicMap::VisibleGraphicLayer* visibleGraphicLayer();
+
+private:
     GraphicMap::VisibleGraphicLayer* m_visibleGraphicLayer = nullptr;
 };
 
