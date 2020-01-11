@@ -60,8 +60,6 @@ public:
     void visitGraphicLayer(GraphicMap::BlockingGraphicLayer&) override;
 
 private:
-    void initializeDrawingTools();
-    void initializeProject(const QString&);
     void initializeScenes();
     void connectScenes();
     void enableMapCreation();

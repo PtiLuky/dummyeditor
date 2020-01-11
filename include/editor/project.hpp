@@ -13,7 +13,7 @@
 //  forward declaration
 //////////////////////////////////////////////////////////////////////////////
 
-class MapDocument;
+struct MapDocument;
 
 namespace Editor {
 class StartingPoint;

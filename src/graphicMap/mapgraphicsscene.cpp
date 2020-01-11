@@ -56,9 +56,9 @@ MapGraphicsScene& MapGraphicsScene::setMapDocument(
     clear();
 
     m_mapDocument = mapDocument;
-    m_map         = m_mapDocument->map();
+    m_map         = m_mapDocument->map;
 
-    const Editor::Project& project = m_mapDocument->project();
+    const Editor::Project& project = m_mapDocument->project;
     m_mapChipset                   = QPixmap(QString(
         (project.coreProject().projectPath() / "chipsets" / m_map->chipset())
             .string()

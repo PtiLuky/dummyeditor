@@ -1,7 +1,7 @@
 #include "graphicMap/layerGraphicEvents.hpp"
 
 #include "editor/layerEvents.hpp"
-#include "graphicMap/eventItemSquare.hpp"
+#include "graphicMap/graphicItem.hpp"
 #include "graphicMap/graphicLayerVisitor.hpp"
 #include "graphicMap/mapGraphicsScene.hpp"
 
@@ -42,7 +42,7 @@ EventsGraphicLayer::EventsGraphicLayer(Editor::EventsLayer& eventsLayer,
 
 void EventsGraphicLayer::draw(int index, quint16 x, quint16 y)
 {
-    m_layerItems[index] = new EventSquareItem();
+    m_layerItems[index] = new GraphicItem(GraphicItem::eEventItem);
     m_layerItems[index]->setZValue(m_zIndex);
 
     m_layerItems[index]->setPos(QPointF(x - (x % 16), y - (y % 16)));

@@ -124,7 +124,7 @@ void MapsTreeView::onPropertiesAction()
         m_project->mapsModel()->itemFromIndex(m_selectedModelIndex);
     qDebug() << item->text();
     std::shared_ptr<MapDocument> mapDocument(m_project->document(item->text()));
-    auto map(mapDocument->map());
+    auto map(mapDocument->map);
     // XXX fix this:
 
     MapEditDialog dlg;

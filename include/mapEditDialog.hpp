@@ -17,7 +17,7 @@ namespace Editor {
 class Project;
 }
 
-class MapDocument;
+struct MapDocument;
 
 //////////////////////////////////////////////////////////////////////////////
 //  MapEditDialog class

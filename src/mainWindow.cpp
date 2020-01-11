@@ -82,7 +82,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     m_ui->tabGeneral->layout()->setMenuBar(tabGeneralToolBar);
     initializeScenes();
-    initializeDrawingTools();
 
     QObject::connect(m_ui->treeViewMaps, SIGNAL(chipsetMapChanged(QString)),
                      m_chipsetScene, SLOT(changeChipset(QString)));
@@ -99,11 +98,6 @@ QObject::connect(m_chipsetScene, SIGNAL(selectionChanged(QRect)),
 
     QList<int> desktopSizeListHeight{3 * height() / 5, height() / 5};
     m_ui->splitter->setSizes(desktopSizeListHeight);
-}
-
-void MainWindow::initializeDrawingTools()
-{
-    // TODO: Remove this.
 }
 
 void MainWindow::initializeScenes()
@@ -137,6 +131,7 @@ QObject::connect(ui->actionSelection,
 
 void MainWindow::closeCurrentProject()
 {
+    // TODO clean currently loaded project
     delete m_chipsetScene;
     delete m_mapScene;
 }
@@ -162,14 +157,12 @@ void MainWindow::newProject()
         return;
     }
 
-    // TODO clean currently loaded project
-
-    // Initialize a project into this directory
-    initializeProject(projectDirectory);
-
     if (nullptr != m_currentProject) {
         closeCurrentProject();
     }
+
+    // Initialize a project into this directory
+    Editor::Project::create(projectDirectory);
 
     loadProject(projectDirectory);
 }
@@ -193,7 +186,6 @@ void MainWindow::openProject()
 
 void MainWindow::loadProject(const QString& projectDirectory)
 {
-
     connectScenes();
 
     m_currentProject = std::make_shared<Editor::Project>(
@@ -215,23 +207,14 @@ void MainWindow::saveProject()
     }
 
     m_currentProject->saveProjectFile();
-    qDebug() << m_currentProject->openedMaps().count();
 
     if (m_currentProject->openedMaps().count() <= 0) {
         return;
     }
 
-    QMap<QString, MapDocument>::iterator i;
-
     for (auto e : m_currentProject->openedMaps().keys()) {
-        qDebug() << e;
-        m_currentProject->document(e)->save();
+        m_currentProject->document(e)->map->save();
     }
-}
-
-void MainWindow::initializeProject(const QString& projectDirectory)
-{
-    Editor::Project::create(projectDirectory);
 }
 
 void MainWindow::selectCurrentMap(QModelIndex selectedIndex)
@@ -240,8 +223,7 @@ void MainWindow::selectCurrentMap(QModelIndex selectedIndex)
 
     QString mapName(mapModel->itemFromIndex(selectedIndex)->text());
     qDebug() << mapName;
-    std::shared_ptr<Editor::Map> map(
-        m_currentProject->document(mapName)->map());
+    std::shared_ptr<Editor::Map> map(m_currentProject->document(mapName)->map);
     m_chipsetScene->setChipset((m_currentProject->coreProject().projectPath()
                                 / "chipsets" / map->chipset())
                                    .string()

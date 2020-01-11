@@ -22,7 +22,7 @@ class BlockingLayer;
 } // namespace Core
 } // namespace Dummy
 
-class MapDocument;
+struct MapDocument;
 
 namespace GraphicMap {
 class GraphicLayer;

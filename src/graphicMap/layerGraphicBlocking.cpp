@@ -4,7 +4,7 @@
 
 #include "editor/layerBlocking.hpp"
 #include "editor/map.hpp"
-#include "graphicMap/blockingItemSquare.hpp"
+#include "graphicMap/graphicItem.hpp"
 #include "graphicMap/mapGraphicsScene.hpp"
 #include "layer_clipboard/blocking.hpp"
 
@@ -98,7 +98,7 @@ void BlockingGraphicLayer::erase(int index, quint16 x, quint16 y)
 
 void BlockingGraphicLayer::draw(int index, quint16 x, quint16 y)
 {
-  m_layerItems[index] = new BlockingSquareItem();
+  m_layerItems[index] = new GraphicItem(GraphicItem::eBlockingSquareItem);
   m_layerItems[index]->setZValue(m_zIndex);
   m_layerItems[index]->setPos(QPointF(x - (x % 8), y - (y % 8)));
   m_mapGraphicsScene.addItem(m_layerItems[index]);
