@@ -43,6 +43,12 @@ signals:
     void drawingToolSelected(::DrawingTools::GraphicPaletteTool*);
 
 protected:
+    QGraphicsPixmapItem* selectionItem() const { return m_selectionItem; }
+    void setSelectionItem(QGraphicsPixmapItem* i) { m_selectionItem = i; }
+    const QRect& rectSelection() const { return m_rectSelection; }
+    const QPixmap& selectionPixmap() const { return m_selectionPixmap; }
+
+private:
     ChipsetGraphicsScene* m_chipsetGraphicsScene = nullptr;
     QGraphicsRectItem* m_selectionRectItem       = nullptr;
     QGraphicsPixmapItem* m_selectionItem         = nullptr;

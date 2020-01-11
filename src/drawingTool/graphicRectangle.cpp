@@ -27,7 +27,7 @@ void GraphicRectangle::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
         qDebug() << m_rectangle;
         m_rectangle.setBottomRight(pt);
 
-        m_mapGraphicsScene.removeItem(m_selectionItem);
+        m_mapGraphicsScene.removeItem(selectionItem());
         drawChipsetSelectionInRectangle();
         m_hoverItem->setPos(QPoint(m_rectangle.topLeft()));
         m_hoverItem->setZValue(88888);
@@ -37,7 +37,7 @@ void GraphicRectangle::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
 void GraphicRectangle::mapMousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-    if (nullptr == m_selectionItem) {
+    if (nullptr == selectionItem()) {
         return;
     }
 
@@ -59,11 +59,11 @@ void GraphicRectangle::mapMousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
 void GraphicRectangle::drawChipsetSelectionInRectangle()
 {
-    if (nullptr == m_selectionItem) {
+    if (nullptr == selectionItem()) {
         return;
     }
 
-    const QPixmap& chipsetSelection(m_selectionItem->pixmap());
+    const QPixmap& chipsetSelection(selectionItem()->pixmap());
     QPixmap dstPixmap(m_rectangle.size());
     QPainter painter(&dstPixmap);
 
@@ -85,7 +85,7 @@ void GraphicRectangle::mapMouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     m_mouseClicked = false;
 
-    if (nullptr != m_selectionItem) {
+    if (nullptr != selectionItem()) {
         applyChipsetSelectionInRectangle();
     }
 
@@ -127,7 +127,7 @@ void GraphicRectangle::onUnselected()
 
 void GraphicRectangle::applyChipsetSelectionInRectangle()
 {
-    const QPixmap& chipsetSelection(m_selectionItem->pixmap());
+    const QPixmap& chipsetSelection(selectionItem()->pixmap());
     for (int j = 0; j < m_rectangle.height(); j += chipsetSelection.height()) {
         for (int i = 0; i < m_rectangle.width();
              i += chipsetSelection.width()) {
@@ -147,11 +147,11 @@ void GraphicRectangle::applySelectionToMap(quint16 mapX, quint16 mapY)
 
     QPoint point(mapX, mapY);
 
-    qint16 chipsetX = qint16(m_rectSelection.x() / 16);
-    qint16 chipsetY = qint16(m_rectSelection.y() / 16);
+    qint16 chipsetX = qint16(rectSelection().x() / 16);
+    qint16 chipsetY = qint16(rectSelection().y() / 16);
 
-    for (quint16 j = 0; j < m_rectSelection.height() / 16; j++) {
-        for (quint16 i = 0; i < m_rectSelection.width() / 16; i++) {
+    for (quint16 j = 0; j < rectSelection().height() / 16; j++) {
+        for (quint16 i = 0; i < rectSelection().width() / 16; i++) {
             qDebug() << "CHIPSET: " << chipsetX + i << chipsetY + j;
             qDebug() << "TARGET: " << point.x() + i << point.y() + j;
             m_visibleGraphicLayer->setTile(

@@ -17,7 +17,7 @@ class QDomNode;
 class MapsTreeModel : public QStandardItemModel
 {
 public:
-    MapsTreeModel(const QDomNode& mapsNode);
+    explicit MapsTreeModel(const QDomNode& mapsNode);
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role) const override;
 

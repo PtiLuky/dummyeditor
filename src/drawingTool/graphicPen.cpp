@@ -22,11 +22,11 @@ void GraphicPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
     pt.setX(pt.x() - (pt.x() % 16));
     pt.setY(pt.y() - (pt.y() % 16));
 
-    if (nullptr != m_selectionItem) {
+    if (nullptr != selectionItem()) {
         if (m_hoverItem == nullptr
-            || m_hoverItem->pixmap().toImage() != m_selectionPixmap.toImage()) {
+            || m_hoverItem->pixmap().toImage() != selectionPixmap().toImage()) {
             m_hoverItem =
-                m_mapGraphicsScene.addPixmap(m_selectionItem->pixmap());
+                m_mapGraphicsScene.addPixmap(selectionItem()->pixmap());
             m_hoverItem->setZValue(99999);
         }
         m_hoverItem->setPos(pt);
@@ -41,7 +41,7 @@ void GraphicPen::mapMousePressEvent(::QGraphicsSceneMouseEvent* event)
 {
     qDebug() << "Pen press.";
 
-    if (nullptr == m_selectionItem || nullptr == m_visibleGraphicLayer) {
+    if (nullptr == selectionItem() || nullptr == m_visibleGraphicLayer) {
         return;
     }
 
@@ -92,16 +92,16 @@ void GraphicPen::onUnselected()
         m_hoverItem = nullptr;
     }
     qDebug() << "Remove selection item.";
-    if (nullptr != m_selectionItem) {
-        m_mapGraphicsScene.removeItem(m_selectionItem);
-        m_selectionItem = nullptr;
+    if (nullptr != selectionItem()) {
+        m_mapGraphicsScene.removeItem(selectionItem());
+        setSelectionItem(nullptr);
     }
 }
 
 void GraphicPen::drawPattern(QGraphicsSceneMouseEvent* event)
 {
     const QPoint& point(event->scenePos().toPoint());
-    const QRect& selectionRect(m_selectionItem->pixmap().rect());
+    const QRect& selectionRect(selectionItem()->pixmap().rect());
     int width(selectionRect.width() / 16);
     int height(selectionRect.height() / 16);
 
@@ -110,8 +110,8 @@ void GraphicPen::drawPattern(QGraphicsSceneMouseEvent* event)
             m_visibleGraphicLayer->setTile(
                 quint16(point.x() - (point.x() % 16) + (i * 16)),
                 quint16(point.y() - (point.y() % 16) + (j * 16)),
-                qint16(m_rectSelection.x() + (i * 16)),
-                qint16(m_rectSelection.y() + (j * 16)));
+                qint16(rectSelection().x() + (i * 16)),
+                qint16(rectSelection().y() + (j * 16)));
         }
     }
 }
