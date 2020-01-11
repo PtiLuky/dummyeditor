@@ -21,7 +21,7 @@ public:
     void setTarget(const QPoint&);
 
 protected:
-    QPoint m_target;
+    QPoint m_target = QPoint(0, 0);
 };
 
 } // namespace LayerClipboard

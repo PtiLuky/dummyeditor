@@ -19,11 +19,10 @@ public:
         eEventItem
     };
 
-    GraphicItem(eGraphicItemType type);
+    explicit GraphicItem(eGraphicItemType type);
 
     QRectF boundingRect() const override;
-    void paint(QPainter*, const QStyleOptionGraphicsItem*,
-                       QWidget* = nullptr) override;
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
 private:
     eGraphicItemType m_type;

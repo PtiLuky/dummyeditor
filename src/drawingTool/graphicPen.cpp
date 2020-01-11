@@ -14,8 +14,6 @@ GraphicPen::GraphicPen(GraphicMap::MapGraphicsScene& mapGraphicsScene,
                        GraphicMap::VisibleGraphicLayer* visibleGraphicLayer)
     : GraphicPaletteTool(QIcon(":/icons/icon_pen.png"), mapGraphicsScene,
                          visibleGraphicLayer)
-    , m_hoverItem(nullptr)
-    , m_mousePressed(false)
 {}
 
 void GraphicPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)

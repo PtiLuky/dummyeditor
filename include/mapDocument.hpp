@@ -24,7 +24,7 @@ public:
     MapDocument(Editor::Project&, const QString&, std::shared_ptr<Editor::Map>);
 
     Editor::Project& project;
-    const std::shared_ptr<Editor::Map> map;
+    const std::shared_ptr<Editor::Map> map = nullptr;
     const QString mapName;
 };
 

@@ -13,8 +13,6 @@ namespace DrawingTools {
 
 SelectionTool::SelectionTool(GraphicMap::MapGraphicsScene& mapGraphicsScene)
     : DrawingTool(mapGraphicsScene, QIcon(":/icons/icon_selection.png"))
-    , m_mouseClicked(false)
-    , m_selectionRectItem(nullptr)
 {}
 
 void SelectionTool::accept(DrawingVisitor& visitor)

@@ -44,7 +44,7 @@ private slots:
     void onOK();
 
 private:
-    Ui::MapEditDialog* m_ui;
+    Ui::MapEditDialog* m_ui = nullptr;
     QString m_chipsetPath;
 };
 

@@ -13,7 +13,6 @@ GraphicEraser::GraphicEraser(
     GraphicMap::VisibleGraphicLayer* visibleGraphicLayer)
     : GraphicGeneralTool(QIcon(":/icons/icon_eraser.png"), mapGraphicsScene,
                          visibleGraphicLayer)
-    , m_mouseClicked(false)
 {}
 
 void GraphicEraser::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)

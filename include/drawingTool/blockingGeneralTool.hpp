@@ -43,7 +43,7 @@ signals:
     void drawingToolSelected(DrawingTools::BlockingGeneralTool*);
 
 private:
-    GraphicMap::BlockingGraphicLayer* m_blockingGraphicLayer;
+    GraphicMap::BlockingGraphicLayer* m_blockingGraphicLayer = nullptr;
 };
 
 } // namespace DrawingTools

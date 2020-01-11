@@ -12,7 +12,6 @@ BlockingPen::BlockingPen(GraphicMap::MapGraphicsScene& mapGraphicsScene,
                          GraphicMap::BlockingGraphicLayer* blockingGraphicLayer)
     : BlockingGeneralTool(QIcon(":/icons/icon_pen_2.png"), mapGraphicsScene,
                           blockingGraphicLayer)
-    , m_mouseClicked(false)
 {}
 
 void BlockingPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)

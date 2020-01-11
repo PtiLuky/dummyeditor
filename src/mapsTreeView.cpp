@@ -14,7 +14,6 @@
 
 MapsTreeView::MapsTreeView(QWidget* parent)
     : QTreeView(parent)
-    , m_project(nullptr)
     , m_mapMenu(new QMenu(this))
     , m_newMapAction(new QAction(tr("Add new map"), this))
     , m_propertiesAction(new QAction(tr("Properties"), this))
@@ -66,7 +65,7 @@ void MapsTreeView::onNewMapAction()
     if (dlg.exec() != QDialog::Accepted)
         return;
 
-    MapsTreeModel* mapModel = m_project->mapsModel();
+    const MapsTreeModel* mapModel = m_project->mapsModel();
     if (nullptr == mapModel) {
         return;
     }
@@ -88,8 +87,7 @@ void MapsTreeView::onNewMapAction()
     map->setMusic(dlg.getMusic().toStdString());
     map->reset(dlg.getWidth(), dlg.getHeight());
 
-    auto mapDocument =
-        std::make_shared<MapDocument>(*m_project, mapName, map);
+    auto mapDocument = std::make_shared<MapDocument>(*m_project, mapName, map);
 
     // XXX: For now, create one floor with four layers.
     // The layers will have for positions :

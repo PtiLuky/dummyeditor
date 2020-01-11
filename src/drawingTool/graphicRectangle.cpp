@@ -16,8 +16,6 @@ GraphicRectangle::GraphicRectangle(
     GraphicMap::VisibleGraphicLayer* visibleGraphicLayer)
     : GraphicPaletteTool(QIcon(":/icons/icon_rect.png"), mapGraphicsScene,
                          visibleGraphicLayer)
-    , m_mouseClicked(false)
-    , m_hoverItem(nullptr)
 {}
 
 void GraphicRectangle::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)

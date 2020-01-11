@@ -14,8 +14,6 @@ namespace Editor {
 
 Project::Project(const std::string& projectFolder)
     : m_coreProject(fs::path(projectFolder))
-    , m_mapsModel(nullptr)
-    , m_startingPoint(nullptr)
 {
     // Try to read the "project.xml" file that should be present in folderPath.
     QFile xmlProjectFile(
@@ -95,7 +93,7 @@ QDomDocument Project::createXmlProjectTree()
 
 void Project::createFolders(const QString& baseFolder)
 {
-    std::vector<QString> folders{"maps", "chipsets", "sounds"};
+    std::vector<QString> folders {"maps", "chipsets", "sounds"};
     std::for_each(folders.begin(), folders.end(),
                   [&baseFolder](const QString& folder) {
                       QDir dir(baseFolder + "/" + folder);

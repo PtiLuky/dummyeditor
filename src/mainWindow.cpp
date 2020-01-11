@@ -23,7 +23,6 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
-    , m_currentProject(nullptr)
     , m_chipsetScene(new ChipsetGraphicsScene())
     , m_mapScene(new GraphicMap::MapGraphicsScene())
 {
@@ -93,10 +92,10 @@ QObject::connect(m_chipsetScene, SIGNAL(selectionChanged(QRect)),
     m_ui->graphicsViewChipset->scale(2.0, 2.0);
     m_ui->graphicsViewMap->scale(2.0, 2.0);
 
-    QList<int> desktopSizeListWidth{width() / 5, 3 * width() / 5};
+    QList<int> desktopSizeListWidth {width() / 5, 3 * width() / 5};
     m_ui->splitter_2->setSizes(desktopSizeListWidth);
 
-    QList<int> desktopSizeListHeight{3 * height() / 5, height() / 5};
+    QList<int> desktopSizeListHeight {3 * height() / 5, height() / 5};
     m_ui->splitter->setSizes(desktopSizeListHeight);
 }
 
@@ -219,7 +218,7 @@ void MainWindow::saveProject()
 
 void MainWindow::selectCurrentMap(QModelIndex selectedIndex)
 {
-    MapsTreeModel* mapModel = m_currentProject->mapsModel();
+    const MapsTreeModel* mapModel = m_currentProject->mapsModel();
 
     QString mapName(mapModel->itemFromIndex(selectedIndex)->text());
     qDebug() << mapName;

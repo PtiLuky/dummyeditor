@@ -13,7 +13,6 @@ BlockingEraser::BlockingEraser(
     GraphicMap::BlockingGraphicLayer* blockingGraphicLayer)
     : BlockingGeneralTool(QIcon(":/icons/icon_eraser.png"), mapGraphicsScene,
                           blockingGraphicLayer)
-    , m_mouseClicked(false)
 {}
 
 void BlockingEraser::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)

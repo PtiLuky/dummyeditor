@@ -15,12 +15,6 @@ namespace GraphicMap {
 
 MapGraphicsScene::MapGraphicsScene(QObject* parent)
     : QGraphicsScene(parent)
-    , m_mapDocument(nullptr)
-    , m_map(nullptr)
-    , m_darkFilter(nullptr)
-    , m_isDrawing(false)
-    , m_drawingTool(nullptr)
-    , m_currentGraphicLayer(nullptr)
 {
     // m_paintingLayerState = new GraphicMap::NotPaintingState(*this);
     // m_drawingTool = new NoDrawingTool(*this);
