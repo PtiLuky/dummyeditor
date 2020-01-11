@@ -16,8 +16,8 @@ MapsTreeView::MapsTreeView(QWidget* parent)
     : QTreeView(parent)
     , m_project(nullptr)
     , m_mapMenu(new QMenu(this))
-    , m_newMapAction(new QAction(tr("Add new map")))
-    , m_propertiesAction(new QAction(tr("Properties")))
+    , m_newMapAction(new QAction(tr("Add new map"), this))
+    , m_propertiesAction(new QAction(tr("Properties"), this))
 {
     m_mapMenu->addAction(m_newMapAction);
     m_mapMenu->addAction(m_propertiesAction);

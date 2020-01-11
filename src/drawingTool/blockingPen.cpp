@@ -17,14 +17,14 @@ BlockingPen::BlockingPen(GraphicMap::MapGraphicsScene& mapGraphicsScene,
 
 void BlockingPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-    if (nullptr != m_blockingGraphicLayer) {
+    if (nullptr != blockingLayer()) {
         QPoint point(mouseEvent->scenePos().toPoint());
         point.setX(point.x() - (point.x() % 8));
         point.setY(point.y() - (point.y() % 8));
 
         if (m_mouseClicked) {
             // XXX: set blocking tile
-            m_blockingGraphicLayer->setTile(point.x(), point.y(), true);
+            blockingLayer()->setTile(point.x(), point.y(), true);
         }
     }
 }
@@ -32,7 +32,7 @@ void BlockingPen::mapMouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 void BlockingPen::mapMousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     qDebug() << "Blocking pen press.";
-    if (nullptr == m_blockingGraphicLayer) {
+    if (nullptr == blockingLayer()) {
         return;
     }
 
@@ -40,7 +40,7 @@ void BlockingPen::mapMousePressEvent(QGraphicsSceneMouseEvent* event)
     point.setX(point.x() - (point.x() % 8));
     point.setY(point.y() - (point.y() % 8));
     // XXX: set blocking tile.
-    m_blockingGraphicLayer->setTile(point.x(), point.y(), true);
+    blockingLayer()->setTile(point.x(), point.y(), true);
 
     m_mouseClicked = true;
 }

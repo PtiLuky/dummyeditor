@@ -26,15 +26,16 @@ MainWindow::MainWindow(QWidget* parent)
     , m_currentProject(nullptr)
     , m_chipsetScene(new ChipsetGraphicsScene())
     , m_mapScene(new GraphicMap::MapGraphicsScene())
-    , m_selectionDrawingTool(new DrawingTools::SelectionTool(*m_mapScene))
-    , m_graphicTools({new DrawingTools::GraphicPen(*m_mapScene),
-                      new DrawingTools::GraphicRectangle(*m_mapScene),
-                      new DrawingTools::GraphicEraser(*m_mapScene),
-                      m_selectionDrawingTool})
-    , m_blockingTools({new DrawingTools::BlockingPen(*m_mapScene),
-                       new DrawingTools::BlockingEraser(*m_mapScene)})
 {
     m_ui->setupUi(this);
+
+    m_graphicTools.push_back(new DrawingTools::GraphicPen(*m_mapScene));
+    m_graphicTools.push_back(new DrawingTools::GraphicRectangle(*m_mapScene));
+    m_graphicTools.push_back(new DrawingTools::GraphicEraser(*m_mapScene));
+    m_graphicTools.push_back(new DrawingTools::SelectionTool(*m_mapScene));
+
+    m_blockingTools.push_back(new DrawingTools::BlockingPen(*m_mapScene));
+    m_blockingTools.push_back(new DrawingTools::BlockingEraser(*m_mapScene));
 
     /*----------------------tab GENERAL---------------------------------- */
 

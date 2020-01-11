@@ -23,6 +23,11 @@ void BlockingGeneralTool::emitDrawingToolSelected()
     emit drawingToolSelected(this);
 }
 
+GraphicMap::BlockingGraphicLayer* BlockingGeneralTool::blockingLayer()
+{
+    return m_blockingGraphicLayer;
+}
+
 void BlockingGeneralTool::drawGrid()
 {
     if (nullptr == m_blockingGraphicLayer) {
