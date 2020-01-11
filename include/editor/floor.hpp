@@ -47,9 +47,9 @@ public:
 private:
     Dummy::Local::Floor& m_floor;
     GraphicLayers m_graphicLayers;
-    std::unique_ptr<BlockingLayer> m_blockingLayer = nullptr;
-    std::unique_ptr<EventsLayer> m_eventsLayer     = nullptr;
-    bool m_visible                                 = true;
+    std::unique_ptr<BlockingLayer> m_blockingLayer;
+    std::unique_ptr<EventsLayer> m_eventsLayer;
+    bool m_visible = true;
 };
 
 } // namespace Editor
