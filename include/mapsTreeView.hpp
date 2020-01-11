@@ -58,10 +58,10 @@ private slots:
     void showContextMenu(const QPoint&);
 
 private:
-    std::shared_ptr<Editor::Project> m_project = nullptr;
-    QMenu* m_mapMenu                           = nullptr;
-    QAction* m_newMapAction                    = nullptr;
-    QAction* m_propertiesAction                = nullptr;
+    std::shared_ptr<Editor::Project> m_project;
+    QMenu* m_mapMenu            = nullptr;
+    QAction* m_newMapAction     = nullptr;
+    QAction* m_propertiesAction = nullptr;
     QModelIndex m_selectedModelIndex;
 };
 

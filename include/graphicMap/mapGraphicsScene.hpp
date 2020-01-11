@@ -75,9 +75,9 @@ private:
     void drawDarkFilter();
 
 private:
-    std::shared_ptr<MapDocument> m_mapDocument = nullptr;
-    std::shared_ptr<Editor::Map> m_map         = nullptr;
-    QGraphicsRectItem* m_darkFilter            = nullptr;
+    std::shared_ptr<MapDocument> m_mapDocument;
+    std::shared_ptr<Editor::Map> m_map;
+    QGraphicsRectItem* m_darkFilter = nullptr;
     QPixmap m_mapChipset;
     QRect m_chipsetSelection;
 

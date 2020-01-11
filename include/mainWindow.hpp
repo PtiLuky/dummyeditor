@@ -80,10 +80,10 @@ private slots:
     void publishTools(GraphicMap::GraphicLayer*);
 
 private:
-    Ui::MainWindow* m_ui                              = nullptr;
-    std::shared_ptr<Editor::Project> m_currentProject = nullptr;
-    ChipsetGraphicsScene* m_chipsetScene              = nullptr;
-    GraphicMap::MapGraphicsScene* m_mapScene          = nullptr;
+    Ui::MainWindow* m_ui                     = nullptr;
+    ChipsetGraphicsScene* m_chipsetScene     = nullptr;
+    GraphicMap::MapGraphicsScene* m_mapScene = nullptr;
+    std::shared_ptr<Editor::Project> m_currentProject;
 
     std::vector<DrawingTools::DrawingTool*> m_graphicTools {};
     std::vector<DrawingTools::DrawingTool*> m_blockingTools {};

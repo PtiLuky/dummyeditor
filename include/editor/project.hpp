@@ -60,9 +60,9 @@ private:
 private:
     Dummy::Local::Project m_coreProject;
     QDomDocument m_domDocument;
-    MapsTreeModel* m_mapsModel                     = nullptr;
-    bool m_isModified                              = false;
-    std::unique_ptr<StartingPoint> m_startingPoint = nullptr;
+    MapsTreeModel* m_mapsModel = nullptr;
+    bool m_isModified          = false;
+    std::unique_ptr<StartingPoint> m_startingPoint;
 
     QMap<QString, std::shared_ptr<MapDocument>> m_openedMaps;
 };
