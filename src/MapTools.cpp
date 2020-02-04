@@ -266,8 +266,7 @@ void MapTools::copyCut(eCopyCut action)
     qint16 maxY       = minY + selectionH - 1;
     for (qint16 y = minY; y <= maxY; ++y)
         for (qint16 x = minX; x <= maxX; ++x) {
-            size_t indexInLayer = y * m_visLayer->layer().width() + x;
-            auto value          = m_visLayer->layer()[indexInLayer];
+            auto value = m_visLayer->layer().at({x, y});
             valuesInPatch.push_back(value);
             if (action == eCopyCut::Cut) {
                 m_visLayer->setTile(x, y, {-1, -1});
