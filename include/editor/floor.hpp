@@ -4,7 +4,7 @@
 #include <map>
 #include <memory>
 
-#include <dummy/local/floor.hpp>
+#include <dummy/core/floor.hpp>
 
 #include "editor/layerBlocking.hpp"
 #include "editor/layerEvents.hpp"
@@ -24,7 +24,7 @@ using GraphicLayers = std::map<int8_t, std::unique_ptr<GraphicLayer>>;
 class Floor
 {
 public:
-    explicit Floor(Dummy::Local::Floor&);
+    explicit Floor(Dummy::Core::Floor&);
 
     GraphicLayer& graphicLayerAt(int8_t position); //< unimplemented...
     const GraphicLayers& graphicLayers() const { return m_graphicLayers; }
@@ -33,10 +33,10 @@ public:
 
     BlockingLayer& blockingLayer() { return m_blockingLayer; }
     EventsLayer& eventsLayer() { return m_eventsLayer; }
-    Dummy::Local::Floor& localFloor() { return m_floor; }
+    Dummy::Core::Floor& localFloor() { return m_floor; }
 
 private:
-    Dummy::Local::Floor& m_floor;
+    Dummy::Core::Floor& m_floor;
     GraphicLayers m_graphicLayers;
     BlockingLayer m_blockingLayer;
     EventsLayer m_eventsLayer;

@@ -6,7 +6,7 @@
 #include <string>
 
 #include <dummy/core/layer.hpp>
-#include <dummy/local/map.hpp>
+#include <dummy/core/luaMap.hpp>
 
 #include "editor/floor.hpp"
 #include "editor/layer.hpp"
@@ -30,7 +30,7 @@ using Floors = std::vector<std::unique_ptr<Floor>>;
 //  Map class
 //////////////////////////////////////////////////////////////////////////////
 
-class Map : public Dummy::Local::Map
+class Map : public Dummy::Core::LuaMap
 {
 public:
     explicit Map(const std::filesystem::path&, const std::string&);
@@ -55,8 +55,6 @@ public:
         return m_editorFloors[floor]->graphicLayerAt(position);
     }
 
-    void load() override;
-
 private:
     void saveBlockingLayers();
     void saveGraphicLayers();
@@ -67,7 +65,7 @@ private:
     void resizeGraphicLayer(Editor::GraphicLayer&, std::uint16_t, std::uint16_t);
 
     static void writeStdString(std::ofstream&, const std::string&);
-    void writeFloor(std::ofstream&, const Dummy::Local::Floor&) const;
+    void writeFloor(std::ofstream&, const Dummy::Core::Floor&) const;
     Floors m_editorFloors;
 };
 } // namespace Editor

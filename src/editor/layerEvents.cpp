@@ -1,11 +1,11 @@
 #include "editor/layerEvents.hpp"
 
+#include <dummy/core/floor.hpp>
 #include <dummy/core/layer.hpp>
-#include <dummy/local/floor.hpp>
 
 namespace Editor {
 
-EventsLayer::EventsLayer(Dummy::Local::Floor& floor)
+EventsLayer::EventsLayer(Dummy::Core::Floor& floor)
     : m_floor(floor)
 {}
 

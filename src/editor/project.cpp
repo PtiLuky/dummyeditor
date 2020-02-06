@@ -177,11 +177,11 @@ void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
     // 0 (the one juste below the character)
     // 1 (the one juste above the character)
     // 2 (another one above)
-    Dummy::Local::Floor floor(*map);
-    floor.addGraphicLayer(-1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(0, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(2, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
+    Dummy::Core::Floor floor(*map);
+    floor.setGraphicLayer(-1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
+    floor.setGraphicLayer(0, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
+    floor.setGraphicLayer(1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
+    floor.setGraphicLayer(2, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
 
     map->addFloor(make_unique<Editor::Floor>(floor));
     map->resize(w, h);
@@ -199,7 +199,6 @@ const MapDocument& Project::document(const QString& mapName)
 
     if (! m_openedMaps.contains(cleantMapname)) {
         auto map = make_shared<Editor::Map>(m_projectPath, cleantMapname.toStdString());
-        map->load();
 
         auto mapDocument = make_shared<MapDocument>(*this, cleantMapname, map);
 

@@ -1,11 +1,11 @@
 #include "editor/floor.hpp"
 
-#include <dummy/local/floor.hpp>
+#include <dummy/core/floor.hpp>
 
 
 namespace Editor {
 
-Floor::Floor(Dummy::Local::Floor& floor)
+Floor::Floor(Dummy::Core::Floor& floor)
     : m_floor(floor)
     , m_blockingLayer(m_floor.blockingLayer())
     , m_eventsLayer(m_floor)

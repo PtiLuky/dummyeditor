@@ -14,19 +14,14 @@ namespace fs = std::filesystem;
 
 namespace Editor {
 Map::Map(const std::filesystem::path& project, const std::string& name)
-    : Dummy::Local::Map(project, name)
-{}
-
-Map::~Map() {}
-
-void Map::load()
+    : Dummy::Core::LuaMap(project, name)
 {
-    Dummy::Local::Map::load();
-
     for (auto& floor : m_floors) {
         m_editorFloors.push_back(std::make_unique<Floor>(floor));
     }
 }
+
+Map::~Map() {}
 
 void Map::setName(const std::string& newName)
 {
@@ -132,7 +127,7 @@ void Map::saveBlockingLayers()
 
     // Write the blocking layers
     for (auto& floor : m_floors) {
-        floor.blockingLayer().writeRawData(ofs);
+        floor.blockingLayer().writeToStream(ofs);
     }
 
     ofs.close();
@@ -179,7 +174,7 @@ void Map::writeStdString(std::ofstream& ofs, const std::string& str)
     }
 }
 
-void Map::writeFloor(std::ofstream& ofs, const Dummy::Local::Floor& floor) const
+void Map::writeFloor(std::ofstream& ofs, const Dummy::Core::Floor& floor) const
 {
     // Write the layers count.
     std::uint8_t layersCount = floor.graphicLayers().size();
@@ -187,7 +182,7 @@ void Map::writeFloor(std::ofstream& ofs, const Dummy::Local::Floor& floor) const
 
     for (const auto& [position, layer] : floor.graphicLayers()) {
         ofs.write(reinterpret_cast<const char*>(&position), sizeof(std::int8_t));
-        layer.writeRawData(ofs);
+        layer.writeToStream(ofs);
     }
 }
 
