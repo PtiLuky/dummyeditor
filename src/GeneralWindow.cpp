@@ -308,7 +308,7 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
     m_ui->maps_panel->setCurrentIndex(1);
 }
 
-void GeneralWindow::on_toogleGridChipset_clicked(bool isDown)
+void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
 {
     m_chipsetScene.setGridVisible(isDown);
 }

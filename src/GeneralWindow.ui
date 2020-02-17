@@ -126,7 +126,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="chipsets_tab" native="true">
+            <widget class="QWidget" name="chipsets_tab">
              <attribute name="title">
               <string/>
              </attribute>
@@ -172,9 +172,13 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton">
+                 <widget class="QPushButton" name="toggleGridChipset">
                   <property name="text">
-                   <string>PushButton</string>
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../icons.qrc">
+                    <normaloff>:/icons/icon_penpath.png</normaloff>:/icons/icon_penpath.png</iconset>
                   </property>
                  </widget>
                 </item>
