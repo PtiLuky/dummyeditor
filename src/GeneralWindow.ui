@@ -123,6 +123,9 @@
             </widget>
            </widget>
            <widget class="QTabWidget" name="chipsets_panel">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
             <widget class="QWidget" name="chipsets_tab" native="true">
              <attribute name="title">
               <string/>
@@ -146,7 +149,43 @@
               <item>
                <widget class="QGraphicsView" name="graphicsViewChipset"/>
               </item>
+              <item>
+               <layout class="QHBoxLayout" name="chipset_buttons">
+                <item>
+                 <widget class="QPushButton" name="chipsetAddButton">
+                  <property name="text">
+                   <string>Add Chipset</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton">
+                  <property name="text">
+                   <string>PushButton</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
              </layout>
+            </widget>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>Page</string>
+             </attribute>
             </widget>
            </widget>
           </widget>
