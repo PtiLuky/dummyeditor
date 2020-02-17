@@ -70,6 +70,7 @@ private:
     void closeEvent(QCloseEvent* event) override;
     void updateProjectView();
     void updateMapsAndFloorsList();
+    void updateChipsetsTab();
 
     void setupLoggers();
     void cleanLoggers();

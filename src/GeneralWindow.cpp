@@ -160,6 +160,7 @@ void GeneralWindow::updateProjectView()
 
     // update tabs content
     updateMapsAndFloorsList();
+    updateChipsetsTab();
 
     // update usable actions
     m_ui->actionSave->setEnabled(thereIsAProject);
@@ -176,7 +177,12 @@ void GeneralWindow::updateMapsAndFloorsList()
     m_ui->maps_panel->setCurrentIndex(0);
     m_ui->layer_list_tab->reset();
     m_mapScene.clear();
+}
+
+void GeneralWindow::updateChipsetsTab()
+{
     m_chipsetScene.clear();
+    m_ui->chipsets_panel->setTabText(0,"Chipset1");
 }
 
 void GeneralWindow::setupLoggers()
