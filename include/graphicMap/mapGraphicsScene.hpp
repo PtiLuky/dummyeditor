@@ -31,6 +31,11 @@ class MapGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
+    enum class eZoom
+    {
+        ZoomIn,
+        ZoomOut,
+    };
     explicit MapGraphicsScene(QObject* parent = nullptr);
     virtual ~MapGraphicsScene() override;
 
@@ -59,7 +64,7 @@ public slots:
     void clear();
 
 signals:
-    void zooming(QString);
+    void zooming(eZoom);
 
 private:
     void instantiateFloor(Editor::Floor&, const QPixmap& chip, int& zIdxInOut);

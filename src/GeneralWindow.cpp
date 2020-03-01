@@ -13,7 +13,6 @@
 #include "graphicMap/layerGraphicBlocking.hpp"
 #include "graphicMap/layerGraphicVisible.hpp"
 #include "utils/definitions.hpp"
-#include "utils/Logger.hpp"
 #include "utils/mapDocument.hpp"
 
 using Editor::Project;
@@ -380,13 +379,13 @@ void GeneralWindow::on_actionResize_triggered()
     m_ui->graphicsViewMap->scale(minScale,minScale);
 }
 
-void GeneralWindow::mapZoomTriggered(QString zoom)
+void GeneralWindow::mapZoomTriggered(GraphicMap::MapGraphicsScene::eZoom zoom)
 {
-    if (zoom == "+")
+    if (zoom == GraphicMap::MapGraphicsScene::eZoom::ZoomIn)
     {
         m_ui->graphicsViewMap->scale(1.25, 1.25);
     }
-    else if (zoom == "-")
+    else if (zoom == GraphicMap::MapGraphicsScene::eZoom::ZoomOut)
     {
         m_ui->graphicsViewMap->scale(0.75, 0.75);
     }

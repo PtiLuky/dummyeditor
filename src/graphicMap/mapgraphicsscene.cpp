@@ -177,11 +177,11 @@ void MapGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent* e)
 {
     if (e->modifiers().testFlag(Qt::ControlModifier) && (e->delta() > 0))
     {
-        emit zooming(QString::fromStdString("+"));
+        emit zooming(eZoom::ZoomIn);
     }
     else if (e->modifiers().testFlag(Qt::ControlModifier) && (e->delta() < 0))
     {
-        emit zooming(QString::fromStdString("-"));
+        emit zooming(eZoom::ZoomOut);
     }
 
 }

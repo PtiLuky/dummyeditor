@@ -47,7 +47,7 @@ public:
 
 public slots:
 
-    void mapZoomTriggered(QString);
+    void mapZoomTriggered(GraphicMap::MapGraphicsScene::eZoom);
 
 private slots:
     void on_actionNew_triggered();
