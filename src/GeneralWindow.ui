@@ -318,6 +318,7 @@
    <addaction name="actionRedo"/>
    <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
+   <addaction name="actionResize"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionToggleGrid"/>
   </widget>
@@ -477,16 +478,6 @@
     <string>Selection</string>
    </property>
   </action>
-  <action name="actionZoomIn">
-   <property name="text">
-    <string>Zoom +</string>
-   </property>
-  </action>
-  <action name="actionZoomOut">
-   <property name="text">
-    <string>Zoom -</string>
-   </property>
-  </action>
   <action name="actionUndo">
    <property name="enabled">
     <bool>false</bool>
@@ -509,6 +500,42 @@
    </property>
    <property name="text">
     <string>Redo</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icon_zoom_in.png</normaloff>:/icons/icon_zoom_in.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom in</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icon_zoom_out.png</normaloff>:/icons/icon_zoom_out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+   <property name="toolTip">
+    <string>zoom out</string>
+   </property>
+  </action>
+  <action name="actionResize">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icon_resize.png</normaloff>:/icons/icon_resize.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize window</string>
+   </property>
+   <property name="toolTip">
+    <string>Resize window</string>
    </property>
   </action>
  </widget>

@@ -45,6 +45,10 @@ public:
     bool loadProject(const QString& path);
     bool closeProject();
 
+public slots:
+
+    void mapZoomTriggered(GraphicMap::MapGraphicsScene::eZoom);
+
 private slots:
     void on_actionNew_triggered();
     void on_actionOpen_triggered();
@@ -62,6 +66,9 @@ private slots:
     void on_actionPaste_triggered();
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
+    void on_actionZoomIn_triggered();
+    void on_actionZoomOut_triggered();
+    void on_actionResize_triggered();
 
     void graphicLayerSelected(GraphicMap::VisibleGraphicLayer* layer);
     void blockingLayerSelected(GraphicMap::BlockingGraphicLayer* layer);

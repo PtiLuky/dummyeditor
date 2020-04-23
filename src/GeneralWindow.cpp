@@ -73,8 +73,9 @@ GeneralWindow::GeneralWindow(QWidget* parent)
     m_ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
 
     // connect ui items
-    connect(m_ui->btnNewMap, SIGNAL(clicked()), m_ui->mapsList, SLOT(addMapAtRoot()));
-    connect(m_ui->mapsList, SIGNAL(chipsetMapChanged(QString)), &m_chipsetScene, SLOT(setChipset(QString)));
+    connect(m_ui->btnNewMap, &QPushButton::clicked, m_ui->mapsList, &MapsTreeView::addMapAtRoot);
+    connect(m_ui->mapsList, &MapsTreeView::chipsetMapChanged, &m_chipsetScene, &ChipsetGraphicsScene::setChipset);
+    connect(&m_mapScene, &GraphicMap::MapGraphicsScene::zooming, this, &GeneralWindow::mapZoomTriggered);
 }
 
 GeneralWindow::~GeneralWindow()
@@ -289,14 +290,14 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
 
     // link visible layers
     for (const auto& pVisLayer : m_mapScene.graphicLayers()) {
-        connect(pVisLayer.get(), SIGNAL(layerSelected(GraphicMap::VisibleGraphicLayer*)), this,
-                SLOT(graphicLayerSelected(GraphicMap::VisibleGraphicLayer*)));
+        connect(pVisLayer.get(), &GraphicMap::VisibleGraphicLayer::layerSelected, this,
+                &GeneralWindow::graphicLayerSelected);
     }
 
     // link blocking layers
     for (const auto& pBlockLayer : m_mapScene.blockingLayers()) {
-        connect(pBlockLayer.get(), SIGNAL(layerSelected(GraphicMap::BlockingGraphicLayer*)), this,
-                SLOT(blockingLayerSelected(GraphicMap::BlockingGraphicLayer*)));
+        connect(pBlockLayer.get(), &GraphicMap::BlockingGraphicLayer::layerSelected, this,
+                &GeneralWindow::blockingLayerSelected);
     }
 
     // link events layers ?
@@ -365,6 +366,35 @@ void GeneralWindow::on_actionUndo_triggered()
 void GeneralWindow::on_actionRedo_triggered()
 {
     m_mapTools.redo();
+}
+void GeneralWindow::on_actionZoomIn_triggered()
+{
+    m_ui->graphicsViewMap->scale(2.0, 2.0);
+}
+void GeneralWindow::on_actionZoomOut_triggered()
+{
+    m_ui->graphicsViewMap->scale(0.5, 0.5);
+}
+void GeneralWindow::on_actionResize_triggered()
+{
+    if (m_mapScene.height() == 0 || m_mapScene.width() == 0)
+        return;
+
+    qreal minScale = std::min(m_ui->graphicsViewMap->height()/m_mapScene.height(),m_ui->graphicsViewMap->width()/m_mapScene.width());
+    m_ui->graphicsViewMap->resetTransform();
+    m_ui->graphicsViewMap->scale(minScale,minScale);
+}
+
+void GeneralWindow::mapZoomTriggered(GraphicMap::MapGraphicsScene::eZoom zoom)
+{
+    if (zoom == GraphicMap::MapGraphicsScene::eZoom::ZoomIn)
+    {
+        m_ui->graphicsViewMap->scale(1.25, 1.25);
+    }
+    else if (zoom == GraphicMap::MapGraphicsScene::eZoom::ZoomOut)
+    {
+        m_ui->graphicsViewMap->scale(0.75, 0.75);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

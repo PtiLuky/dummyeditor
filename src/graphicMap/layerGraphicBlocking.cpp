@@ -1,7 +1,5 @@
 #include "graphicMap/layerGraphicBlocking.hpp"
 
-#include <QDebug>
-
 #include "editor/layerBlocking.hpp"
 #include "editor/map.hpp"
 #include "graphicMap/graphicItem.hpp"
@@ -15,8 +13,8 @@ BlockingGraphicLayer::BlockingGraphicLayer(Editor::BlockingLayer& blockingLayer,
     : GraphicMap::MapSceneLayer(zIndex)
     , m_blockingLayer(blockingLayer)
 {
-    connect(&m_blockingLayer, SIGNAL(visibilityChanged(bool)), this, SLOT(setVisibility(bool)));
-    connect(&m_blockingLayer, SIGNAL(setSelected()), this, SLOT(setSelected()));
+    connect(&m_blockingLayer, &Editor::GraphicLayer::visibilityChanged, this, &MapSceneLayer::setVisibility);
+    connect(&m_blockingLayer, &Editor::GraphicLayer::setSelected, this, &BlockingGraphicLayer::setSelected);
 
     const size_t nbCells = m_blockingLayer.layer().size();
     indexedItems().resize(nbCells);
