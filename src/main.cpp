@@ -1,10 +1,11 @@
-#include "GeneralWindow.hpp"
 #include <QApplication>
+
+#include "widgets/generalWindow.hpp"
 
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
-    GeneralWindow mainWindow;
+    Editor::GeneralWindow mainWindow;
 
     mainWindow.show();
 

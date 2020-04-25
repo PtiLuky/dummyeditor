@@ -1,23 +1,10 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 project(dummyeditor)
-
-# where to find #include files
-include_directories(
-    include
-    vendor/libdummy/include
-)
 
 # Specify C++ version
 set(CMAKE_CXX_STANDARD 17)
 
-# Silence an annoying Boost/C++17 warning
-add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
-
-# enable a sub-cmake
-add_subdirectory("vendor/libdummy")
-
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Qt pre-compilation activation
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -28,56 +15,68 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-find_package(Boost 1.69.0 REQUIRED)
-find_package(Lua 5.3 REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.ui")
-file(GLOB_RECURSE HEADERS "include/*.hpp")
+# enable a sub-cmake
+add_subdirectory("submodules/dummyRPG")
 
-macro(GroupSources curdir)
-    file(
-        GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
-        ${PROJECT_SOURCE_DIR}/${curdir}/*
-    )
-    foreach(child ${children})
-        if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-            GroupSources(${curdir}/${child})
-        else()
-            string(REGEX REPLACE "^(src|include)/?" "" curdirsimple ${curdir})
-            string(REPLACE "/" "\\" groupname "${curdirsimple}")
-            #string(REPLACE "/" "\\" groupname "${curdir}")
-            source_group(
-                "${groupname}"
-                FILES
-                ${PROJECT_SOURCE_DIR}/${curdir}/${child}
-            )
-        endif()
-    endforeach()
-endmacro()
+###############################################################################
 
-link_directories(${Boost_LIBRARY_DIRS} ${LUA_LIBRARIES})
+set(FORM_FILES
+    forms/CinematicsWidget.ui
+    forms/GeneralWindow.ui
+    forms/mapeditdialog.ui
+    forms/mapFloorTreeWidget.ui
+)
 
-GroupSources(include)
-GroupSources(src)
-GroupSources(ui)
+set(CMAKE_AUTOUIC_SEARCH_PATHS forms)
 
-set(DUMMYEDITOR_LINK_LIBRARIES
+add_executable(dummyeditor
+    include/editor/project.hpp
+    include/utils/definitions.hpp
+    include/utils/logger.hpp
+    include/widgets/chipsetGraphicsScene.hpp
+    include/widgets/cinematicsWidget.hpp
+    include/widgets/generalWindow.hpp
+    include/widgets/graphicItem.hpp
+    include/widgets/layerItems.hpp
+    include/widgets/mapEditDialog.hpp
+    include/widgets/mapFloorTreeModel.hpp
+    include/widgets/mapFloorTreeWidget.hpp
+    include/widgets/mapGraphicsScene.hpp
+    include/widgets/mapsTree.hpp
+    include/widgets/mapTools.hpp
+
+    src/main.cpp
+    src/editor/project.cpp
+    src/utils/logger.cpp
+    src/widgets/chipsetGraphicsScene.cpp
+    src/widgets/cinematicsWidget.cpp
+    src/widgets/generalWindow.cpp
+    src/widgets/graphicItem.cpp
+    src/widgets/layerItems.cpp
+    src/widgets/mapEditDialog.cpp
+    src/widgets/mapFloorTreeModel.cpp
+    src/widgets/mapFloorTreeWidget.cpp
+    src/widgets/mapGraphicsScene.cpp
+    src/widgets/mapsTree.cpp
+    src/widgets/mapTools.cpp
+
+    "${FORM_FILES}"
+     icons.qrc
+)
+
+source_group(_ REGULAR_EXPRESSION "(src|include)/*")
+source_group(editor REGULAR_EXPRESSION "(src|include)/editor/*")
+source_group(widgets REGULAR_EXPRESSION "(src|include)/widgets/*")
+source_group(utils REGULAR_EXPRESSION "(src|include)/utils/*")
+
+target_include_directories(dummyeditor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(dummyeditor
     Qt5::Core
     Qt5::Gui
     Qt5::Xml
     Qt5::Widgets
-    dummy
-    ${Boost_LIBRARIES}
-    ${LUA_LIBRARY})
-
-if (UNIX)
-    set(DUMMYEDITOR_LINK_LIBRARIES
-        ${DUMMYEDITOR_LINK_LIBRARIES}
-        stdc++fs
-    )
-endif (UNIX)
-
-add_executable(dummyeditor ${SOURCES} ${HEADERS} icons.qrc)
+    dummyrpg)
 
 # Add compilation warnings
 if(MSVC)
@@ -85,43 +84,3 @@ if(MSVC)
 else()
   target_compile_options(dummyeditor PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic)
 endif()
-
-IF (WIN32)
-    SET_TARGET_PROPERTIES (dummyeditor
-        PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:console /NODEFAULTLIB:library"
-    )
-    SET_TARGET_PROPERTIES (dummyeditor
-        PROPERTIES LINK_FLAGS_RELEASE
-        "/SUBSYSTEM:windows /ENTRY:mainCRTStartup /NODEFAULTLIB:library"
-    )
-    SET_TARGET_PROPERTIES (dummyeditor
-        PROPERTIES LINK_FLAGS_MINSIZEREL
-        "/SUBSYSTEM:windows /ENTRY:mainCRTStartup /NODEFAULTLIB:library"
-    )
-    SET_TARGET_PROPERTIES (dummyeditor
-        PROPERTIES LINK_FLAGS_RELWITHDEBINFO
-        "/SUBSYSTEM:windows /ENTRY:mainCRTStartup /NODEFAULTLIB:library"
-    )
-
-    # On Windows, need to specify Boost’s lib dir. Sick.
-    if (CMAKE_BUILD_TYPE MATCHES Debug)
-        target_link_directories(dummyeditor
-            PUBLIC
-            ${Boost_LIBRARY_DIR_DEBUG}
-        )
-    endif (CMAKE_BUILD_TYPE MATCHES Debug)
-
-    if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_link_directories(dummyeditor
-            PUBLIC
-            ${Boost_LIBRARY_DIR_RELEASE}
-        )
-    endif (CMAKE_BUILD_TYPE MATCHES Release)
-ENDIF (WIN32)
-
-
-target_link_libraries(dummyeditor
-    ${DUMMYEDITOR_LINK_LIBRARIES}
-)
-
-target_include_directories(dummyeditor PUBLIC ${Boost_INCLUDE_DIR} ${LUA_INCLUDE_DIR})

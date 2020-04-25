@@ -1,10 +1,10 @@
-#include "utils/Logger.hpp"
+#include "utils/logger.hpp"
 
 #include <QDateTime>
 #include <QDir>
 #include <iostream>
 
-namespace Log {
+namespace Editor {
 
 std::vector<std::shared_ptr<Logger>> Logger::gLoggers;
 
@@ -85,7 +85,7 @@ void print(const QString& message, eLogType type)
 #ifdef QT_DEBUG
 void debug(const QString& message)
 {
-  Logger::printAll(message.toStdString(), eLogType::DEBUG);
+    Logger::printAll(message.toStdString(), eLogType::DEBUG);
 }
 #else
 void debug(const QString&) {}
@@ -103,4 +103,4 @@ void error(const QString& message)
     Logger::printAll(message.toStdString(), eLogType::ERROR);
 }
 
-} // namespace Log
+} // namespace Editor
