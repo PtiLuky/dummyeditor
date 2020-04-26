@@ -37,6 +37,7 @@ public:
 
     // Utils
     void saveProject();
+    bool saveCurrMap();
     void createMap(const tMapInfo& mapInfo, QStandardItem& parent);
     bool loadMap(const QString& mapName);
 
@@ -51,6 +52,7 @@ private:
     bool m_isModified = false;
 
     QString m_projectPath;
+    QString m_currMapName;
     std::unique_ptr<MapsTreeModel> m_mapsModel;
     std::unordered_map<std::string, uint16_t> m_mapNameToId;
     std::shared_ptr<Dummy::Map> m_currMap;
