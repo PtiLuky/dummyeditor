@@ -62,7 +62,7 @@ private:
 class MapsTreeModel : public QStandardItemModel
 {
 public:
-    explicit MapsTreeModel(const Dummy::GameStatic& game);
+    explicit MapsTreeModel(const QDomNode& mapsNode);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 private:

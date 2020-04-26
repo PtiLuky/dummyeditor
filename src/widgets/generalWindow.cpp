@@ -101,10 +101,6 @@ bool GeneralWindow::loadProject(const QString& path)
     // Update the view
     updateProjectView();
 
-    // TODO: add the project name and the path to the output
-    if (m_loadedProject != nullptr)
-        debug(tr("Project loaded"));
-
     return true;
 }
 
@@ -123,13 +119,11 @@ bool GeneralWindow::closeProject()
     } else if (resBtn == QMessageBox::No) {
         // Nothing to do
     } else {
-        debug(tr("Closing canceled"));
         return false; // failure of closing : cancellation
     }
 
     // Clear project
     m_loadedProject = nullptr;
-    debug(tr("Project closed"));
 
     // Clear view
     updateProjectView();
@@ -222,7 +216,7 @@ void GeneralWindow::on_actionNew_triggered()
     if (m_loadedProject == nullptr)
         return;
 
-    info(tr("Project created at %1").arg(projectDirectory));
+    Log::info(tr("Project created at %1").arg(projectDirectory));
     loadProject(projectDirectory);
 }
 
@@ -234,12 +228,14 @@ void GeneralWindow::on_actionOpen_triggered()
         return;
 
     // Ask where new is
-    QString projectDirectory = QFileDialog::getExistingDirectory(this, tr("Choose an existing project directory"));
-    if (projectDirectory == "")
+    QString projectFile =
+        QFileDialog::getOpenFileName(this, tr("Choose an existing project file"), "", tr("Dummy Project (*.xml)"));
+    if (projectFile == "")
         return;
 
     // Open new
-    loadProject(projectDirectory);
+    loadProject(projectFile);
+    Log::info(tr("Project %1 opened").arg(projectFile));
 }
 
 void GeneralWindow::on_actionSave_triggered()
@@ -252,7 +248,7 @@ void GeneralWindow::on_actionSave_triggered()
 
     // TODO: create a way to check the save action and get this info to
     // condition the output info
-    info(tr("Project saved"));
+    Log::info(tr("Project saved"));
 }
 
 void GeneralWindow::on_actionClose_triggered()
@@ -289,8 +285,9 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
 
     // update floor list
     m_ui->layer_list_tab->setEditorMap(*map);
-    connect(m_ui->layer_list_tab->model(), &MapFloorTreeModel::activeLayerChanged, this,
-            &GeneralWindow::activeLayerChanged);
+    const auto* floorTree = m_ui->layer_list_tab->model();
+    connect(floorTree, &MapFloorTreeModel::activeLayerChanged, this, &GeneralWindow::activeLayerChanged);
+    connect(floorTree, &MapFloorTreeModel::layerVisibilityChanged, this, &GeneralWindow::layerVisibilityChanged);
 
     m_mapTools.clear();
 
@@ -307,7 +304,6 @@ void GeneralWindow::activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_
 {
     if (type == eLayerType::Graphic) {
         m_ui->toolbar_mapTools->setEnabled(true);
-        m_ui->toolbar_mapTools->setEnabled(true);
         for (auto& layerWrap : m_mapScene.graphicLayers())
             if (layerWrap->isThisLayer(floorIdx, layerIdx))
                 m_mapTools.setActiveLayer(*layerWrap);
@@ -320,6 +316,20 @@ void GeneralWindow::activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_
 
     } else {
         m_ui->toolbar_mapTools->setEnabled(false);
+    }
+}
+
+void GeneralWindow::layerVisibilityChanged(bool newVisibility, eLayerType type, uint8_t floorIdx, uint8_t layerIdx)
+{
+    if (type == eLayerType::Graphic) {
+        for (auto& layerWrap : m_mapScene.graphicLayers())
+            if (layerWrap->isThisLayer(floorIdx, layerIdx))
+                layerWrap->setVisibility(newVisibility);
+
+    } else if (type == eLayerType::Blocking) {
+        for (auto& layerWrap : m_mapScene.blockingLayers())
+            if (layerWrap->isThisFloor(floorIdx))
+                layerWrap->setVisibility(newVisibility);
     }
 }
 

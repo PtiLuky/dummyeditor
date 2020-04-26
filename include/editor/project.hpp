@@ -43,9 +43,8 @@ public:
     static std::shared_ptr<Project> create(const QString& projectRootPath);
 
 private:
-    /*
-      void dumpToXmlNode(QDomDocument& document, QDomElement& xmlNode, const QStandardItem* modelItem);
-  */
+    void dumpToXmlNode(QDomDocument& document, QDomElement& xmlNode, const QStandardItem* modelItem);
+    void registerMaps(const QDomNode& mapsNode);
 
 private:
     Dummy::GameStatic m_game;
@@ -53,6 +52,7 @@ private:
 
     QString m_projectPath;
     std::unique_ptr<MapsTreeModel> m_mapsModel;
+    std::unordered_map<std::string, uint16_t> m_mapNameToId;
     std::shared_ptr<Dummy::Map> m_currMap;
 };
 

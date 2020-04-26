@@ -73,6 +73,7 @@ void LoggerFile::print(const std::string& message, eLogType type)
 ////////////////////////////////////////////////
 // fast access QString
 ////////////////////////////////////////////////
+namespace Log {
 
 void print(const std::string& message, eLogType type)
 {
@@ -103,4 +104,5 @@ void error(const QString& message)
     Logger::printAll(message.toStdString(), eLogType::ERROR);
 }
 
+} // namespace Log
 } // namespace Editor

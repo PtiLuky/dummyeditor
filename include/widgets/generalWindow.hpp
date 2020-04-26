@@ -54,6 +54,7 @@ private slots:
 
     void mapZoomTriggered(MapGraphicsScene::eZoom);
     void activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_t layerIdx);
+    void layerVisibilityChanged(bool newVisibility, eLayerType type, uint8_t floorIdx, uint8_t layerIdx);
 
 private:
     void closeEvent(QCloseEvent* event) override;

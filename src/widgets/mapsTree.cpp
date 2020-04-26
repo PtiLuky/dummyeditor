@@ -145,12 +145,9 @@ void MapsTreeView::showEditDlg()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-MapsTreeModel::MapsTreeModel(const Dummy::GameStatic& game)
+MapsTreeModel::MapsTreeModel(const QDomNode& mapsNode)
 {
-    for (const auto& map : game.mapsNames) {
-        QString mapName = QString::fromStdString(map);
-        invisibleRootItem()->appendRow(new QStandardItem(mapName));
-    }
+    XmlMapToQItem(mapsNode, invisibleRootItem());
 }
 
 void MapsTreeModel::XmlMapToQItem(const QDomNode& node, QStandardItem* parent)
