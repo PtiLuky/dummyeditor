@@ -256,6 +256,12 @@ void GeneralWindow::on_actionClose_triggered()
     closeProject();
 }
 
+void GeneralWindow::on_actionPlay_triggered()
+{
+    if (m_loadedProject)
+        m_loadedProject->testMap();
+}
+
 void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
 {
     // fetch map data
@@ -276,7 +282,7 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
         chipsets.push_back(chipPath);
     }
 
-    m_chipsetScene.setChipset(chipsets);
+    m_chipsetScene.setChipset(chipsets, map->chipsetsUsed());
     m_ui->graphicsViewChipset->viewport()->update();
 
     // update map scene
@@ -385,7 +391,7 @@ void GeneralWindow::on_actionZoomOut_triggered()
 }
 void GeneralWindow::on_actionResize_triggered()
 {
-    if (m_mapScene.height() == 0 || m_mapScene.width() == 0)
+    if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
         return;
 
     qreal minScale = std::min(m_ui->graphicsViewMap->height() / m_mapScene.height(),

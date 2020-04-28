@@ -35,7 +35,7 @@ void MapGraphicsScene::setMap(const Dummy::Map& map, const std::vector<QPixmap>&
     int zindex            = 0;
     const size_t nbFloors = map.floors().size();
     for (uint8_t i = 0; i < nbFloors; ++i) {
-        instantiateFloor(*map.floorAt(i), chipsets, i, zindex);
+        instantiateFloor(*map.floorAt(i), chipsets, map.chipsetsUsed(), i, zindex);
     }
 }
 
@@ -101,12 +101,13 @@ void MapGraphicsScene::clearGrid()
     m_gridItems.clear();
 }
 
-void MapGraphicsScene::instantiateFloor(Dummy::Floor& floor, const std::vector<QPixmap>& chips, uint8_t floorId,
-                                        int& zindex)
+void MapGraphicsScene::instantiateFloor(Dummy::Floor& floor, const std::vector<QPixmap>& chips,
+                                        const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorId, int& zindex)
 {
     // Add graphic layers
     for (uint8_t i = 0; i < floor.graphicLayers().size(); ++i) {
-        auto pGraphicLayer = std::make_unique<LayerGraphicItems>(floor.graphicLayersAt(i), chips, floorId, i, ++zindex);
+        auto pGraphicLayer =
+            std::make_unique<LayerGraphicItems>(floor.graphicLayersAt(i), chips, chipsetIds, floorId, i, ++zindex);
         addItem(pGraphicLayer->graphicItems());
         m_visibleLayers.push_back(std::move(pGraphicLayer));
     }

@@ -1,4 +1,5 @@
 build/
+exe/
 CMakeLists.txt.user
 *.pro.user
 *.user.*

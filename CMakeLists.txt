@@ -16,6 +16,8 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/exe)
+
 # enable a sub-cmake
 add_subdirectory("submodules/dummyRPG")
 

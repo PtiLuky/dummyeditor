@@ -93,7 +93,12 @@ void MapsTreeView::createMap(int result)
         return;
 
     tMapInfo mapInfo;
-    mapInfo.m_mapName     = m_newMapDialog->getMapName().toStdString();
+    QString mapName = Project::sanitizeMapName(m_newMapDialog->getMapName());
+
+    if (m_project->mapExists(mapName))
+        return;
+
+    mapInfo.m_mapName     = mapName.toStdString();
     mapInfo.m_chispetPath = m_newMapDialog->getChipset().toStdString();
     mapInfo.m_musicPath   = m_newMapDialog->getMusic().toStdString();
     mapInfo.m_width       = m_newMapDialog->getWidth();

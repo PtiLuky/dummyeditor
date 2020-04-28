@@ -42,14 +42,17 @@ private:
 class LayerGraphicItems : public MapSceneLayer
 {
 public:
-    explicit LayerGraphicItems(Dummy::GraphicLayer& layer, const std::vector<QPixmap>& chipses, uint8_t floorIdx,
-                               uint8_t layerIdx, int zIndex);
+    explicit LayerGraphicItems(Dummy::GraphicLayer& layer, const std::vector<QPixmap>& chipses,
+                               const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorIdx, uint8_t layerIdx,
+                               int zIndex);
     void setTile(Dummy::Coord, Dummy::Tileaspect);
     const Dummy::GraphicLayer& layer();
 
 private:
+    size_t idxOfId(Dummy::chip_id);
     Dummy::GraphicLayer& m_graphicLayer;
     const std::vector<QPixmap> m_chipsets;
+    const std::vector<Dummy::chip_id> m_chipsetIds;
 };
 
 //////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 #include "editor/project.hpp"
 
 #include <QDir>
+#include <QProcess>
 #include <algorithm>
 #include <fstream>
 
@@ -69,6 +70,23 @@ MapsTreeModel* Project::mapsModel() const
 const Dummy::Map* Project::currMap() const
 {
     return m_currMap.get();
+}
+
+void Project::testMap()
+{
+    if (m_currMapName.isNull())
+        return;
+
+    saveCurrMap();
+#if _WIN32
+    QString playerProgram = "player.exe";
+#else
+    QString playerProgram = "player";
+#endif
+    QStringList arguments;
+    arguments << m_projectPath << m_currMapName;
+    QProcess* myProcess = new QProcess();
+    myProcess->start(playerProgram, arguments);
 }
 
 std::shared_ptr<Project> Project::create(const QString& projectRootPath)
@@ -179,9 +197,12 @@ void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
     if (m_mapsModel == nullptr)
         return;
 
+    if (mapExists(QString::fromStdString(mapInfo.m_mapName)))
+        return;
+
     const uint16_t w            = mapInfo.m_width;
     const uint16_t h            = mapInfo.m_height;
-    const QString mapName       = QString::fromStdString(mapInfo.m_mapName);
+    const QString mapName       = sanitizeMapName(QString::fromStdString(mapInfo.m_mapName));
     const Dummy::char_id chipId = m_game.registerChipset(mapInfo.m_chispetPath);
 
     if (m_currMap != nullptr)
@@ -215,6 +236,21 @@ bool Project::loadMap(const QString& mapName)
         Log::error(QObject::tr("Error while loading the map %1").arg(mapPath));
 
     return bRes;
+}
+
+bool Project::mapExists(const QString& mapName)
+{
+    std::string strName = mapName.toStdString();
+    return m_mapNameToId.find(strName) != m_mapNameToId.end();
+}
+
+QString Project::sanitizeMapName(const QString& unsafeName)
+{
+    QString safeName = unsafeName;
+    safeName.remove(QRegularExpression(QString::fromUtf8("[`~!@#$%\\^&*€”+=|:.;<>«»,?/{}'\"\\\\]")));
+    if (safeName.isNull())
+        safeName = "new_map";
+    return safeName;
 }
 
 } // namespace Editor

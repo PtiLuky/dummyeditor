@@ -58,7 +58,8 @@ signals:
     void zooming(eZoom);
 
 private:
-    void instantiateFloor(Dummy::Floor&, const std::vector<QPixmap>& chips, uint8_t floorId, int& zIdxInOut);
+    void instantiateFloor(Dummy::Floor&, const std::vector<QPixmap>& chips,
+                          const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorId, int& zIdxInOut);
 
     // Layers
     vec_uniq<LayerGraphicItems> m_visibleLayers;

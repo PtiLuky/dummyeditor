@@ -73,13 +73,15 @@ void ChipsetGraphicsScene::setGridVisible(bool visible)
         m_gridItems.clear();
 }
 
-void ChipsetGraphicsScene::setChipset(const std::vector<QString>& chipsetPaths)
+void ChipsetGraphicsScene::setChipset(const std::vector<QString>& chipsetPaths,
+                                      const std::vector<Dummy::chip_id>& chipsetIds)
 {
     clear();
 
     // TODO handle several chipsets
 
     m_chipset = QPixmap(chipsetPaths[0]);
+    m_currId  = chipsetIds[0];
     addPixmap(m_chipset);
     setSelectRect(QRect(0, 0, 0, 0));
     drawGrid();

@@ -38,11 +38,13 @@ bool MapSceneLayer::isThisLayer(uint8_t floorIdx, uint8_t layerIdx) const
 
 //////////////////////////////////////////////////////////////////////////////
 
-LayerGraphicItems::LayerGraphicItems(Dummy::GraphicLayer& layer, const std::vector<QPixmap>& chipsets, uint8_t floorIdx,
-                                     uint8_t layerIdx, int zIndex)
+LayerGraphicItems::LayerGraphicItems(Dummy::GraphicLayer& layer, const std::vector<QPixmap>& chipsets,
+                                     const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorIdx, uint8_t layerIdx,
+                                     int zIndex)
     : MapSceneLayer(floorIdx, layerIdx, zIndex)
     , m_graphicLayer(layer)
     , m_chipsets(chipsets)
+    , m_chipsetIds(chipsetIds)
 {
     const size_t nbCells = layer.size();
     indexedItems().resize(nbCells);
@@ -70,10 +72,11 @@ void LayerGraphicItems::setTile(Dummy::Coord coord, Dummy::Tileaspect aspect)
         indexedItems()[index] = nullptr;
     }
 
-    if (aspect == Dummy::undefAspect || aspect.chipId >= m_chipsets.size()) {
+    size_t idxOfChip = idxOfId(aspect.chipId);
+    if (aspect == Dummy::undefAspect || idxOfChip >= m_chipsets.size()) {
         m_graphicLayer.set(coord, Dummy::undefAspect);
     } else {
-        const QPixmap& chip = m_chipsets[aspect.chipId];
+        const QPixmap& chip = m_chipsets[idxOfChip];
         indexedItems()[index] =
             new QGraphicsPixmapItem(chip.copy(QRect(aspect.x * CELL_W, aspect.y * CELL_H, CELL_W, CELL_H)));
         indexedItems()[index]->setPos(coord.x * CELL_W, coord.y * CELL_H);
@@ -86,6 +89,15 @@ void LayerGraphicItems::setTile(Dummy::Coord coord, Dummy::Tileaspect aspect)
 const Dummy::GraphicLayer& LayerGraphicItems::layer()
 {
     return m_graphicLayer;
+}
+
+size_t LayerGraphicItems::idxOfId(Dummy::chip_id id)
+{
+    for (size_t i = 0; i < m_chipsetIds.size(); ++i)
+        if (id == m_chipsetIds[i])
+            return i;
+
+    return static_cast<size_t>(-1);
 }
 
 //////////////////////////////////////////////////////////////////////////////

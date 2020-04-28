@@ -32,6 +32,8 @@ public:
     MapsTreeModel* mapsModel() const;
     const Dummy::Map* currMap() const;
 
+    void testMap();
+
     // Setters
     void setModified(bool isModified) { m_isModified = isModified; }
 
@@ -40,6 +42,9 @@ public:
     bool saveCurrMap();
     void createMap(const tMapInfo& mapInfo, QStandardItem& parent);
     bool loadMap(const QString& mapName);
+    bool mapExists(const QString& mapName);
+
+    static QString sanitizeMapName(const QString& unsafeName);
 
     static std::shared_ptr<Project> create(const QString& projectRootPath);
 

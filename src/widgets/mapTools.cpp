@@ -183,8 +183,7 @@ void MapTools::drawVisible(const QRect& region)
     if (chipsetSelection.isNull())
         return;
 
-    // TODO find right ChipsetId
-    Dummy::chip_id chipId = 0;
+    Dummy::chip_id chipId = m_chipsetScene.currId();
 
     tVisibleClipboard toDraw;
     toDraw.width  = static_cast<quint16>(region.width()) / CELL_W;
