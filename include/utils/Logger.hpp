@@ -2,7 +2,6 @@
 #define LOGGER_HPP
 
 #include <QFile>
-#include <QString>
 #include <QTextStream>
 #include <memory>
 #include <vector>
@@ -15,7 +14,7 @@
  *
  */
 
-namespace Log {
+namespace Editor {
 enum class eLogType
 {
     DEBUG,       // to help developpers only
@@ -63,6 +62,7 @@ private:
 //////////////////////////
 // Fast access methods
 
+namespace Log {
 void print(const std::string& message, eLogType type);
 void print(const QString& message, eLogType type);
 
@@ -70,8 +70,9 @@ void debug(const QString& message);
 void log(const QString& message);
 void info(const QString& message);
 void error(const QString& message);
-
-
 } // namespace Log
+
+
+} // namespace Editor
 
 #endif // LOGGER_HPP

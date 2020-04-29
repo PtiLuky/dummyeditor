@@ -1,104 +1,122 @@
 #include "editor/project.hpp"
 
-#include <algorithm>
-
 #include <QDir>
-#include <QObject>
+#include <QProcess>
+#include <algorithm>
+#include <fstream>
 
-#include "editor/layerBlocking.hpp"
-#include "editor/layerEvents.hpp"
-#include "editor/layerGraphic.hpp"
-#include "editor/map.hpp"
-#include "mapsTree.hpp"
-#include "utils/Logger.hpp"
-#include "utils/mapDocument.hpp"
+#include "dummyrpg/serialize.hpp"
+#include "utils/logger.hpp"
+#include "widgets/mapsTree.hpp"
 
 using std::make_shared;
 using std::make_unique;
 
+static const char* const PROJECT_FILE_NAME = "dummy-rpg-project.xml";
+static const char* const DATA_FILE_NAME    = "game-data.gdummy";
+static const char* const MAP_FILE_EXT      = ".mdummy";
+
 namespace Editor {
 
-Project::Project(const std::string& projectFolder)
-    : m_projectPath(projectFolder)
+Project::Project(const QString& projectFile)
 {
     // Try to read the "project.xml" file that should be present in folderPath.
-    QFile xmlProjectFile((m_projectPath / "project.xml").string().c_str());
-    m_domDocument.setContent(&xmlProjectFile);
-    xmlProjectFile.close();
+    QFileInfo fileInfo(projectFile);
+    QFile xmlProjectFile(projectFile);
+    QDomDocument projectDom;
+    projectDom.setContent(&xmlProjectFile);
 
-    QDomNodeList mapsNodes = m_domDocument.documentElement().elementsByTagName("maps");
+    QDomNodeList mapsNodes = projectDom.documentElement().elementsByTagName("maps");
+    std::unique_ptr<MapsTreeModel> mapsTree;
 
     if (mapsNodes.length() > 0) {
-        m_mapsModel = make_unique<MapsTreeModel>(mapsNodes.at(0));
+        auto mapsNode = mapsNodes.at(0);
+        mapsTree      = make_unique<MapsTreeModel>(mapsNode);
+        registerMaps(mapsNode);
     } else {
-        // XXX: Throw exception?
+        QDomNode fakeMapsList;
+        mapsTree = make_unique<MapsTreeModel>(fakeMapsList);
     }
 
-    QDomNodeList startingPositionNodes = m_domDocument.documentElement().elementsByTagName("starting_point");
 
-    if (startingPositionNodes.length() > 0) {
-        const QDomNode& startingPositionNode(startingPositionNodes.at(0));
-        const QDomNamedNodeMap& attributes(startingPositionNode.attributes());
-        m_startingPoint = StartingPoint(attributes.namedItem("map").nodeValue().toStdString().c_str(),
-                                        attributes.namedItem("x").nodeValue().toUShort(),
-                                        attributes.namedItem("y").nodeValue().toUShort(),
-                                        attributes.namedItem("floor").nodeValue().toUShort());
+    Dummy::GameStatic newGameData;
+    std::ifstream gameDataFile((fileInfo.path() + "/" + DATA_FILE_NAME).toStdString(), std::ios::binary);
+    if (gameDataFile.good()) {
+        bool bRes = Dummy::Serializer::parseGameFromFile(gameDataFile, newGameData);
+        if (! bRes)
+            Log::error("Error while loading game data");
     }
+
+    m_mapsModel   = std::move(mapsTree);
+    m_game        = newGameData;
+    m_projectPath = fileInfo.path();
 }
 
-MapsTreeModel* Project::mapsModel()
+const QString& Project::projectPath() const
+{
+    return m_projectPath;
+}
+
+const Dummy::GameStatic& Project::game() const
+{
+    return m_game;
+}
+
+MapsTreeModel* Project::mapsModel() const
 {
     return m_mapsModel.get();
 }
 
-QMap<QString, std::shared_ptr<MapDocument>> Project::openedMaps() const
+const Dummy::Map* Project::currMap() const
 {
-    return m_openedMaps;
+    return m_currMap.get();
 }
 
-void Project::setStartingPoint(const StartingPoint& startingPoint)
+void Project::testMap()
 {
-    m_startingPoint = startingPoint;
+    if (m_currMapName.isNull())
+        return;
+
+    saveCurrMap();
+#if _WIN32
+    QString playerProgram = "player.exe";
+#else
+    QString playerProgram = "player";
+#endif
+    QStringList arguments;
+    arguments << m_projectPath << m_currMapName;
+    QProcess* myProcess = new QProcess();
+    myProcess->start(playerProgram, arguments);
 }
 
-void Project::create(const QString& folder)
+std::shared_ptr<Project> Project::create(const QString& projectRootPath)
 {
-    createXmlProjectFile(folder);
-    createFolders(folder);
-}
+    // Check folder exists and is empty
+    const QDir projectDir(projectRootPath);
+    if (! projectDir.exists()) {
+        Log::error(QObject::tr("Project directory does not exist: %1").arg(projectDir.absolutePath()));
+        return nullptr;
+    }
+    if (! projectDir.isEmpty()) {
+        Log::error(QObject::tr("Project directory must be empty: %1").arg(projectDir.absolutePath()));
+        return nullptr;
+    }
 
-void Project::createXmlProjectFile(const QString& folder)
-{
-    QFile projectFile(folder + "/" + "project.xml");
+    // Create subfolders
+    projectDir.mkdir("maps");
+    projectDir.mkdir("images");
+    projectDir.mkdir("fonts");
+    projectDir.mkdir("sounds");
+
+    // Create DummyRPG Editor project file
+    QFile projectFile(projectDir.filePath(PROJECT_FILE_NAME));
     projectFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&projectFile);
-    const int indent = 4;
-    out << createXmlProjectTree().toString(indent);
-    projectFile.close();
-}
+    if (! projectFile.isOpen()) {
+        Log::error(QObject::tr("Could not create project file: %1").arg(projectFile.fileName()));
+        return nullptr;
+    }
 
-QDomDocument Project::createXmlProjectTree()
-{
-    QDomDocument doc;
-    QDomElement project = doc.createElement("project");
-    QDomElement maps    = doc.createElement("maps");
-
-    doc.appendChild(project);
-    project.appendChild(maps);
-
-    return doc;
-}
-
-void Project::createFolders(const QString& baseFolder)
-{
-    std::vector<QString> folders {"maps", "chipsets", "sounds"};
-    std::for_each(folders.begin(), folders.end(), [&baseFolder](const QString& folder) {
-        QDir dir(baseFolder + "/" + folder);
-        if (! dir.exists()) {
-            dir.mkpath(".");
-        }
-        Log::info(QObject::tr("create folder ") + folder);
-    });
+    return std::make_shared<Project>(projectRootPath);
 }
 
 void Project::saveProject()
@@ -109,29 +127,37 @@ void Project::saveProject()
 
     doc.appendChild(projectNode);
     projectNode.appendChild(mapsNode);
-
-    QDomElement startingPointNode = doc.createElement("starting_point");
-    startingPointNode.setAttribute("map", m_startingPoint.mapName());
-    startingPointNode.setAttribute("x", m_startingPoint.x());
-    startingPointNode.setAttribute("y", m_startingPoint.y());
-    startingPointNode.setAttribute("floor", static_cast<uint16_t>(m_startingPoint.floor()));
-    projectNode.appendChild(startingPointNode);
-
     dumpToXmlNode(doc, mapsNode, m_mapsModel->invisibleRootItem());
-    QString xmlPath((m_projectPath / "project.xml").string().c_str());
 
-    // XXX: Handle errors eventually.
-    QFile file(xmlPath);
+    QFile file(m_projectPath + "/" + PROJECT_FILE_NAME);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream stream(&file);
     const int indent = 4;
     doc.save(stream, indent);
 
-    if (openedMaps().count() > 0) {
-        for (auto e : openedMaps().keys()) {
-            document(e).m_map->save();
-        }
+    bool bRes;
+    std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
+    bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
+    if (! bRes)
+        Log::error("Error while saving the game data...");
+
+    bRes = saveCurrMap();
+    if (! bRes)
+        Log::error("Error while saving the map...");
+}
+
+bool Project::saveCurrMap()
+{
+    if (m_currMap == nullptr) {
+        Log::error("No current map to save");
+        return false;
     }
+
+    QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
+    std::ofstream mapDataFile(mapPath.toStdString(), std::ios::binary);
+    bool bRes = Dummy::Serializer::serializeMapToFile(*m_currMap, mapDataFile);
+
+    return bRes;
 }
 
 void Project::dumpToXmlNode(QDomDocument& doc, QDomElement& xmlNode, const QStandardItem* modelItem)
@@ -149,11 +175,21 @@ void Project::dumpToXmlNode(QDomDocument& doc, QDomElement& xmlNode, const QStan
     }
 }
 
-void Project::cleanMapName(QString& mapName)
+void Project::registerMaps(const QDomNode& mapsNode)
 {
-    mapName.replace("\\", "");
-    mapName.replace("/", "");
-    mapName.replace("..", "");
+    const auto& children = mapsNode.childNodes();
+    int nbChildren       = children.count();
+
+    for (int i = 0; i < nbChildren; ++i) {
+        const auto& n = children.at(i);
+
+        if (n.nodeName() == "map") {
+            std::string mapName = n.attributes().namedItem("name").nodeValue().toStdString();
+            m_mapNameToId.insert({mapName, static_cast<uint16_t>(m_game.mapsNames.size())});
+            m_game.mapsNames.push_back(mapName);
+            registerMaps(n);
+        }
+    }
 }
 
 void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
@@ -161,49 +197,60 @@ void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
     if (m_mapsModel == nullptr)
         return;
 
-    const uint16_t w      = mapInfo.m_width;
-    const uint16_t h      = mapInfo.m_height;
-    const QString mapName = QString::fromStdString(mapInfo.m_mapName);
+    if (mapExists(QString::fromStdString(mapInfo.m_mapName)))
+        return;
 
-    auto map = make_shared<Editor::Map>(m_projectPath, mapInfo.m_mapName);
-    map->setChipset(mapInfo.m_chispetPath);
-    map->setMusic(mapInfo.m_musicPath);
-    map->reset(w, h);
+    const uint16_t w            = mapInfo.m_width;
+    const uint16_t h            = mapInfo.m_height;
+    const QString mapName       = sanitizeMapName(QString::fromStdString(mapInfo.m_mapName));
+    const Dummy::char_id chipId = m_game.registerChipset(mapInfo.m_chispetPath);
 
-    // For now, create one floor with four layers.
-    // The layers will have for position :
-    // -1 (the lowest one)
-    // 0 (the one juste below the character)
-    // 1 (the one juste above the character)
-    // 2 (another one above)
-    Dummy::Local::Floor floor(*map);
-    floor.addGraphicLayer(-1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(0, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(1, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
-    floor.addGraphicLayer(2, Dummy::Core::GraphicLayer(w, h, {-1, -1}));
+    if (m_currMap != nullptr)
+        saveCurrMap();
 
-    map->addFloor(make_unique<Editor::Floor>(floor));
-    map->resize(w, h);
-    map->save();
+    m_currMap     = make_shared<Dummy::Map>(w, h, chipId);
+    m_currMapName = mapName;
 
     // Add the new map into the tree.
     QList<QStandardItem*> mapRow {new QStandardItem(mapName)};
     parent.appendRow(mapRow);
+
+    saveProject();
 }
 
-const MapDocument& Project::document(const QString& mapName)
+bool Project::loadMap(const QString& mapName)
 {
-    QString cleantMapname(mapName);
-    cleanMapName(cleantMapname);
+    if (mapName == m_currMapName)
+        return true;
 
-    if (! m_openedMaps.contains(cleantMapname)) {
-        auto map = make_shared<Editor::Map>(m_projectPath, cleantMapname.toStdString());
-        map->load();
+    if (m_currMap != nullptr)
+        saveCurrMap();
 
-        auto mapDocument = make_shared<MapDocument>(*this, cleantMapname, map);
+    m_currMap     = make_shared<Dummy::Map>();
+    m_currMapName = mapName;
 
-        m_openedMaps.insert(cleantMapname, mapDocument);
-    }
-    return *(m_openedMaps[cleantMapname]);
+    QString mapPath = m_projectPath + "/maps/" + mapName + MAP_FILE_EXT;
+    std::ifstream mapDataFile(mapPath.toStdString(), std::ios::binary);
+    bool bRes = Dummy::Serializer::parseMapFromFile(mapDataFile, *m_currMap);
+    if (! bRes)
+        Log::error(QObject::tr("Error while loading the map %1").arg(mapPath));
+
+    return bRes;
 }
+
+bool Project::mapExists(const QString& mapName)
+{
+    std::string strName = mapName.toStdString();
+    return m_mapNameToId.find(strName) != m_mapNameToId.end();
+}
+
+QString Project::sanitizeMapName(const QString& unsafeName)
+{
+    QString safeName = unsafeName;
+    safeName.remove(QRegularExpression(QString::fromUtf8("[`~!@#$%\\^&*€”+=|:.;<>«»,?/{}'\"\\\\]")));
+    if (safeName.isNull())
+        safeName = "new_map";
+    return safeName;
+}
+
 } // namespace Editor

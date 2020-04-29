@@ -2,21 +2,13 @@
 #define EDITORPROJECT_H
 
 #include <QDomDocument>
-#include <QMap>
-#include <filesystem>
-#include <memory>
+#include <QStandardItem>
+#include <QString>
 
-#include "editor/startingPoint.hpp"
-#include "mapsTree.hpp"
-
-//////////////////////////////////////////////////////////////////////////////
-//  forward declaration
-//////////////////////////////////////////////////////////////////////////////
-
-struct MapDocument;
+#include "dummyrpg/game.hpp"
 
 namespace Editor {
-class StartingPoint;
+class MapsTreeModel;
 
 //////////////////////////////////////////////////////////////////////////////
 //  Project class
@@ -33,39 +25,42 @@ struct tMapInfo
 class Project
 {
 public:
-    explicit Project(const std::string& folder);
+    explicit Project(const QString& folder);
 
-    // Getters
-    MapsTreeModel* mapsModel();
-    const std::filesystem::path& projectPath() const { return m_projectPath; }
-    const MapDocument& document(const QString& mapName);
-    QMap<QString, std::shared_ptr<MapDocument>> openedMaps() const;
+    const QString& projectPath() const;
+    const Dummy::GameStatic& game() const;
+    MapsTreeModel* mapsModel() const;
+    const Dummy::Map* currMap() const;
+
+    void testMap();
 
     // Setters
     void setModified(bool isModified) { m_isModified = isModified; }
-    void setStartingPoint(const StartingPoint&);
 
     // Utils
     void saveProject();
-    static void create(const QString&);
-    static void cleanMapName(QString& mapName);
+    bool saveCurrMap();
     void createMap(const tMapInfo& mapInfo, QStandardItem& parent);
+    bool loadMap(const QString& mapName);
+    bool mapExists(const QString& mapName);
+
+    static QString sanitizeMapName(const QString& unsafeName);
+
+    static std::shared_ptr<Project> create(const QString& projectRootPath);
 
 private:
     void dumpToXmlNode(QDomDocument& document, QDomElement& xmlNode, const QStandardItem* modelItem);
-
-    static QDomDocument createXmlProjectTree();
-    static void createXmlProjectFile(const QString&);
-    static void createFolders(const QString&);
+    void registerMaps(const QDomNode& mapsNode);
 
 private:
-    std::filesystem::path m_projectPath;
-    QDomDocument m_domDocument;
-    std::unique_ptr<MapsTreeModel> m_mapsModel;
+    Dummy::GameStatic m_game;
     bool m_isModified = false;
-    StartingPoint m_startingPoint;
 
-    QMap<QString, std::shared_ptr<MapDocument>> m_openedMaps;
+    QString m_projectPath;
+    QString m_currMapName;
+    std::unique_ptr<MapsTreeModel> m_mapsModel;
+    std::unordered_map<std::string, uint16_t> m_mapNameToId;
+    std::shared_ptr<Dummy::Map> m_currMap;
 };
 
 } // namespace Editor
