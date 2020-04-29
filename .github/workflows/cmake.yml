@@ -1,0 +1,119 @@
+name: C++ Build
+
+on:
+  push:
+    paths:
+    - '.github/workflows/cmake.yml'
+    - 'forms/**'
+    - 'include/**'
+    - 'src/**'
+    - 'submodules/**'
+
+# Env variables
+env:
+  BUILD_TYPE: Release
+  
+jobs:
+  # Build for windows and mac (without sonar scanner)
+  build-win-mac:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "Windows (build)"
+            os: windows-latest
+            sfmlbin: "https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip"
+            archvieName: "SFML-2.5.1.zip"
+            uncompressCmd: "unzip SFML-2.5.1.zip -d ."
+            # Disable macOS build for the moment, SFML is getting harder to install and I don't have a Mac to test
+#          - name: "Mac"
+#            os: macOS-latest
+#            sfmlbin: "https://www.sfml-dev.org/files/SFML-2.5.1-macOS-clang.tar.gz"
+#            archvieName: "SFML-2.5.1.zip.tar.gz"
+#            uncompressCmd: "tar -xf SFML-2.5.1.zip.tar.gz && mv SFML-2.5.1-macos-clang SFML-2.5.1"
+      
+    steps:        
+    - uses: actions/checkout@v2
+
+    - name: Create Lib Environment
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+        mkdir libs
+        cd libs
+        curl -o  ${{ matrix.config.archvieName }} ${{ matrix.config.sfmlbin }}
+        ${{ matrix.config.uncompressCmd }}
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+      
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSFML_DIR:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1/lib/cmake/SFML -DSFML_ROOT:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1
+  
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+      
+      
+  # Build for Linux (with sonar scanner)
+  build-linux:
+    name: " Linux (build) and Sonar scan"
+    runs-on: [ubuntu-latest]
+      
+    steps:        
+    - uses: actions/checkout@v2
+
+    - name: Create Lib Environment
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+        mkdir libs
+        cd libs
+        wget -O SFML-2.5.1.zip "https://www.sfml-dev.org/files/SFML-2.5.1-linux-gcc-64-bit.tar.gz"
+        tar -xf SFML-2.5.1.zip
+
+    - name: Install Qt
+      shell: bash
+      run: |
+        apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+        apt-get install qt5-default qttools5-dev-tools
+        
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+    
+    - name: Configure Sonar
+      shell: bash
+      run: |
+        export SONAR_SCANNER_VERSION=4.2.0.1873
+        export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
+        curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip 
+        unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+        mv $SONAR_SCANNER_HOME $HOME/.sonar/sonar
+        curl --create-dirs -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+        unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+      
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSFML_DIR:PATH=${{runner.workspace}}/libs/SFML-2.5.1/lib/cmake/SFML -DSFML_ROOT:PATH=${{runner.workspace}}/libs/SFML-2.5.1
+  
+    - name: Build with sonar observer
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: $HOME/.sonar/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build . --config $BUILD_TYPE
+
+    - name: Sonar scanner
+      env:
+        SONAR_SCANNER_OPTS: -server
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      shell: bash
+      run: $HOME/.sonar/sonar/bin/sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.cfamily.build-wrapper-output=${{runner.workspace}}/build/bw-output -Dsonar.junit.reportPaths=${{runner.workspace}}/build/output-tests.txt
