@@ -22,6 +22,9 @@ Project::Project(const QString& projectFile)
 {
     // Try to read the "project.xml" file that should be present in folderPath.
     QFileInfo fileInfo(projectFile);
+    if(fileInfo.isDir())
+      fileInfo = QFileInfo(projectFile + "/" + PROJECT_FILE_NAME);
+
     QFile xmlProjectFile(projectFile);
     QDomDocument projectDom;
     projectDom.setContent(&xmlProjectFile);

@@ -91,10 +91,11 @@ void MapEditDialog::on_pushButtonBrowseChipset_clicked()
         return;
 
     // If user has selected several files, we only use the first one
-    QString selectedChipset     = dlg.selectedFiles().at(0);
-    int indexOfFileNameInString = selectedChipset.indexOf(m_chipsetPath);
+
+    QString selectedChipset     = QDir::cleanPath(dlg.selectedFiles().at(0));
+    int indexOfFileNameInString = selectedChipset.indexOf(QDir::cleanPath(m_chipsetPath));
     if (indexOfFileNameInString < 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Please select a chipset inside the 'chipset' folder."));
+        QMessageBox::critical(this, tr("Error"), tr("Please select a chipset inside the 'images' folder."));
     } else {
         m_ui->lineEditChipset->setText(selectedChipset.mid(indexOfFileNameInString + 1 + m_chipsetPath.size()));
     }

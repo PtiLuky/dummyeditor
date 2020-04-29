@@ -217,7 +217,9 @@ void GeneralWindow::on_actionNew_triggered()
         return;
 
     Log::info(tr("Project created at %1").arg(projectDirectory));
-    loadProject(projectDirectory);
+
+    // Update the view
+    updateProjectView();
 }
 
 void GeneralWindow::on_actionOpen_triggered()
