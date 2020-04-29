@@ -93,7 +93,8 @@ const Dummy::GraphicLayer& LayerGraphicItems::layer()
 
 size_t LayerGraphicItems::idxOfId(Dummy::chip_id id)
 {
-    for (size_t i = 0; i < m_chipsetIds.size(); ++i)
+    const size_t nbOfChips = m_chipsetIds.size();
+    for (size_t i = 0; i < nbOfChips; ++i)
         if (id == m_chipsetIds[i])
             return i;
 

@@ -105,16 +105,19 @@ void MapGraphicsScene::instantiateFloor(Dummy::Floor& floor, const std::vector<Q
                                         const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorId, int& zindex)
 {
     // Add graphic layers
-    for (uint8_t i = 0; i < floor.graphicLayers().size(); ++i) {
+    const size_t nbFloors = floor.graphicLayers().size();
+    for (uint8_t i = 0; i < nbFloors; ++i) {
+        ++zindex;
         auto pGraphicLayer =
-            std::make_unique<LayerGraphicItems>(floor.graphicLayersAt(i), chips, chipsetIds, floorId, i, ++zindex);
+            std::make_unique<LayerGraphicItems>(floor.graphicLayersAt(i), chips, chipsetIds, floorId, i, zindex);
         addItem(pGraphicLayer->graphicItems());
         m_visibleLayers.push_back(std::move(pGraphicLayer));
     }
 
     // Add 1 blocking layer
     {
-        auto pBlockingLayer = std::make_unique<LayerBlockingItems>(floor.blockingLayer(), floorId, 0, ++zindex);
+        ++zindex;
+        auto pBlockingLayer = std::make_unique<LayerBlockingItems>(floor.blockingLayer(), floorId, 0, zindex);
         addItem(pBlockingLayer->graphicItems());
         m_blockingLayers.push_back(std::move(pBlockingLayer));
     }

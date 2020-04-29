@@ -425,8 +425,8 @@ void MapTools::redo()
 
 MapTools::CommandPaint::CommandPaint(MapTools& parent, QPoint&& pxCoord, tVisibleClipboard&& clip)
     : m_parent(parent)
-    , m_position(pxCoord)
-    , m_toDraw(clip)
+    , m_position(std::move(pxCoord))
+    , m_toDraw(std::move(clip))
 {}
 
 void MapTools::CommandPaint::execute()
@@ -467,8 +467,8 @@ void MapTools::CommandPaint::undo()
 
 MapTools::CommandPaintBlocking::CommandPaintBlocking(MapTools& parent, QPoint&& pxCoord, tBlockingClipboard&& clip)
     : m_parent(parent)
-    , m_position(pxCoord)
-    , m_toDraw(clip)
+    , m_position(std::move(pxCoord))
+    , m_toDraw(std::move(clip))
 {}
 
 void MapTools::CommandPaintBlocking::execute()

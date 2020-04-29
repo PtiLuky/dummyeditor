@@ -89,7 +89,10 @@ void debug(const QString& message)
     Logger::printAll(message.toStdString(), eLogType::DEBUG);
 }
 #else
-void debug(const QString&) {}
+void debug(const QString&)
+{
+    // Don't print debug messages out of debug compilation
+}
 #endif // QT_DEBUT
 void log(const QString& message)
 {

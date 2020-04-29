@@ -78,7 +78,7 @@ void Project::testMap()
         return;
 
     saveCurrMap();
-#if _WIN32
+#ifdef _WIN32
     QString playerProgram = "player.exe";
 #else
     QString playerProgram = "player";
@@ -135,9 +135,8 @@ void Project::saveProject()
     const int indent = 4;
     doc.save(stream, indent);
 
-    bool bRes;
     std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
-    bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
+    bool bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
     if (! bRes)
         Log::error("Error while saving the game data...");
 
@@ -247,7 +246,7 @@ bool Project::mapExists(const QString& mapName)
 QString Project::sanitizeMapName(const QString& unsafeName)
 {
     QString safeName = unsafeName;
-    safeName.remove(QRegularExpression(QString::fromUtf8("[`~!@#$%\\^&*€”+=|:.;<>«»,?/{}'\"\\\\]")));
+    safeName.remove(QRegularExpression(QString::fromUtf8(R"([`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
     if (safeName.isNull())
         safeName = "new_map";
     return safeName;
