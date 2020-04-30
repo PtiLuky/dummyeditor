@@ -60,12 +60,56 @@ jobs:
       run: |
         export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSFML_DIR:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1/lib/cmake/SFML -DSFML_ROOT:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1
-  
+
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
-      
+
+    - name: Deploy
+      working-directory: ${{runner.workspace}}/dummyeditor
+      shell: bash
+      if: contains(github.ref, 'release')
+      run: |
+        mkdir dummyEditor
+        mv exe/Release/dummyeditor.exe dummyEditor/
+        mv exe/Release/player.exe dummyEditor/
+        export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
+        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin/. dummyEditor/
+        cp -R exe/Resources dummyEditor/
+        export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
+        windeployqt dummyEditor/dummyeditor.exe
+
+    - name: Create Zip File
+      working-directory: ${{runner.workspace}}/dummyeditor
+      shell: powershell
+      if: contains(github.ref, 'release')
+      run: |
+        Compress-Archive dummyEditor dummyEditor.zip
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      if: contains(github.ref, 'release')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: true
+        prerelease: true
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      if: contains(github.ref, 'release')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{runner.workspace}}/dummyeditor/dummyEditor.zip
+        asset_name: dummyEditorWindows.zip
+        asset_content_type: application/zip
       
   # Build for Linux (with sonar scanner)
   build-linux:
