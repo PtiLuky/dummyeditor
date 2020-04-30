@@ -33,11 +33,18 @@ from this Editor yet.
 
 ## How to try DummyRPG?
 
-For the moment you will have to build it from sources, see below "Install from sources".
+You can find a .zip to extract and execute for **Windows only**:
+* [Go to the Releases page](https://github.com/PtiLuky/dummyeditor/releases/) to find the last release. Download **dummyEditorWindows.zip**.
+* Extract it somewhere
+* Run dummyeditor.exe
+  * If an error occures, try install VC runtime by running **vc_redist.x64.exe** before and then try again to run dummyeditor.exe
+
+
+For other platerforms you will have to build it from sources, see below "Install from sources".
 |  Platerform | build from source  | install from exe  |
 |:-:|:-:|:-:|
 | Linux  |  **Yes** |  not planned |
-| Windows  | **Yes**  |  soon |
+| Windows  | **Yes**  |  **Yess** |
 | Mac  |  (Unknown) | not planned  |
 
 
