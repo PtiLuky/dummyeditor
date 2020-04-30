@@ -68,9 +68,9 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Deploy
-      if: contains(github.ref, "release")
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
+      if: contains(github.ref, 'release')
       run: |
         mkdir dummyEditor
         mv exe/Release/dummyeditor.exe dummyEditor/
@@ -82,16 +82,16 @@ jobs:
         windeployqt dummyEditor/dummyeditor.exe
 
     - name: Create Zip File
-      if: contains(github.ref, "release")
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: powershell
+      if: contains(github.ref, 'release')
       run: |
         Compress-Archive dummyEditor dummyEditor.zip
 
     - name: Create Release
-      if: contains(github.ref, "release")
       id: create_release
       uses: actions/create-release@v1
+      if: contains(github.ref, 'release')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -101,9 +101,9 @@ jobs:
         prerelease: true
 
     - name: Upload Release Asset
-      if: contains(github.ref, "release")
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
+      if: contains(github.ref, 'release')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
