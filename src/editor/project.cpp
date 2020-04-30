@@ -22,8 +22,8 @@ Project::Project(const QString& projectFile)
 {
     // Try to read the "project.xml" file that should be present in folderPath.
     QFileInfo fileInfo(projectFile);
-    if(fileInfo.isDir())
-      fileInfo = QFileInfo(projectFile + "/" + PROJECT_FILE_NAME);
+    if (fileInfo.isDir())
+        fileInfo = QFileInfo(projectFile + "/" + PROJECT_FILE_NAME);
 
     QFile xmlProjectFile(projectFile);
     QDomDocument projectDom;
@@ -73,6 +73,17 @@ MapsTreeModel* Project::mapsModel() const
 const Dummy::Map* Project::currMap() const
 {
     return m_currMap.get();
+}
+
+bool Project::isModified() const
+{
+    return m_isModified;
+}
+
+void Project::changed()
+{
+    m_isModified = true;
+    emit saveStatusChanged(false);
 }
 
 void Project::testMap()
@@ -144,7 +155,10 @@ void Project::saveProject()
         Log::error("Error while saving the game data...");
 
     bRes = saveCurrMap();
-    if (! bRes)
+    if (bRes) {
+        m_isModified = true;
+        emit saveStatusChanged(true);
+    } else
         Log::error("Error while saving the map...");
 }
 

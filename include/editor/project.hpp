@@ -22,8 +22,9 @@ struct tMapInfo
     uint16_t m_height = 0;
 };
 
-class Project
+class Project : public QObject
 {
+    Q_OBJECT
 public:
     explicit Project(const QString& folder);
 
@@ -31,11 +32,9 @@ public:
     const Dummy::GameStatic& game() const;
     MapsTreeModel* mapsModel() const;
     const Dummy::Map* currMap() const;
+    bool isModified() const;
 
     void testMap();
-
-    // Setters
-    void setModified(bool isModified) { m_isModified = isModified; }
 
     // Utils
     void saveProject();
@@ -47,6 +46,12 @@ public:
     static QString sanitizeMapName(const QString& unsafeName);
 
     static std::shared_ptr<Project> create(const QString& projectRootPath);
+
+public slots:
+    void changed();
+
+signals:
+    void saveStatusChanged(bool isSaved);
 
 private:
     void dumpToXmlNode(QDomDocument& document, QDomElement& xmlNode, const QStandardItem* modelItem);

@@ -97,6 +97,8 @@ bool GeneralWindow::loadProject(const QString& path)
 
     // Use this new project
     m_loadedProject = newProject;
+    connect(m_loadedProject.get(), &Project::saveStatusChanged, this, &GeneralWindow::saveStatusChanged);
+    connect(&m_mapTools, &MapTools::modificationDone, m_loadedProject.get(), &Project::changed);
 
     // Update the view
     updateProjectView();
@@ -109,21 +111,23 @@ bool GeneralWindow::closeProject()
     if (m_loadedProject == nullptr)
         return true; // success, nothing to do
 
-    QMessageBox::StandardButton resBtn =
-        QMessageBox::question(this, "DummyEditor", tr("Do you want to save before closing this project?"),
-                              QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Cancel);
+    if (m_loadedProject->isModified()) {
+        QMessageBox::StandardButton resBtn =
+            QMessageBox::question(this, "DummyEditor", tr("Do you want to save before closing this project?"),
+                                  QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Cancel);
 
-    // Save project if needed
-    if (resBtn == QMessageBox::Yes) {
-        m_loadedProject->saveProject();
-    } else if (resBtn == QMessageBox::No) {
-        // Nothing to do
-    } else {
-        return false; // failure of closing : cancellation
+        // Save project if needed
+        if (resBtn == QMessageBox::Yes) {
+            m_loadedProject->saveProject();
+        } else if (resBtn == QMessageBox::No) {
+            // Nothing to do
+        } else {
+            return false; // failure of closing : cancellation
+        }
     }
 
     // Clear project
-    m_loadedProject = nullptr;
+    m_loadedProject.reset();
 
     // Clear view
     updateProjectView();
@@ -168,6 +172,7 @@ void GeneralWindow::updateMapsAndFloorsList()
 void GeneralWindow::updateChipsetsTab()
 {
     m_chipsetScene.clear();
+    m_chipsetScene.update();
     m_ui->chipsets_panel->setTabText(0, "Tileset1");
 }
 
@@ -184,7 +189,6 @@ void GeneralWindow::setupLoggers()
     Logger::registerLogger(pStatusBarLog);
 
     // File logger
-
     std::shared_ptr<Logger> pFileLog = std::make_shared<LoggerFile>();
     m_loggers.push_back(pFileLog);
     Logger::registerLogger(pFileLog);
@@ -217,6 +221,8 @@ void GeneralWindow::on_actionNew_triggered()
     if (m_loadedProject == nullptr)
         return;
 
+    connect(m_loadedProject.get(), &Project::saveStatusChanged, this, &GeneralWindow::saveStatusChanged);
+    connect(&m_mapTools, &MapTools::modificationDone, m_loadedProject.get(), &Project::changed);
     Log::info(tr("Project created at %1").arg(projectDirectory));
 
     // Update the view
@@ -343,6 +349,14 @@ void GeneralWindow::layerVisibilityChanged(bool newVisibility, eLayerType type, 
             if (layerWrap->isThisFloor(floorIdx))
                 layerWrap->setVisibility(newVisibility);
     }
+}
+
+void GeneralWindow::saveStatusChanged(bool saved)
+{
+    if (saved)
+        setWindowTitle("DummyEditor - RPG");
+    else
+        setWindowTitle("*DummyEditor - RPG");
 }
 
 void GeneralWindow::on_actionEraser_triggered()

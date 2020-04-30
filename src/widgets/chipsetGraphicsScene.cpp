@@ -63,6 +63,7 @@ void ChipsetGraphicsScene::clear()
 {
     m_selectionRectItem.reset();
     m_gridItems.clear();
+    QGraphicsScene::clear();
 }
 
 void ChipsetGraphicsScene::setGridVisible(bool visible)

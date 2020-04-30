@@ -57,6 +57,8 @@ private slots:
     void activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_t layerIdx);
     void layerVisibilityChanged(bool newVisibility, eLayerType type, uint8_t floorIdx, uint8_t layerIdx);
 
+    void saveStatusChanged(bool isSaved);
+
 private:
     void closeEvent(QCloseEvent* event) override;
     void updateProjectView();

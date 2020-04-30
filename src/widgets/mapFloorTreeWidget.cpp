@@ -20,7 +20,7 @@ void FloorListWidget::setEditorMap(const Dummy::Map& map)
 void FloorListWidget::reset()
 {
     m_floorTreeModel.reset();
-    m_ui->treeViewFloors->reset();
+    m_ui->treeViewFloors->setModel(new QStandardItemModel());
 }
 
 void FloorListWidget::selectFirstVisLayer()

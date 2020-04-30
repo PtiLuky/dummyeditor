@@ -396,6 +396,7 @@ void MapTools::doCommand(std::unique_ptr<Command>&& c)
     // update UI
     m_toolsUI.actionUndo->setEnabled(true);
     m_toolsUI.actionRedo->setEnabled(false);
+    emit modificationDone();
 }
 
 void MapTools::undo()
@@ -409,6 +410,7 @@ void MapTools::undo()
     // update UI
     m_toolsUI.actionUndo->setEnabled(m_nbCommandsValid > 0);
     m_toolsUI.actionRedo->setEnabled(true);
+    emit modificationDone();
 }
 
 void MapTools::redo()
@@ -422,6 +424,7 @@ void MapTools::redo()
     // update UI
     m_toolsUI.actionUndo->setEnabled(true);
     m_toolsUI.actionRedo->setEnabled(m_nbCommandsValid < m_commandsHistory.size());
+    emit modificationDone();
 }
 
 MapTools::CommandPaint::CommandPaint(MapTools& parent, QPoint&& pxCoord, tVisibleClipboard&& clip)

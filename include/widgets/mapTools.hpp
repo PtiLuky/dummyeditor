@@ -25,8 +25,9 @@ public:
     virtual void undo()    = 0;
 };
 
-class MapTools
+class MapTools : public QObject
 {
+    Q_OBJECT
     friend class Command;
 
 public:
@@ -62,6 +63,9 @@ public:
 
     void undo();
     void redo();
+
+signals:
+    void modificationDone();
 
 private:
     void resetTools();
