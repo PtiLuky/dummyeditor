@@ -10,38 +10,34 @@
   - **CMake v3.13** minimum
   - **QtCreator** (recommandé) *(Visual Studio ou un éditeur de texte + CMake-gui sont des alternatives valides si les librairies Qt sont installées)*
 - Libraries nécessaires:
-  - Lua 5.3 https://sourceforge.net/projects/luabinaries/files/5.3.5/Windows%20Libraries/Static/lua-5.3.5_Win64_vc14_lib.zip/download
-  - Boost 1_69 pour MSVC https://github.com/dummymeuporg/dummymeuporg.github.io/wiki/Install-boost-on-Windows
+  - SFML https://www.sfml-dev.org/
 
 ## Configurer projet
 
 - Ouvrir git bash et cloner le projet et initialiser les sous-modules
 ```
-    git clone --recursive https://github.com/dummymeuporg/dummyeditor.git
+    git clone --recursive git@github.com:PtiLuky/dummyeditor.git
 ```
 - Ouvrir le dossier cloné
 ```
-    cd dummueditor
+    cd dummyeditor
 ```
 - Plus tard, pour mettre à jour le projet et ses sous-modules:
 ```
 git pull --recurse-submodules
 ```
 
-- Configurer QtCreator: Tools -> options -> Kits, trouverou créer un Kit pour complier avec MSVC. Le kit sélectionné ne dois pas avoir un icône rouge. Si c'est le cas, survoler l'icône pour connaître le problème.
+- Configurer QtCreator: Tools -> options -> Kits, trouver ou créer un Kit pour complier avec MSVC. Le kit sélectionné ne dois pas avoir un icône rouge. Si c'est le cas, survoler l'icône pour connaître le problème.
 ![Kit configuration example](Photo/Qt-Config_MSVC_kit.png "Kit configuration example")
+
 
 - Configurer CMake:
     - CMake a besoin de connaître certaines variables pour fonctionner, dont où se trouvent Boost et Lua. Si vous utilisez QtCreator, le meilleur moyen est d'y régler la configuration cmake :
     - Tools -> Options -> Kits -> (choose the right one):
       - **CMake generator**: mettre "Visual studio 16 2019 / none"
     - configuration CMake : ajouter les variables suivantes : (et adapter les valeurs en fonction)
-      - BOOST_INCLUDEDIR:PATH=C:\SDKs\boost_1_69_0
-      - BOOST_LIBRARYDIR:PATH=C:\SDKs\boost_1_69_0\lib64-msvc-14.1
-      - BOOST_ROOT:PATH=C:\SDKs\boost_1_59_0\boost
-      - LUA_INCLUDE_DIR:PATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\include
-      - LUA_LIBRARIES:FILEPATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\lua53.lib
-      - LUA_LIBRARY:FILEPATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\lua53.lib
+      - SFML_DIR:PATH=C:\SDKs\SFML-2.5.1\lib\cmake\SFML
+      - SFML_ROOT:PATH=C:\SDKs\SFML-2.5.1
     - Si vous n'utilisez pas QtCreator il fautdra renseigner une variable suplémentaire :  CMAKE_PREFIX_PATH:STRING=path/to/Qt/folder
 
 - Charger le projet :

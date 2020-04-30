@@ -10,18 +10,17 @@
   - **CMake v3.13** minimum
   - **QtCreator** (recommanded) *(Visual Studio and basic editor + CMake-gui are valid aternatives if Qt libraries are installed)*
 - Needed libraries:
-  - Lua 5.3 https://sourceforge.net/projects/luabinaries/files/5.3.5/Windows%20Libraries/Static/lua-5.3.5_Win64_vc14_lib.zip/download
-  - Boost 1_69 for MSVC https://github.com/dummymeuporg/dummymeuporg.github.io/wiki/Install-boost-on-Windows
+  - SFML https://www.sfml-dev.org/
 
 ## Setup the project
 
 - Open git bash and clone the project and initialize and update submodules
 ```
-    git clone --recursive https://github.com/dummymeuporg/dummyeditor.git
+git clone --recursive git@github.com:PtiLuky/dummyeditor.git
 ```
 - Go to cloned directory
 ```
-    cd dummueditor
+    cd dummyeditor
 ```
 - Later, to update project and its submodules:
 ```
@@ -36,12 +35,8 @@ git pull --recurse-submodules
     - Tools -> Options -> Kits -> (choose the right one):
       - **CMake generator**: set "Visual studio 16 2019 / none"
     - CMake configuration: add the following variables: (and adapt their values to your configuration)
-      - BOOST_INCLUDEDIR:PATH=C:\SDKs\boost_1_69_0
-      - BOOST_LIBRARYDIR:PATH=C:\SDKs\boost_1_69_0\lib64-msvc-14.1
-      - BOOST_ROOT:PATH=C:\SDKs\boost_1_59_0\boost
-      - LUA_INCLUDE_DIR:PATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\include
-      - LUA_LIBRARIES:FILEPATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\lua53.lib
-      - LUA_LIBRARY:FILEPATH=C:\SDKs\lua-5.3.5_Win64_vc14_lib\lua53.lib
+      - SFML_DIR:PATH=C:\SDKs\SFML-2.5.1\lib\cmake\SFML
+      - SFML_ROOT:PATH=C:\SDKs\SFML-2.5.1
     - if you're not using QtCreator you'll need to add one more variable:  CMAKE_PREFIX_PATH:STRING=path/to/Qt/folder
 
 - Load the project:
