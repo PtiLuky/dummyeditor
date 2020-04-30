@@ -79,8 +79,8 @@ jobs:
         cp -R exe/Resources deploy-output/
         ls deploy-output
 
+    - uses: ilammy/msvc-dev-cmd@v1.2.0
     - name: Deploy - second part
-      uses: ilammy/msvc-dev-cmd@v1.2.0
       working-directory: ${{runner.workspace}}/dummyeditor
       run: |
         windeployqt deploy-output/dummyeditor.exe
