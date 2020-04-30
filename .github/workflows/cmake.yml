@@ -71,7 +71,8 @@ jobs:
       working-directory: $GITHUB_WORKSPACE
       shell: bash
       run: |
-        ls exe/
+        pwd
+        ls exe
         mkdir deployoutput
         mv exe/dummyeditor.exe deploy-output/
         mv exe/player.exe deploy-output/
