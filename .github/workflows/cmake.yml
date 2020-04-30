@@ -70,13 +70,15 @@ jobs:
       working-directory: ${{runner.workspace}}
       shell: bash
       run: |
-        mkdir deploy-output
-        mv exe/dummyeditor.exe deploy-output/
-        mv exe/player.exe deploy-output/
+        ls build/
+        ls build/exe/
         ls exe/
+        mkdir deploy-output
+        mv build/exe/dummyeditor.exe deploy-output/
+        mv build/exe/player.exe deploy-output/
         windeployqt deploy-output/dummyeditor.exe
         cp /s libs/SFML-2.5.1/bin deploy-output
-        ls exe/
+        ls build/exe/
       
   # Build for Linux (with sonar scanner)
   build-linux:
