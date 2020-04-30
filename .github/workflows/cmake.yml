@@ -67,18 +67,25 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Deploy
+    - name: Deploy - first part
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
       run: |
         mkdir deploy-output
         mv exe/Release/dummyeditor.exe deploy-output/
         mv exe/Release/player.exe deploy-output/
-        windeployqt deploy-output/dummyeditor.exe
         export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
-        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin deploy-output/
-        cp -R exe/Resources deploy-output/Resources
+        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin/. deploy-output/
+        cp -R exe/Resources deploy-output/
         ls deploy-output
+
+    - name: Deploy - second part
+      uses: ilammy/msvc-dev-cmd@v1.2.0
+      working-directory: ${{runner.workspace}}/dummyeditor
+      run: |
+        windeployqt deploy-output/dummyeditor.exe
+        dir deploy-output
+
       
   # Build for Linux (with sonar scanner)
   build-linux:
