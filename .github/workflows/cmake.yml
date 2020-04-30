@@ -77,15 +77,9 @@ jobs:
         export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
         cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin/. deploy-output/
         cp -R exe/Resources deploy-output/
-        ls deploy-output
-
-    - uses: ilammy/msvc-dev-cmd@v1.2.0
-    - name: Deploy - second part
-      working-directory: ${{runner.workspace}}/dummyeditor
-      run: |
+        export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
         windeployqt deploy-output/dummyeditor.exe
-        dir deploy-output
-
+        ls deploy-output
       
   # Build for Linux (with sonar scanner)
   build-linux:
