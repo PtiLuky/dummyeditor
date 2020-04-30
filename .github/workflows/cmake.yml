@@ -81,9 +81,10 @@ jobs:
         windeployqt deploy-output/dummyeditor.exe
 
     - name: Create Zip File
-      uses: montudor/action-zip@v0.1.0
-      with:
-        args: zip -r dummyEditor.zip deploy-output
+      working-directory: ${{runner.workspace}}/dummyeditor
+      shell: powershell
+      run: |
+        Compress-Archive deploy-output dummyEditor.zip
 
     - name: Upload Windows Zip install
       uses: actions/upload-artifact@v1
