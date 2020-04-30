@@ -71,26 +71,20 @@ jobs:
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
       run: |
-        mkdir deploy-output
-        mv exe/Release/dummyeditor.exe deploy-output/
-        mv exe/Release/player.exe deploy-output/
+        mkdir dummyEditor
+        mv exe/Release/dummyeditor.exe dummyEditor/
+        mv exe/Release/player.exe dummyEditor/
         export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
-        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin/. deploy-output/
-        cp -R exe/Resources deploy-output/
+        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin/. dummyEditor/
+        cp -R exe/Resources dummyEditor/
         export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
-        windeployqt deploy-output/dummyeditor.exe
-
-    - name: Create Zip File
-      working-directory: ${{runner.workspace}}/dummyeditor
-      shell: powershell
-      run: |
-        Compress-Archive deploy-output dummyEditor.zip
+        windeployqt dummyEditor/dummyeditor.exe
 
     - name: Upload Windows Zip install
       uses: actions/upload-artifact@v1
       with:
         name: Windows zip
-        path: ${{runner.workspace}}/dummyeditor/dummyEditor.zip
+        path: ${{runner.workspace}}/dummyeditor/dummyEditor
       
   # Build for Linux (with sonar scanner)
   build-linux:
