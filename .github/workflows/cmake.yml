@@ -75,7 +75,8 @@ jobs:
         mv exe/Release/dummyeditor.exe deploy-output/
         mv exe/Release/player.exe deploy-output/
         windeployqt deploy-output/dummyeditor.exe
-        cp -R ${{runner.workspace}}/libs/SFML-2.5.1/bin deploy-output/
+        export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
+        cp -R $WORKSPACE_PATH/libs/SFML-2.5.1/bin deploy-output/
         cp -R exe/Resources deploy-output/Resources
         ls deploy-output
       
