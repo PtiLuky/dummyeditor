@@ -60,7 +60,7 @@ jobs:
       run: |
         mkdir exe
         export WORKSPACE_PATH=$(echo "${{runner.workspace}}" | sed 's/\\/\//g')
-        cmake $GITHUB_WORKSPACE -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./exe/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSFML_DIR:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1/lib/cmake/SFML -DSFML_ROOT:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSFML_DIR:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1/lib/cmake/SFML -DSFML_ROOT:PATH=$WORKSPACE_PATH/libs/SFML-2.5.1
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
@@ -68,18 +68,15 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Deploy
-      working-directory: ${{runner.workspace}}
+      working-directory: $GITHUB_WORKSPACE
       shell: bash
       run: |
-        ls build/
-        ls build/exe/
-        ls exe/
         mkdir deploy-output
-        mv build/exe/dummyeditor.exe deploy-output/
-        mv build/exe/player.exe deploy-output/
+        ls exe
+        mv exe/dummyeditor.exe deploy-output/
+        mv exe/player.exe deploy-output/
         windeployqt deploy-output/dummyeditor.exe
         cp /s libs/SFML-2.5.1/bin deploy-output
-        ls build/exe/
       
   # Build for Linux (with sonar scanner)
   build-linux:
