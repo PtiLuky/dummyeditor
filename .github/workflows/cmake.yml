@@ -68,7 +68,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Deploy
-      working-directory: $GITHUB_WORKSPACE
+      working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
       run: |
         pwd
