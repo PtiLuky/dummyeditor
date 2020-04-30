@@ -68,6 +68,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Deploy
+      if: contains(github.ref, "release")
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
       run: |
@@ -80,11 +81,36 @@ jobs:
         export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
         windeployqt dummyEditor/dummyeditor.exe
 
-    - name: Upload Windows Zip install
-      uses: actions/upload-artifact@v1
+    - name: Create Zip File
+      if: contains(github.ref, "release")
+      working-directory: ${{runner.workspace}}/dummyeditor
+      shell: powershell
+      run: |
+        Compress-Archive dummyEditor dummyEditor.zip
+
+    - name: Create Release
+      if: contains(github.ref, "release")
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: Windows zip
-        path: ${{runner.workspace}}/dummyeditor/dummyEditor
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: true
+        prerelease: true
+
+    - name: Upload Release Asset
+      if: contains(github.ref, "release")
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{runner.workspace}}/dummyeditor/dummyEditor.zip
+        asset_name: dummyEditorWindows.zip
+        asset_content_type: application/zip
       
   # Build for Linux (with sonar scanner)
   build-linux:
