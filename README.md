@@ -7,10 +7,10 @@ In this project you'll find:
 * an editor to create games for this editor ! (this repository)
 
 The editor:
-![Screenshot Editor](docs/screenshop-editor.png "Screenshot Editor")
+![Screenshot Editor](docs/screenshot-editor.png "Screenshot Editor")
 
 And a game preview:
-![Screenshot Player](docs/screenshop-player.png "Screenshot Player")
+![Screenshot Player](docs/screenshot-player.png "Screenshot Player")
 
 
 ## Current state
@@ -34,9 +34,9 @@ from this Editor yet.
 For the moment you will have to build it from sources, see below "Install from sources".
 |  Platerform | build from source  | install from exe  |
 |:-:|:-:|:-:|
-| Linux  |  Yes |  not planned |
-| Windows  | Yes  |  soon |
-| Mac  |  (Unkwon) | not planned  |
+| Linux  |  **Yes** |  not planned |
+| Windows  | **Yes**  |  soon |
+| Mac  |  (Unknown) | not planned  |
 
 
 ## How to contribute and what to do?
@@ -48,5 +48,10 @@ All help is welcome :)
 
 ## Install from sources
 
+Tools:
+* Qt (for editor UI)
+* SFML (for player client UI)
+* CMake (for building)
+
 An [installation guide](docs/Installation_Windows-en.md) (available in [french](docs/Installation_Windows-fr.md)) has been written. Procedure for Linux is
-quite similar. Please tell us on Discord if you need help for Linux installation.
+quite similar. Please tell us on [Discord](https://discord.gg/2KmsVp) if you need help for Linux installation.
