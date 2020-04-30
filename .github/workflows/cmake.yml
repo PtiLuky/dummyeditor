@@ -71,12 +71,12 @@ jobs:
       shell: bash
       run: |
         mkdir deploy-output
-        move exe/dummyeditor.exe deploy-output/
-        move exe/player.exe deploy-output/
-        dir exe/
+        mv exe/dummyeditor.exe deploy-output/
+        mv exe/player.exe deploy-output/
+        ls exe/
         windeployqt deploy-output/dummyeditor.exe
-        xcopy /s libs/SFML-2.5.1/bin deploy-output
-        dir exe/
+        cp /s libs/SFML-2.5.1/bin deploy-output
+        ls exe/
       
   # Build for Linux (with sonar scanner)
   build-linux:

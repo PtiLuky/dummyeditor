@@ -1,5 +1,7 @@
 # DummyRPG - Editor
 
+![C++ Build](https://github.com/PtiLuky/dummyeditor/workflows/C++%20Build/badge.svg)
+
 Welcome to DummyRPG project!
 
 In this project you'll find:
