@@ -79,7 +79,11 @@ jobs:
         cp -R exe/Resources deploy-output/
         export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
         windeployqt deploy-output/dummyeditor.exe
-        zip dummyEditor.zip -r deploy-output/
+
+    - name: Create Zip File
+      uses: montudor/action-zip@v0.1.0
+      with:
+        args: zip -r dummyEditor.zip deploy-output
 
     - name: Upload Windows Zip install
       uses: actions/upload-artifact@v1
