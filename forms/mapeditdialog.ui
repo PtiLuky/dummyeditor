@@ -35,7 +35,7 @@
        <item>
         <widget class="QLabel" name="labelChipset">
          <property name="text">
-          <string>Chipset:</string>
+          <string>Tileset:</string>
          </property>
         </widget>
        </item>

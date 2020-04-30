@@ -123,6 +123,9 @@
             </widget>
            </widget>
            <widget class="QTabWidget" name="chipsets_panel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="currentIndex">
              <number>0</number>
             </property>
@@ -154,7 +157,7 @@
                 <item>
                  <widget class="QPushButton" name="chipsetAddButton">
                   <property name="text">
-                   <string>Add Chipset</string>
+                   <string>Add Tileset</string>
                   </property>
                  </widget>
                 </item>
@@ -177,7 +180,7 @@
                    <string/>
                   </property>
                   <property name="icon">
-                   <iconset>
+                   <iconset resource="../icons.qrc">
                     <normaloff>:/icons/icon_penpath.png</normaloff>:/icons/icon_penpath.png</iconset>
                   </property>
                   <property name="checkable">
@@ -191,11 +194,6 @@
                </layout>
               </item>
              </layout>
-            </widget>
-            <widget class="QWidget" name="tab">
-             <attribute name="title">
-              <string>Page</string>
-             </attribute>
             </widget>
            </widget>
           </widget>
@@ -336,7 +334,7 @@
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/newProject_Icon.png</normaloff>:/icons/newProject_Icon.png</iconset>
    </property>
    <property name="text">
@@ -348,7 +346,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_eraser.png</normaloff>:/icons/icon_eraser.png</iconset>
    </property>
    <property name="text">
@@ -363,7 +361,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_pen.png</normaloff>:/icons/icon_pen.png</iconset>
    </property>
    <property name="text">
@@ -372,7 +370,7 @@
   </action>
   <action name="actionPlay">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_launch.png</normaloff>:/icons/icon_launch.png</iconset>
    </property>
    <property name="text">
@@ -381,7 +379,7 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/openProject_Icon.png</normaloff>:/icons/openProject_Icon.png</iconset>
    </property>
    <property name="text">
@@ -390,7 +388,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/save_Icon.png</normaloff>:/icons/save_Icon.png</iconset>
    </property>
    <property name="text">
@@ -402,7 +400,7 @@
   </action>
   <action name="actionClose">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/close_icon_red.png</normaloff>:/icons/close_icon_red.png</iconset>
    </property>
    <property name="text">
@@ -414,7 +412,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/Cut_icon.png</normaloff>:/icons/Cut_icon.png</iconset>
    </property>
    <property name="text">
@@ -426,7 +424,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/copy_Icon.png</normaloff>:/icons/copy_Icon.png</iconset>
    </property>
    <property name="text">
@@ -441,7 +439,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/past_Icon.png</normaloff>:/icons/past_Icon.png</iconset>
    </property>
    <property name="text">
@@ -459,7 +457,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_penpath.png</normaloff>:/icons/icon_penpath.png</iconset>
    </property>
    <property name="text">
@@ -471,7 +469,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_selection.png</normaloff>:/icons/icon_selection.png</iconset>
    </property>
    <property name="text">
@@ -483,7 +481,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/Undo_icon.png</normaloff>:/icons/Undo_icon.png</iconset>
    </property>
    <property name="text">
@@ -495,7 +493,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/Redo_icon.png</normaloff>:/icons/Redo_icon.png</iconset>
    </property>
    <property name="text">
@@ -504,7 +502,7 @@
   </action>
   <action name="actionZoomIn">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_zoom_in.png</normaloff>:/icons/icon_zoom_in.png</iconset>
    </property>
    <property name="text">
@@ -516,7 +514,7 @@
   </action>
   <action name="actionZoomOut">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_zoom_out.png</normaloff>:/icons/icon_zoom_out.png</iconset>
    </property>
    <property name="text">
@@ -528,7 +526,7 @@
   </action>
   <action name="actionResize">
    <property name="icon">
-    <iconset>
+    <iconset resource="../icons.qrc">
      <normaloff>:/icons/icon_resize.png</normaloff>:/icons/icon_resize.png</iconset>
    </property>
    <property name="text">
@@ -558,6 +556,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

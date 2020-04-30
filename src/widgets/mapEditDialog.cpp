@@ -64,7 +64,7 @@ bool MapEditDialog::inputsAreValid(QString* errorMessage)
 
     } else if (m_ui->lineEditChipset->text().isEmpty()) {
         if (errorMessage != nullptr)
-            *errorMessage = tr("You must enter a chipset filename.");
+            *errorMessage = tr("You must enter a tileset filename.");
 
         return false;
 
@@ -85,7 +85,7 @@ bool MapEditDialog::inputsAreValid(QString* errorMessage)
 
 void MapEditDialog::on_pushButtonBrowseChipset_clicked()
 {
-    QFileDialog dlg(this, tr("Choose the chipset file for your map."), m_chipsetPath, "PNG files (*.png)");
+    QFileDialog dlg(this, tr("Choose the tileset file for your map."), m_chipsetPath, "PNG files (*.png)");
 
     if (dlg.exec() != QDialog::Accepted)
         return;
@@ -95,7 +95,7 @@ void MapEditDialog::on_pushButtonBrowseChipset_clicked()
     QString selectedChipset     = QDir::cleanPath(dlg.selectedFiles().at(0));
     int indexOfFileNameInString = selectedChipset.indexOf(QDir::cleanPath(m_chipsetPath));
     if (indexOfFileNameInString < 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Please select a chipset inside the 'images' folder."));
+        QMessageBox::critical(this, tr("Error"), tr("Please select a tileset inside the 'images' folder."));
     } else {
         m_ui->lineEditChipset->setText(selectedChipset.mid(indexOfFileNameInString + 1 + m_chipsetPath.size()));
     }

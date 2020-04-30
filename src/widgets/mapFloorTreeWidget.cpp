@@ -23,6 +23,16 @@ void FloorListWidget::reset()
     m_ui->treeViewFloors->reset();
 }
 
+void FloorListWidget::selectFirstVisLayer()
+{
+    // Select first layer first floor
+    auto firstFloorIdx = m_floorTreeModel->index(0, 0);
+    m_ui->treeViewFloors->expand(firstFloorIdx);
+    auto firstVisLayerIdx = m_floorTreeModel->index(1, 0, firstFloorIdx);
+    m_ui->treeViewFloors->setCurrentIndex(firstVisLayerIdx);
+    on_treeViewFloors_clicked(firstVisLayerIdx); // trigger signal manually...
+}
+
 MapFloorTreeModel* FloorListWidget::model() const
 {
     return m_floorTreeModel.get();

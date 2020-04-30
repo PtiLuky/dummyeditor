@@ -17,6 +17,7 @@ void MapTools::clear()
 {
     resetTools();
     resetLayerLink();
+    setTool(eTools::Pen);
 }
 
 void MapTools::setActiveLayer(LayerGraphicItems& layerWrap)

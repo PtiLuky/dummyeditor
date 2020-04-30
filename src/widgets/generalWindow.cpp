@@ -141,6 +141,7 @@ void GeneralWindow::updateProjectView()
     if (! thereIsAProject) {
         m_mapTools.clear();
         m_ui->toolbar_mapTools->setEnabled(false);
+        m_ui->chipsets_panel->setEnabled(false);
     }
 
     // update tabs content
@@ -167,7 +168,7 @@ void GeneralWindow::updateMapsAndFloorsList()
 void GeneralWindow::updateChipsetsTab()
 {
     m_chipsetScene.clear();
-    m_ui->chipsets_panel->setTabText(0, "Chipset1");
+    m_ui->chipsets_panel->setTabText(0, "Tileset1");
 }
 
 void GeneralWindow::setupLoggers()
@@ -276,6 +277,8 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
     if (map == nullptr)
         return;
 
+    m_mapTools.clear();
+
     // update chipset scene
     std::vector<QString> chipsets;
     for (Dummy::chip_id chipId : map->chipsetsUsed()) {
@@ -285,6 +288,8 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
     }
 
     m_chipsetScene.setChipset(chipsets, map->chipsetsUsed());
+    m_ui->chipsets_panel->setEnabled(true);
+    m_ui->chipsetAddButton->setEnabled(false); // TODO remove this when feature enabled
     m_ui->graphicsViewChipset->viewport()->update();
 
     // update map scene
@@ -296,8 +301,7 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
     const auto* floorTree = m_ui->layer_list_tab->model();
     connect(floorTree, &MapFloorTreeModel::activeLayerChanged, this, &GeneralWindow::activeLayerChanged);
     connect(floorTree, &MapFloorTreeModel::layerVisibilityChanged, this, &GeneralWindow::layerVisibilityChanged);
-
-    m_mapTools.clear();
+    m_ui->layer_list_tab->selectFirstVisLayer();
 
     // update layer list
     m_ui->maps_panel->setCurrentIndex(1);

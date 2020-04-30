@@ -29,6 +29,7 @@ public:
     virtual ~FloorListWidget();
 
     void setEditorMap(const Dummy::Map&);
+    void selectFirstVisLayer();
     void reset();
 
     MapFloorTreeModel* model() const;
