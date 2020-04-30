@@ -67,7 +67,7 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Deploy - first part
+    - name: Deploy
       working-directory: ${{runner.workspace}}/dummyeditor
       shell: bash
       run: |
@@ -79,7 +79,13 @@ jobs:
         cp -R exe/Resources deploy-output/
         export VCINSTALLDIR="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC"
         windeployqt deploy-output/dummyeditor.exe
-        ls deploy-output
+        zip dummyEditor.zip -r deploy-output/
+
+    - name: Upload Windows Zip install
+      uses: actions/upload-artifact@v1
+      with:
+        name: Windows zip
+        path: ${{runner.workspace}}/dummyeditor/dummyEditor.zip
       
   # Build for Linux (with sonar scanner)
   build-linux:
