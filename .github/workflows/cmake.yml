@@ -77,6 +77,7 @@ jobs:
         mv exe/player.exe deploy-output/
         windeployqt deploy-output/dummyeditor.exe
         cp /s libs/SFML-2.5.1/bin deploy-output
+        ls deploy-output
       
   # Build for Linux (with sonar scanner)
   build-linux:
