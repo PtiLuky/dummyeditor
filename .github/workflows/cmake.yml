@@ -73,12 +73,12 @@ jobs:
       run: |
         pwd
         ls exe
-        mkdir deployoutput
+        mkdir deploy-output
         mv exe/dummyeditor.exe deploy-output/
         mv exe/player.exe deploy-output/
         windeployqt deploy-output/dummyeditor.exe
-        cp /s libs/SFML-2.5.1/bin deployoutput/
-        ls deployoutput
+        cp /s libs/SFML-2.5.1/bin deploy-output/
+        ls deploy-output
       
   # Build for Linux (with sonar scanner)
   build-linux:
