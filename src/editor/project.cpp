@@ -75,6 +75,11 @@ const Dummy::Map* Project::currMap() const
     return m_currMap.get();
 }
 
+Dummy::Map* Project::currMap()
+{
+    return m_currMap.get();
+}
+
 bool Project::isModified() const
 {
     return m_isModified;
@@ -121,6 +126,9 @@ std::shared_ptr<Project> Project::create(const QString& projectRootPath)
     projectDir.mkdir("images");
     projectDir.mkdir("fonts");
     projectDir.mkdir("sounds");
+
+    // Copy first default tilesheet
+    QFile::copy("Resources/images/ClassicRPG_Sheet.png", projectRootPath + "/images/ClassicRPG_Sheet.png");
 
     // Create DummyRPG Editor project file
     QFile projectFile(projectDir.filePath(PROJECT_FILE_NAME));
@@ -258,6 +266,11 @@ bool Project::mapExists(const QString& mapName)
 {
     std::string strName = mapName.toStdString();
     return m_mapNameToId.find(strName) != m_mapNameToId.end();
+}
+
+bool Project::renameCurrMap(const QString& newName)
+{
+    return true;
 }
 
 QString Project::sanitizeMapName(const QString& unsafeName)

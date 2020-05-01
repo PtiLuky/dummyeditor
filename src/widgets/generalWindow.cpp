@@ -67,6 +67,7 @@ GeneralWindow::GeneralWindow(QWidget* parent)
     // connect ui items
     connect(m_ui->btnNewMap, &QPushButton::clicked, m_ui->mapsList, &MapsTreeView::addMapAtRoot);
     // connect(m_ui->mapsList, &MapsTreeView::chipsetMapChanged, &m_chipsetScene, &ChipsetGraphicsScene::setChipset);
+    connect(m_ui->mapsList, &MapsTreeView::mapChanged, this, &GeneralWindow::loadMap);
     connect(&m_mapScene, &MapGraphicsScene::zooming, this, &GeneralWindow::mapZoomTriggered);
 }
 
@@ -275,7 +276,11 @@ void GeneralWindow::on_mapsList_doubleClicked(const QModelIndex& selectedIndex)
 {
     // fetch map data
     QString mapName = m_loadedProject->mapsModel()->itemFromIndex(selectedIndex)->text();
+    loadMap(mapName);
+}
 
+void GeneralWindow::loadMap(const QString& mapName)
+{
     bool bRes = m_loadedProject->loadMap(mapName);
     if (! bRes)
         return;

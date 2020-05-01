@@ -25,7 +25,7 @@ public:
     explicit MapEditDialog(QWidget* parent = nullptr);
     virtual ~MapEditDialog(); // we need this because of smart ptr + forward declaration..
 
-    void setup(const Editor::Project& project, const Dummy::Map*);
+    void setup(const Editor::Project& project, const Dummy::Map*, const QString& mapName);
 
     QString getMapName() const;
     uint16_t getWidth() const;

@@ -42,6 +42,7 @@ public slots:
 
 signals:
     void chipsetMapChanged(QString);
+    void mapChanged(const QString& mapName);
 
 private:
     std::shared_ptr<Project> m_project;
@@ -51,7 +52,6 @@ private:
     MapEditDialog* m_newMapDialog = nullptr;
     MapEditDialog* m_editDialog   = nullptr;
     QModelIndex m_selectedIndex;
-    uint16_t m_editedMapIdx;
 };
 
 //////////////////////////////////////////////////////////////////////////////

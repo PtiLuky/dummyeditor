@@ -1,6 +1,9 @@
 #include "widgets/mapsTree.hpp"
 
 #include <QMenu>
+#include <QMessageBox>
+
+#include "utils/logger.hpp"
 
 namespace Editor {
 
@@ -65,7 +68,7 @@ void MapsTreeView::showNewMapDlg()
     if (m_project == nullptr)
         return; // not supposed to happen
 
-    m_newMapDialog->setup(*m_project, nullptr);
+    m_newMapDialog->setup(*m_project, nullptr, tr("New map"));
     m_newMapDialog->open();
 }
 
@@ -95,8 +98,10 @@ void MapsTreeView::createMap(int result)
     tMapInfo mapInfo;
     QString mapName = Project::sanitizeMapName(m_newMapDialog->getMapName());
 
-    if (m_project->mapExists(mapName))
+    if (m_project->mapExists(mapName)) {
+        Log::error(tr("A map with this name already exists (%1)").arg(mapName));
         return;
+    }
 
     mapInfo.m_mapName     = mapName.toStdString();
     mapInfo.m_chispetPath = m_newMapDialog->getChipset().toStdString();
@@ -107,6 +112,8 @@ void MapsTreeView::createMap(int result)
     m_project->createMap(mapInfo, *selectedParentMap);
 
     expand(m_selectedIndex);
+
+    emit mapChanged(mapName);
 }
 
 void MapsTreeView::editMap(int result)
@@ -114,36 +121,35 @@ void MapsTreeView::editMap(int result)
     if (result != QDialog::Accepted)
         return;
 
-    /*
-    m_editedMap->setName(m_editDialog->getMapName().toStdString());
+    auto* map = m_project->currMap();
+    if (map == nullptr)
+        return;
 
-    std::string strChipset = m_editDialog->getChipset().toStdString();
-    if (strChipset != m_editedMap->chipset()) {
-        emit chipsetMapChanged(QString::fromStdString((m_project->projectPath() / "chipsets" / strChipset).string()));
-        m_editedMap->setChipset(strChipset);
+    m_project->renameCurrMap(m_editDialog->getMapName());
+
+    uint16_t w = m_editDialog->getWidth();
+    uint16_t h = m_editDialog->getHeight();
+    if (w < map->width() || h < map->height()) {
+        auto btn = QMessageBox::question(this, tr("Resize?"),
+                                         tr("You are about to REDUCE map size, some data will be lost. Continue?"));
+        if (btn == QMessageBox::No)
+            return;
     }
-    m_editedMap->setMusic(m_editDialog->getMusic().toStdString());
 
-    quint16 width  = m_editDialog->getWidth();
-    quint16 height = m_editDialog->getHeight();
-
-    if (width != m_editedMap->width() || height != m_editedMap->height()) {
-        m_editedMap->resize(width, height);
+    if (w != map->width() || h != map->height()) {
+        map->resize(w, h);
     }
-*/
+
+    emit mapChanged(m_editDialog->getMapName());
 }
 
 void MapsTreeView::showEditDlg()
 {
-    /*
-      const QStandardItem* item = m_project->mapsModel()->itemFromIndex(m_selectedIndex);
-      m_editedMapIdx            = static_cast<uint16_t>(item->row());
+    const QString mapName = m_project->mapsModel()->itemFromIndex(m_selectedIndex)->text();
+    m_project->loadMap(mapName);
+    const auto* map = m_project->currMap();
 
-      if (m_editedMapIdx >= m_project->game().maps.size())
-          return;
-
-    m_editDialog->setup(*m_project, &m_project->game().maps[m_editedMapIdx]);*/
-    m_editDialog->setup(*m_project, nullptr);
+    m_editDialog->setup(*m_project, map, mapName);
     m_editDialog->open();
 }
 

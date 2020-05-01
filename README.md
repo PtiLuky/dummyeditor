@@ -44,7 +44,7 @@ For other platerforms you will have to build it from sources, see below "Install
 |  Platerform | build from source  | install from exe  |
 |:-:|:-:|:-:|
 | Linux  |  **Yes** |  not planned |
-| Windows  | **Yes**  |  **Yess** |
+| Windows  | **Yes**  |  **Yes** |
 | Mac  |  (Unknown) | not planned  |
 
 
