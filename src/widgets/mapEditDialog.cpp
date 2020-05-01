@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "dummyrpg/layer.hpp"
 
 MapEditDialog::MapEditDialog(QWidget* parent)
     : QDialog(parent)
@@ -64,9 +65,9 @@ bool MapEditDialog::inputsAreValid(QString* errorMessage)
         msg = tr("The map's height must be above or equal to 1.");
     else if (m_ui->spinBoxMapWidth->value() < 1) // should not happen
         msg = tr("The map's width must be above or equal to 1.");
-    else if (m_ui->spinBoxMapHeight->value() > 1024) // should not happen
+    else if (m_ui->spinBoxMapHeight->value() > Dummy::MAX_LAYER_BORDER_SIZE) // should not happen
         msg = tr("The map's height must be above or equal to 1.");
-    else if (m_ui->spinBoxMapWidth->value() > 1024) // should not happen
+    else if (m_ui->spinBoxMapWidth->value() > Dummy::MAX_LAYER_BORDER_SIZE) // should not happen
         msg = tr("The map's width must be above or equal to 1.");
 
     if (! msg.isNull()) {
@@ -87,13 +88,12 @@ void MapEditDialog::on_pushButtonBrowseChipset_clicked()
 
     // If user has selected several files, we only use the first one
 
-    QString selectedChipset     = QDir::cleanPath(dlg.selectedFiles().at(0));
-    int indexOfFileNameInString = selectedChipset.indexOf(QDir::cleanPath(m_chipsetPath));
-    if (indexOfFileNameInString < 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Please select a tileset inside the 'images' folder."));
-    } else {
-        m_ui->lineEditChipset->setText(selectedChipset.mid(indexOfFileNameInString + 1 + m_chipsetPath.size()));
+    QFileInfo tilesetFile(dlg.selectedFiles().at(0));
+    QDir imgDir(m_chipsetPath);
+    if (tilesetFile.dir() != imgDir) {
+        QFile::copy(tilesetFile.filePath(), m_chipsetPath + "/" + tilesetFile.fileName());
     }
+    m_ui->lineEditChipset->setText(tilesetFile.fileName());
 }
 
 void MapEditDialog::on_pushButtonOK_clicked()

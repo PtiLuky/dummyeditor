@@ -284,7 +284,7 @@ void GeneralWindow::loadMap(const QString& mapName)
     bool bRes = m_loadedProject->loadMap(mapName);
     if (! bRes)
         return;
-    auto* map = m_loadedProject->currMap();
+    const auto* map = m_loadedProject->currMap();
     if (map == nullptr)
         return;
 
@@ -300,7 +300,7 @@ void GeneralWindow::loadMap(const QString& mapName)
 
     m_chipsetScene.setChipset(chipsets, map->chipsetsUsed());
     m_ui->chipsets_panel->setEnabled(true);
-    m_ui->chipsetAddButton->setEnabled(false); // TODO remove this when feature enabled
+    m_ui->chipsetAddButton->setEnabled(false);
     m_ui->graphicsViewChipset->viewport()->update();
 
     // update map scene
