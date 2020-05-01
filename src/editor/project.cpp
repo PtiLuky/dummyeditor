@@ -164,7 +164,7 @@ void Project::saveProject()
 
     bRes = saveCurrMap();
     if (bRes) {
-        m_isModified = true;
+        m_isModified = false;
         emit saveStatusChanged(true);
     } else
         Log::error("Error while saving the map...");
@@ -270,6 +270,29 @@ bool Project::mapExists(const QString& mapName)
 
 bool Project::renameCurrMap(const QString& newName)
 {
+    if (mapExists(newName)) {
+        Log::error(tr("A map with this name already exists"));
+        return false;
+    }
+
+    // Change in our id-mapping
+    std::string strOldName = m_currMapName.toStdString();
+    std::string strNewName = newName.toStdString();
+    m_mapNameToId.insert({strNewName, m_mapNameToId.at(strOldName)});
+    m_mapNameToId.erase(strOldName);
+
+    // Change in file name
+    QFile::rename(m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT,
+                  m_projectPath + "/maps/" + newName + MAP_FILE_EXT);
+
+    // Change in map architecture
+    if (m_mapsModel)
+        m_mapsModel->renameNode(m_currMapName, newName);
+
+    m_currMapName = newName;
+    m_isModified  = true;
+    saveProject();
+
     return true;
 }
 

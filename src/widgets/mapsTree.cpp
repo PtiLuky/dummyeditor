@@ -188,4 +188,12 @@ QVariant MapsTreeModel::headerData(int section, Qt::Orientation orientation, int
 
     return QVariant();
 }
+
+void MapsTreeModel::renameNode(const QString& oldName, const QString& newName)
+{
+    auto oldNameItems = findItems(oldName,  Qt::MatchRecursive);
+    const int nbItems = oldNameItems.size();
+    for (int i = 0; i < nbItems; ++i)
+        oldNameItems[i]->setText(newName);
+}
 } // namespace Editor

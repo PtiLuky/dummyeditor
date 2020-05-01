@@ -64,6 +64,7 @@ class MapsTreeModel : public QStandardItemModel
 public:
     explicit MapsTreeModel(const QDomNode& mapsNode);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    void renameNode(const QString& oldName, const QString& newName);
 
 private:
     void XmlMapToQItem(const QDomNode& mapsNode, QStandardItem* parent);
