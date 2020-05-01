@@ -175,6 +175,20 @@
                  </spacer>
                 </item>
                 <item>
+                 <widget class="QPushButton" name="btn_refreshTileset">
+                  <property name="toolTip">
+                   <string>Refresh tileset</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../icons.qrc">
+                    <normaloff>:/icons/icon_refresh.png</normaloff>:/icons/icon_refresh.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QPushButton" name="btnSwapBackground">
                   <property name="toolTip">
                    <string>Toggle dark background</string>

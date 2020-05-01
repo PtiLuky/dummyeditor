@@ -49,14 +49,12 @@ LayerGraphicItems::LayerGraphicItems(Dummy::GraphicLayer& layer, const std::vect
     const size_t nbCells = layer.size();
     indexedItems().resize(nbCells);
 
-    size_t index = 0;
-    uint16_t w   = m_graphicLayer.width();
-    uint16_t h   = m_graphicLayer.height();
+    uint16_t w = m_graphicLayer.width();
+    uint16_t h = m_graphicLayer.height();
     for (uint16_t x = 0; x < w; ++x)
         for (uint16_t y = 0; y < h; ++y) {
             Dummy::Coord coord {x, y};
             setTile(coord, m_graphicLayer.at(coord));
-            ++index;
         }
 }
 
@@ -84,6 +82,21 @@ void LayerGraphicItems::setTile(Dummy::Coord coord, Dummy::Tileaspect aspect)
 
         m_graphicLayer.set(coord, aspect);
     }
+}
+
+void LayerGraphicItems::updateTilesets(const std::vector<QPixmap>& chipsets,
+                                       const std::vector<Dummy::chip_id>& chipsetIds)
+{
+    m_chipsets   = chipsets;
+    m_chipsetIds = chipsetIds;
+
+    uint16_t w = m_graphicLayer.width();
+    uint16_t h = m_graphicLayer.height();
+    for (uint16_t x = 0; x < w; ++x)
+        for (uint16_t y = 0; y < h; ++y) {
+            Dummy::Coord coord {x, y};
+            setTile(coord, m_graphicLayer.at(coord));
+        }
 }
 
 const Dummy::GraphicLayer& LayerGraphicItems::layer()

@@ -327,6 +327,16 @@ void GeneralWindow::on_btnSwapBackground_clicked(bool isDown)
     m_chipsetScene.setDarkBackground(isDown);
 }
 
+void GeneralWindow::on_btn_refreshTileset_clicked()
+{
+    const auto* map = m_loadedProject->currMap();
+    if (map == nullptr)
+        return;
+
+    m_chipsetScene.refreshChipsets();
+    m_mapScene.updateTilesets(m_chipsetScene.chipsets(), map->chipsetsUsed());
+}
+
 void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
 {
     m_chipsetScene.setGridVisible(isDown);

@@ -46,13 +46,14 @@ public:
                                const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorIdx, uint8_t layerIdx,
                                int zIndex);
     void setTile(Dummy::Coord, Dummy::Tileaspect);
+    void updateTilesets(const std::vector<QPixmap>& chipsets, const std::vector<Dummy::chip_id>& chipsetIds);
     const Dummy::GraphicLayer& layer();
 
 private:
     size_t idxOfId(Dummy::chip_id);
     Dummy::GraphicLayer& m_graphicLayer;
-    const std::vector<QPixmap> m_chipsets;
-    const std::vector<Dummy::chip_id> m_chipsetIds;
+    std::vector<QPixmap> m_chipsets;
+    std::vector<Dummy::chip_id> m_chipsetIds;
 };
 
 //////////////////////////////////////////////////////////////////////////////
