@@ -245,6 +245,8 @@ void MapTools::copyCut(eCopyCut action)
 {
     if (m_currLayerType == eLayerType::Graphic && m_visLayer != nullptr) {
         QRect selectedRect = m_mapScene.selectionRect().toRect();
+        if (selectedRect.isNull())
+            return;
 
         std::vector<Dummy::Tileaspect> valuesInPatch;
         uint16_t minX       = static_cast<uint16_t>(selectedRect.x()) / CELL_W;
@@ -266,6 +268,9 @@ void MapTools::copyCut(eCopyCut action)
         }
     } else if (m_currLayerType == eLayerType::Blocking && m_blockLayer != nullptr) {
         QRect selectedRect = m_mapScene.selectionRect().toRect();
+        if (selectedRect.isNull())
+            return;
+
         std::vector<bool> valuesInPatch;
         uint16_t minX       = static_cast<uint16_t>(selectedRect.x()) / CELL_W;
         uint16_t minY       = static_cast<uint16_t>(selectedRect.y()) / CELL_W;

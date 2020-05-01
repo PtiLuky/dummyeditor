@@ -602,7 +602,7 @@
   <customwidget>
    <class>Editor::SpritesWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/SpritesWidget.hpp</header>
+   <header>widgets/spritesWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
