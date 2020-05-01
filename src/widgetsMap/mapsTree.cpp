@@ -1,4 +1,4 @@
-#include "widgets/mapsTree.hpp"
+#include "widgetsMap/mapsTree.hpp"
 
 #include <QMenu>
 #include <QMessageBox>

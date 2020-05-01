@@ -1,8 +1,8 @@
 #ifndef MAPTOOLS_H
 #define MAPTOOLS_H
 
-#include "widgets/chipsetGraphicsScene.hpp"
-#include "widgets/mapGraphicsScene.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
+#include "widgetsMap/mapGraphicsScene.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration

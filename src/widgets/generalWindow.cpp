@@ -27,8 +27,11 @@ GeneralWindow::GeneralWindow(QWidget* parent)
     m_ui->graphicsViewMap->setBackgroundBrush(QColor("#969696"));
 
     // Set default sizes of movable splitters between panels
-    QList<int> horiCoef = {width() / 4, width() - (width() / 4)};
-    QList<int> vertCoef = {width() / 4, width() - (width() / 4)};
+
+    int minWidth        = width() / 4;
+    int minHeight       = height() / 3;
+    QList<int> horiCoef = {minWidth, 3 * minWidth};
+    QList<int> vertCoef = {minHeight, 2 * minHeight};
     m_ui->splitter_map->setSizes(horiCoef);
     m_ui->splitter_chipset->setSizes(vertCoef);
 
@@ -150,6 +153,7 @@ void GeneralWindow::updateProjectView()
     }
 
     // update tabs content
+    m_ui->tab_sprites->setProject(m_loadedProject);
     updateMapsAndFloorsList();
     updateChipsetsTab();
 
@@ -328,6 +332,12 @@ void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
     m_chipsetScene.setGridVisible(isDown);
 }
 
+void GeneralWindow::on_maps_panel_currentChanged(int currentIdx)
+{
+    if (currentIdx == 1)
+        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isEnabled());
+}
+
 void GeneralWindow::activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_t layerIdx)
 {
     if (type == eLayerType::Graphic) {
@@ -386,7 +396,11 @@ void GeneralWindow::on_actionSelection_triggered()
 
 void GeneralWindow::on_actionToggleGrid_triggered()
 {
-    m_mapTools.updateGridDisplay();
+    if (m_ui->maps_panel->currentIndex() == 0)
+        m_mapTools.updateGridDisplay();
+
+    else if (m_ui->maps_panel->currentIndex() == 1)
+        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isEnabled());
 }
 
 void GeneralWindow::on_actionCut_triggered()
@@ -413,21 +427,34 @@ void GeneralWindow::on_actionRedo_triggered()
 }
 void GeneralWindow::on_actionZoomIn_triggered()
 {
-    m_ui->graphicsViewMap->scale(2.0, 2.0);
+    if (m_ui->maps_panel->currentIndex() == 0)
+        m_ui->graphicsViewMap->scale(2.0, 2.0);
+
+    else if (m_ui->maps_panel->currentIndex() == 1)
+        m_ui->tab_sprites->zoomIn();
 }
 void GeneralWindow::on_actionZoomOut_triggered()
 {
-    m_ui->graphicsViewMap->scale(0.5, 0.5);
+    if (m_ui->maps_panel->currentIndex() == 0)
+        m_ui->graphicsViewMap->scale(0.5, 0.5);
+
+    else if (m_ui->maps_panel->currentIndex() == 1)
+        m_ui->tab_sprites->zoomOut();
 }
 void GeneralWindow::on_actionResize_triggered()
 {
-    if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
-        return;
+    if (m_ui->maps_panel->currentIndex() == 0) {
+        if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
+            return;
 
-    qreal minScale = std::min(m_ui->graphicsViewMap->height() / m_mapScene.height(),
-                              m_ui->graphicsViewMap->width() / m_mapScene.width());
-    m_ui->graphicsViewMap->resetTransform();
-    m_ui->graphicsViewMap->scale(minScale, minScale);
+        qreal minScale = std::min(m_ui->graphicsViewMap->height() / m_mapScene.height(),
+                                  m_ui->graphicsViewMap->width() / m_mapScene.width());
+        m_ui->graphicsViewMap->resetTransform();
+        m_ui->graphicsViewMap->scale(minScale, minScale);
+
+    } else if (m_ui->maps_panel->currentIndex() == 1) {
+        m_ui->tab_sprites->zoomFit();
+    }
 }
 
 void GeneralWindow::mapZoomTriggered(MapGraphicsScene::eZoom zoom)

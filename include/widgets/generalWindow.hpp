@@ -6,8 +6,8 @@
 
 #include "editor/project.hpp"
 #include "utils/logger.hpp"
-#include "widgets/chipsetGraphicsScene.hpp"
-#include "widgets/mapGraphicsScene.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
+#include "widgetsMap/mapGraphicsScene.hpp"
 #include "widgets/mapTools.hpp"
 
 namespace Ui {
@@ -40,6 +40,7 @@ private slots:
     void on_mapsList_doubleClicked(const QModelIndex& selectedIndex);
     void on_btnSwapBackground_clicked(bool isDown);
     void on_toggleGridChipset_clicked(bool isDown);
+    void on_maps_panel_currentChanged(int);
 
     void on_actionEraser_triggered();
     void on_actionPen_triggered();

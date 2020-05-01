@@ -1,4 +1,4 @@
-#include "widgets/mapGraphicsScene.hpp"
+#include "widgetsMap/mapGraphicsScene.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 

@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "dummyrpg/map.hpp"
-#include "widgets/layerItems.hpp"
+#include "widgetsMap/layerItems.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration

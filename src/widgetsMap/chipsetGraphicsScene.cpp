@@ -1,4 +1,4 @@
-#include "widgets/chipsetGraphicsScene.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 

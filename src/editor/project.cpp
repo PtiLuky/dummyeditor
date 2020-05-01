@@ -7,7 +7,7 @@
 
 #include "dummyrpg/serialize.hpp"
 #include "utils/logger.hpp"
-#include "widgets/mapsTree.hpp"
+#include "widgetsMap/mapsTree.hpp"
 
 using std::make_shared;
 using std::make_unique;

@@ -1,8 +1,8 @@
-#include "widgets/layerItems.hpp"
+#include "widgetsMap/layerItems.hpp"
 
 #include <QGraphicsItem>
 
-#include "widgets/graphicItem.hpp"
+#include "widgetsMap/graphicItem.hpp"
 
 namespace Editor {
 
