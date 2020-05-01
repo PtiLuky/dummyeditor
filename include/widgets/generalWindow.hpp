@@ -38,6 +38,7 @@ private slots:
     void on_actionClose_triggered();
     void on_actionPlay_triggered();
     void on_mapsList_doubleClicked(const QModelIndex& selectedIndex);
+    void on_btnSwapBackground_clicked(bool isDown);
     void on_toggleGridChipset_clicked(bool isDown);
 
     void on_actionEraser_triggered();

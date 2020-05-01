@@ -318,6 +318,11 @@ void GeneralWindow::loadMap(const QString& mapName)
     m_ui->maps_panel->setCurrentIndex(1);
 }
 
+void GeneralWindow::on_btnSwapBackground_clicked(bool isDown)
+{
+    m_chipsetScene.setDarkBackground(isDown);
+}
+
 void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
 {
     m_chipsetScene.setGridVisible(isDown);

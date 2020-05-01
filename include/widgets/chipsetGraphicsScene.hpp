@@ -30,6 +30,7 @@ public:
 public slots:
     void clear();
     void setGridVisible(bool visible = true);
+    void setDarkBackground(bool dark = true);
 
 private:
     void drawGrid();

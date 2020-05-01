@@ -6,7 +6,9 @@
 
 ChipsetGraphicsScene::ChipsetGraphicsScene(QObject* parent)
     : QGraphicsScene(parent)
-{}
+{
+    setDarkBackground(false);
+}
 
 void ChipsetGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
@@ -84,6 +86,14 @@ void ChipsetGraphicsScene::setGridVisible(bool visible)
         drawGrid();
     else
         m_gridItems.clear();
+}
+
+void ChipsetGraphicsScene::setDarkBackground(bool dark)
+{
+    if (dark)
+        setBackgroundBrush(QColor(20, 20, 20));
+    else
+        setBackgroundBrush(QColor(240, 240, 240));
 }
 
 void ChipsetGraphicsScene::setChipset(const std::vector<QString>& chipsetPaths,
