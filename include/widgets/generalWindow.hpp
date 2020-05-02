@@ -41,7 +41,7 @@ private slots:
     void on_btnSwapBackground_clicked(bool isDown);
     void on_btn_refreshTileset_clicked();
     void on_toggleGridChipset_clicked(bool isDown);
-    void on_maps_panel_currentChanged(int);
+    void on_panels_tabs_currentChanged(int);
 
     void on_actionEraser_triggered();
     void on_actionPen_triggered();

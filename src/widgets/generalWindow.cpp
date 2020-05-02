@@ -342,7 +342,7 @@ void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
     m_chipsetScene.setGridVisible(isDown);
 }
 
-void GeneralWindow::on_maps_panel_currentChanged(int currentIdx)
+void GeneralWindow::on_panels_tabs_currentChanged(int currentIdx)
 {
     if (currentIdx == 1)
         m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isEnabled());
@@ -406,11 +406,11 @@ void GeneralWindow::on_actionSelection_triggered()
 
 void GeneralWindow::on_actionToggleGrid_triggered()
 {
-    if (m_ui->maps_panel->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentIndex() == 0)
         m_mapTools.updateGridDisplay();
 
-    else if (m_ui->maps_panel->currentIndex() == 1)
-        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isEnabled());
+    else if (m_ui->panels_tabs->currentIndex() == 1)
+        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isChecked());
 }
 
 void GeneralWindow::on_actionCut_triggered()
@@ -437,23 +437,23 @@ void GeneralWindow::on_actionRedo_triggered()
 }
 void GeneralWindow::on_actionZoomIn_triggered()
 {
-    if (m_ui->maps_panel->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentIndex() == 0)
         m_ui->graphicsViewMap->scale(2.0, 2.0);
 
-    else if (m_ui->maps_panel->currentIndex() == 1)
+    else if (m_ui->panels_tabs->currentIndex() == 1)
         m_ui->tab_sprites->zoomIn();
 }
 void GeneralWindow::on_actionZoomOut_triggered()
 {
-    if (m_ui->maps_panel->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentIndex() == 0)
         m_ui->graphicsViewMap->scale(0.5, 0.5);
 
-    else if (m_ui->maps_panel->currentIndex() == 1)
+    else if (m_ui->panels_tabs->currentIndex() == 1)
         m_ui->tab_sprites->zoomOut();
 }
 void GeneralWindow::on_actionResize_triggered()
 {
-    if (m_ui->maps_panel->currentIndex() == 0) {
+    if (m_ui->panels_tabs->currentIndex() == 0) {
         if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
             return;
 
@@ -462,8 +462,8 @@ void GeneralWindow::on_actionResize_triggered()
         m_ui->graphicsViewMap->resetTransform();
         m_ui->graphicsViewMap->scale(minScale, minScale);
 
-    } else if (m_ui->maps_panel->currentIndex() == 1) {
-        m_ui->tab_sprites->zoomFit();
+    } else if (m_ui->panels_tabs->currentIndex() == 1) {
+        m_ui->tab_sprites->zoomOne();
     }
 }
 

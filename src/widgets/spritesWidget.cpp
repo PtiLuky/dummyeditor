@@ -2,6 +2,13 @@
 #include "ui_spritesWidget.h"
 
 #include <QFileDialog>
+#include <QMouseEvent>
+#include <QPainter>
+
+#include "dummyrpg/dummy_types.hpp"
+
+static const float ZOOM_MAX = 16.f;
+static const float ZOOM_MIN = 0.5f;
 
 namespace Editor {
 
@@ -39,6 +46,50 @@ void SpritesWidget::setCurrentSprite(Dummy::sprite_id id)
     updateImage();
 }
 
+void SpritesWidget::mousePressEvent(QMouseEvent* e)
+{
+    if (! isOverImage(e->pos()))
+        return;
+
+    QPoint clickPos = mapToImage(e->pos());
+    m_firstClick    = clickPos;
+    setRect(QRect(m_firstClick, m_firstClick));
+}
+
+void SpritesWidget::mouseMoveEvent(QMouseEvent* e)
+{
+    if (! isOverImage(e->pos()))
+        return;
+
+    QPoint otherClick = mapToImage(e->pos());
+    setRect(QRect(m_firstClick, otherClick).normalized());
+}
+
+void SpritesWidget::mouseReleaseEvent(QMouseEvent* e)
+{
+    if (! isOverImage(e->pos()))
+        return;
+
+    QPoint otherClick = mapToImage(e->pos());
+    setRect(QRect(m_firstClick, otherClick).normalized());
+}
+
+bool SpritesWidget::isOverImage(const QPoint& p) const
+{
+    QPoint scrollTL = m_ui->scrollwrapper->mapTo(this, m_ui->scrollwrapper->rect().topLeft());
+    QPoint scrollBR = m_ui->scrollwrapper->mapTo(this, m_ui->scrollwrapper->rect().bottomRight());
+    return QRect(scrollTL, scrollBR).contains(p);
+}
+
+void SpritesWidget::wheelEvent(QWheelEvent* e)
+{
+    if (e->modifiers().testFlag(Qt::ControlModifier) && (e->delta() > 0)) {
+        zoomIn();
+    } else if (e->modifiers().testFlag(Qt::ControlModifier) && (e->delta() < 0)) {
+        zoomOut();
+    }
+}
+
 void SpritesWidget::updateImage()
 {
     const auto& spritesSheets = m_loadedProject->game().spriteSheets;
@@ -57,10 +108,49 @@ void SpritesWidget::updateImage()
         m_ui->label->setText(QString::number(m_currSpriteId) + " - " + tr("Undefined"));
         m_ui->image_center->setText(tr("Select a sprite sheet"));
         m_ui->image_center->setEnabled(false);
+        m_loadedSpriteSheet = QPixmap();
         return;
     }
 
+    m_ui->input_x->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_width->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_y->setMaximum(m_loadedSpriteSheet.height());
+    m_ui->input_height->setMaximum(m_loadedSpriteSheet.height());
+
+    updateImageDisplay();
+}
+
+void SpritesWidget::updateImageDisplay()
+{
+    if (m_loadedSpriteSheet.isNull())
+        return;
+
     QPixmap displayImg = m_loadedSpriteSheet.scaledToWidth(static_cast<int>(m_loadedSpriteSheet.width() * m_zoom));
+
+    // Pain overlays
+    QPainter p(&displayImg);
+    // grid
+    if (m_showGrid) {
+        QVector<QLine> lines;
+        // vectical lines
+        for (int x = 0; x < displayImg.width(); x += scaled(Dummy::TILE_SIZE))
+            lines.push_back({{x, 0}, {x, displayImg.height()}});
+        // Horizontal lines
+        for (int y = 0; y < displayImg.height(); y += scaled(Dummy::TILE_SIZE))
+            lines.push_back({{0, y}, {displayImg.width(), y}});
+
+        p.setPen(QColor(0, 0, 0, 150));
+        p.drawLines(lines);
+    }
+    // Selection rectangle
+    if (! m_activeRect.isNull()) {
+        QRect scaledRect(scaled(m_activeRect.x()), scaled(m_activeRect.y()), //
+                         scaled(m_activeRect.width()) - 1, scaled(m_activeRect.height()) - 1);
+
+        p.setPen(Qt::red);
+        p.drawRect(scaledRect);
+    }
+
     m_ui->image_center->setEnabled(true);
     m_ui->image_center->setPixmap(displayImg);
 }
@@ -89,10 +179,83 @@ void SpritesWidget::loadSpritesList()
     m_ui->list_sprites->setCurrentRow(selectedRow);
 }
 
-void SpritesWidget::zoomIn() {}
-void SpritesWidget::zoomOut() {}
-void SpritesWidget::zoomFit() {}
-void SpritesWidget::setGrid(bool showGrid) {}
+void SpritesWidget::setRect(const QRect& rect)
+{
+    m_activeRect = rect.normalized();
+
+    // block signals
+    m_ui->input_x->blockSignals(true);
+    m_ui->input_y->blockSignals(true);
+    m_ui->input_width->blockSignals(true);
+    m_ui->input_height->blockSignals(true);
+
+    // And set the new values
+    m_ui->input_x->setValue(rect.x());
+    m_ui->input_y->setValue(rect.y());
+    m_ui->input_width->setValue(rect.width());
+    m_ui->input_height->setValue(rect.height());
+
+    m_ui->input_x->blockSignals(false);
+    m_ui->input_y->blockSignals(false);
+    m_ui->input_width->blockSignals(false);
+    m_ui->input_height->blockSignals(false);
+
+    auto* pSprite = m_loadedProject->spriteAt(m_currSpriteId);
+    if (pSprite != nullptr) {
+        pSprite->x      = static_cast<uint16_t>(rect.x());
+        pSprite->y      = static_cast<uint16_t>(rect.y());
+        pSprite->width  = static_cast<uint16_t>(rect.width());
+        pSprite->height = static_cast<uint16_t>(rect.height());
+    }
+    updateImageDisplay();
+}
+
+void SpritesWidget::zoomIn()
+{
+    m_zoom = std::min(m_zoom * 2.f, ZOOM_MAX);
+    updateImageDisplay();
+}
+
+void SpritesWidget::zoomOut()
+{
+    m_zoom = std::max(m_zoom / 2.f, ZOOM_MIN);
+    updateImageDisplay();
+}
+
+void SpritesWidget::zoomOne()
+{
+    m_zoom = 1;
+    updateImageDisplay();
+}
+
+void SpritesWidget::setGrid(bool showGrid)
+{
+    m_showGrid = showGrid;
+    updateImageDisplay();
+}
+
+int SpritesWidget::scaled(int in) const
+{
+    return static_cast<int>(in * m_zoom);
+}
+
+QPoint SpritesWidget::mapToImage(const QPoint& pt) const
+{
+    const QPoint imgPos = m_ui->image_center->mapTo(this, {0, 0});
+
+    QPoint posInImg = pt - imgPos;
+    if (m_zoom > 0) {
+        posInImg.setX(static_cast<int>(posInImg.x() / m_zoom));
+        posInImg.setY(static_cast<int>(posInImg.y() / m_zoom));
+    }
+
+    QPoint outPt;
+    QSize maxSize = m_loadedSpriteSheet.size();
+    outPt.setX(std::max(std::min(posInImg.x(), maxSize.width() - 1), 0));
+    outPt.setY(std::max(std::min(posInImg.y(), maxSize.height() - 1), 0));
+
+    return outPt;
+}
 
 void SpritesWidget::on_btn_loadImage_clicked()
 {
@@ -136,5 +299,25 @@ void SpritesWidget::on_check_useMultiDir_clicked(bool checked) {}
 
 void SpritesWidget::on_check_useAnimation_clicked(bool checked) {}
 
+void SpritesWidget::on_input_x_valueChanged(int val)
+{
+    m_activeRect.setX(val);
+    setRect(m_activeRect);
+}
+void SpritesWidget::on_input_y_valueChanged(int val)
+{
+    m_activeRect.setY(val);
+    setRect(m_activeRect);
+}
+void SpritesWidget::on_input_width_valueChanged(int val)
+{
+    m_activeRect.setWidth(val);
+    setRect(m_activeRect);
+}
+void SpritesWidget::on_input_height_valueChanged(int val)
+{
+    m_activeRect.setHeight(val);
+    setRect(m_activeRect);
+}
 
 } // namespace Editor
