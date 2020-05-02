@@ -51,7 +51,7 @@ For other platerforms you will have to build it from sources, see below "Install
 ## How to contribute and what to do?
 
 Check out the [Contributing guide](https://github.com/PtiLuky/dummyRPG/blob/master/doc/contributing.md).
-Don't hesistate to come on our [Discord server](https://discord.gg/2KmsVp) !
+Don't hesistate to come on our [Discord server](https://discord.gg/qzx4AjT) !
 
 All help is welcome :)
 
@@ -63,4 +63,4 @@ Tools:
 * CMake (for building)
 
 An [installation guide](docs/Installation_Windows-en.md) (available in [french](docs/Installation_Windows-fr.md)) has been written. Procedure for Linux is
-quite similar. Please tell us on [Discord](https://discord.gg/2KmsVp) if you need help for Linux installation.
+quite similar. Please tell us on [Discord](https://discord.gg/qzx4AjT) if you need help for Linux installation.

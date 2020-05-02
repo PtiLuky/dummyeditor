@@ -51,8 +51,9 @@ Project::Project(const QString& projectFile)
     }
 
     m_mapsModel   = std::move(mapsTree);
-    m_game        = newGameData;
+    m_game        = std::move(newGameData);
     m_projectPath = fileInfo.path();
+    m_game.setGameDataPath(m_projectPath.toStdString());
 }
 
 const QString& Project::projectPath() const
@@ -61,6 +62,11 @@ const QString& Project::projectPath() const
 }
 
 const Dummy::GameStatic& Project::game() const
+{
+    return m_game;
+}
+
+Dummy::GameStatic& Project::game()
 {
     return m_game;
 }
@@ -174,7 +180,7 @@ bool Project::saveCurrMap()
 {
     if (m_currMap == nullptr) {
         Log::error("No current map to save");
-        return false;
+        return true;
     }
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
@@ -294,6 +300,24 @@ bool Project::renameCurrMap(const QString& newName)
     saveProject();
 
     return true;
+}
+
+void Project::createSprite()
+{
+    const size_t nbsprites = m_game.sprites.size();
+    if (nbsprites >= std::numeric_limits<Dummy::sprite_id>::max())
+        return;
+
+    m_game.sprites.push_back(Dummy::AnimatedSprite());
+    changed();
+}
+
+Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
+{
+    if (id >= m_game.sprites.size())
+        return nullptr;
+
+    return &m_game.sprites[id];
 }
 
 QString Project::sanitizeMapName(const QString& unsafeName)

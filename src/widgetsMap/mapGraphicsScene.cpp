@@ -81,7 +81,7 @@ void MapGraphicsScene::drawGrid(quint16 width, quint16 height, unsigned int unit
 void MapGraphicsScene::updateTilesets(const std::vector<QPixmap>& tilesets,
                                       const std::vector<Dummy::chip_id>& chipsetIds)
 {
-    for (auto& layerGraph : m_visibleLayers)
+    for (const auto& layerGraph : m_visibleLayers)
         layerGraph->updateTilesets(tilesets, chipsetIds);
     update();
 }
