@@ -99,10 +99,12 @@ void Project::changed()
 
 void Project::testMap()
 {
-    if (m_currMapName.isNull())
+    if (m_currMapName.isNull()) {
+        Log::error(tr("Impossible to play: no map loaded"));
         return;
+    }
 
-    saveCurrMap();
+    saveProject();
 #ifdef _WIN32
     QString playerProgram = "player.exe";
 #else

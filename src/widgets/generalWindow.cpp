@@ -236,15 +236,15 @@ void GeneralWindow::on_actionNew_triggered()
 
 void GeneralWindow::on_actionOpen_triggered()
 {
-    // Close current project
-    bool projectClosed = closeProject();
-    if (! projectClosed)
-        return;
-
     // Ask where new is
     QString projectFile =
         QFileDialog::getOpenFileName(this, tr("Choose an existing project file"), "", tr("Dummy Project (*.xml)"));
     if (projectFile == "")
+        return;
+
+    // Close current project
+    bool projectClosed = closeProject();
+    if (! projectClosed)
         return;
 
     // Open new

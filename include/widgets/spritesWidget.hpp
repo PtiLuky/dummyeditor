@@ -41,16 +41,34 @@ public slots:
     void on_btn_loadImage_clicked();
     void on_btn_newSprite_clicked();
     void on_list_sprites_currentRowChanged(int);
+
     void on_check_useMultiDir_clicked(bool checked);
-    void on_check_useAnimation_clicked(bool checked);
-    void on_input_x_valueChanged(int);
-    void on_input_y_valueChanged(int);
     void on_input_width_valueChanged(int);
     void on_input_height_valueChanged(int);
 
+    void on_check_anim1_clicked(bool checked);
+    void on_input_frameCount1_valueChanged(int);
+    void on_input_x1_valueChanged(int);
+    void on_input_y1_valueChanged(int);
+
+    void on_check_anim2_clicked(bool checked);
+    void on_input_frameCount2_valueChanged(int);
+    void on_input_x2_valueChanged(int);
+    void on_input_y2_valueChanged(int);
+
+    void on_check_anim3_clicked(bool checked);
+    void on_input_frameCount3_valueChanged(int);
+    void on_input_x3_valueChanged(int);
+    void on_input_y3_valueChanged(int);
+
+    void on_check_anim4_clicked(bool checked);
+    void on_input_frameCount4_valueChanged(int);
+    void on_input_x4_valueChanged(int);
+    void on_input_y4_valueChanged(int);
+
 private:
     void loadSpritesList();
-    void setRect(const QRect&);
+    void updateFields();
     void updateImage();        ///< fetch and update image
     void updateImageDisplay(); ///< update only elments drawn over the image
     int scaled(int) const;     ///< apply zoom
@@ -67,7 +85,6 @@ private:
     float m_zoom    = 4.F;
     bool m_showGrid = false;
     QPoint m_firstClick;
-    QRect m_activeRect;
 };
 } // namespace Editor
 

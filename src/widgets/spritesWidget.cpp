@@ -51,9 +51,14 @@ void SpritesWidget::mousePressEvent(QMouseEvent* e)
     if (! isOverImage(e->pos()))
         return;
 
-    QPoint clickPos = mapToImage(e->pos());
-    m_firstClick    = clickPos;
-    setRect(QRect(m_firstClick, m_firstClick));
+    m_firstClick = mapToImage(e->pos());
+
+    QRect rect(m_firstClick, m_firstClick);
+    on_input_x1_valueChanged(rect.x());
+    on_input_y1_valueChanged(rect.y());
+    on_input_width_valueChanged(rect.width());
+    on_input_height_valueChanged(rect.height());
+    updateFields();
 }
 
 void SpritesWidget::mouseMoveEvent(QMouseEvent* e)
@@ -62,7 +67,13 @@ void SpritesWidget::mouseMoveEvent(QMouseEvent* e)
         return;
 
     QPoint otherClick = mapToImage(e->pos());
-    setRect(QRect(m_firstClick, otherClick).normalized());
+    QRect rect(m_firstClick, otherClick);
+    rect = rect.normalized();
+    on_input_x1_valueChanged(rect.x());
+    on_input_y1_valueChanged(rect.y());
+    on_input_width_valueChanged(rect.width());
+    on_input_height_valueChanged(rect.height());
+    updateFields();
 }
 
 void SpritesWidget::mouseReleaseEvent(QMouseEvent* e)
@@ -71,7 +82,13 @@ void SpritesWidget::mouseReleaseEvent(QMouseEvent* e)
         return;
 
     QPoint otherClick = mapToImage(e->pos());
-    setRect(QRect(m_firstClick, otherClick).normalized());
+    QRect rect(m_firstClick, otherClick);
+    rect = rect.normalized();
+    on_input_x1_valueChanged(rect.x());
+    on_input_y1_valueChanged(rect.y());
+    on_input_width_valueChanged(rect.width());
+    on_input_height_valueChanged(rect.height());
+    updateFields();
 }
 
 bool SpritesWidget::isOverImage(const QPoint& p) const
@@ -90,6 +107,99 @@ void SpritesWidget::wheelEvent(QWheelEvent* e)
     }
 }
 
+void SpritesWidget::updateFields()
+{
+    const auto& sprites = m_loadedProject->game().sprites;
+    if (m_currSpriteId >= sprites.size())
+        return;
+    const auto& sprite = sprites[m_currSpriteId];
+
+    // Block signal to avoid redundant signals
+    m_ui->check_anim1->blockSignals(true);
+    m_ui->check_anim2->blockSignals(true);
+    m_ui->check_anim3->blockSignals(true);
+    m_ui->check_anim4->blockSignals(true);
+    m_ui->input_frameCount1->blockSignals(true);
+    m_ui->input_frameCount2->blockSignals(true);
+    m_ui->input_frameCount3->blockSignals(true);
+    m_ui->input_frameCount4->blockSignals(true);
+    m_ui->input_x1->blockSignals(true);
+    m_ui->input_x2->blockSignals(true);
+    m_ui->input_x3->blockSignals(true);
+    m_ui->input_x4->blockSignals(true);
+    m_ui->input_y1->blockSignals(true);
+    m_ui->input_y2->blockSignals(true);
+    m_ui->input_y3->blockSignals(true);
+    m_ui->input_y4->blockSignals(true);
+    m_ui->input_width->blockSignals(true);
+    m_ui->input_height->blockSignals(true);
+    m_ui->check_useMultiDir->blockSignals(true);
+
+    // Set values
+    m_ui->check_useMultiDir->setChecked(sprite.has4Directions);
+    m_ui->input_width->setValue(sprite.width);
+    m_ui->input_height->setValue(sprite.height);
+    // Anim 1
+    m_ui->check_anim1->setChecked(true);
+    m_ui->check_anim1->setEnabled(false);
+    m_ui->input_frameCount1->setValue(sprite.nbFrames);
+    m_ui->input_x1->setValue(sprite.x);
+    m_ui->input_y1->setValue(sprite.y);
+    // Anim 2
+    bool useAnim2 = sprite.nbFrames2 > 0;
+    m_ui->check_anim2->setChecked(useAnim2);
+    m_ui->check_anim2->setEnabled(sprite.nbFrames3 == 0); // Can only uncheck if next is empty
+    m_ui->input_frameCount2->setEnabled(useAnim2);
+    m_ui->input_frameCount2->setValue(sprite.nbFrames2);
+    m_ui->input_x2->setEnabled(useAnim2);
+    m_ui->input_x2->setValue(sprite.x2);
+    m_ui->input_y2->setEnabled(useAnim2);
+    m_ui->input_y2->setValue(sprite.y2);
+    // anim3
+    bool useAnim3 = sprite.nbFrames3 > 0;
+    m_ui->check_anim3->setChecked(useAnim3);
+    m_ui->check_anim3->setEnabled((sprite.nbFrames4 == 0 && useAnim3) || (sprite.nbFrames2 > 0 && ! useAnim3));
+    m_ui->input_frameCount3->setEnabled(useAnim3);
+    m_ui->input_frameCount3->setValue(sprite.nbFrames3);
+    m_ui->input_x3->setEnabled(useAnim3);
+    m_ui->input_x3->setValue(sprite.x3);
+    m_ui->input_y3->setEnabled(useAnim3);
+    m_ui->input_y3->setValue(sprite.y3);
+    // anim4
+    bool useAnim4 = sprite.nbFrames4 > 0;
+    m_ui->check_anim4->setChecked(useAnim4);
+    m_ui->check_anim4->setEnabled(useAnim4 || (sprite.nbFrames3 > 0 && ! useAnim4));
+    m_ui->input_frameCount4->setEnabled(useAnim4);
+    m_ui->input_frameCount4->setValue(sprite.nbFrames4);
+    m_ui->input_x4->setEnabled(useAnim4);
+    m_ui->input_x4->setValue(sprite.x4);
+    m_ui->input_y4->setEnabled(useAnim4);
+    m_ui->input_y4->setValue(sprite.y4);
+
+    // Unblock signals
+    m_ui->check_anim1->blockSignals(false);
+    m_ui->check_anim2->blockSignals(false);
+    m_ui->check_anim3->blockSignals(false);
+    m_ui->check_anim4->blockSignals(false);
+    m_ui->input_frameCount1->blockSignals(false);
+    m_ui->input_frameCount2->blockSignals(false);
+    m_ui->input_frameCount3->blockSignals(false);
+    m_ui->input_frameCount4->blockSignals(false);
+    m_ui->input_x1->blockSignals(false);
+    m_ui->input_x2->blockSignals(false);
+    m_ui->input_x3->blockSignals(false);
+    m_ui->input_x4->blockSignals(false);
+    m_ui->input_y1->blockSignals(false);
+    m_ui->input_y2->blockSignals(false);
+    m_ui->input_y3->blockSignals(false);
+    m_ui->input_y4->blockSignals(false);
+    m_ui->input_width->blockSignals(false);
+    m_ui->input_height->blockSignals(false);
+    m_ui->check_useMultiDir->blockSignals(false);
+
+    updateImageDisplay();
+}
+
 void SpritesWidget::updateImage()
 {
     const auto& spritesSheets = m_loadedProject->game().spriteSheets;
@@ -99,7 +209,7 @@ void SpritesWidget::updateImage()
 
     const auto& sprite = sprites[m_currSpriteId];
     // Set the image and its name
-    if (sprites[m_currSpriteId].spriteSheetId < spritesSheets.size()) {
+    if (sprite.spriteSheetId < spritesSheets.size()) {
         QString sheetName   = QString::fromStdString(spritesSheets[sprite.spriteSheetId]);
         QString sheetPath   = QString::fromStdString(m_loadedProject->game().spriteSheetPath(sprite.spriteSheetId));
         m_loadedSpriteSheet = QPixmap(sheetPath);
@@ -112,12 +222,18 @@ void SpritesWidget::updateImage()
         return;
     }
 
-    m_ui->input_x->setMaximum(m_loadedSpriteSheet.width());
     m_ui->input_width->setMaximum(m_loadedSpriteSheet.width());
-    m_ui->input_y->setMaximum(m_loadedSpriteSheet.height());
     m_ui->input_height->setMaximum(m_loadedSpriteSheet.height());
+    m_ui->input_x1->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_y1->setMaximum(m_loadedSpriteSheet.height());
+    m_ui->input_x2->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_y2->setMaximum(m_loadedSpriteSheet.height());
+    m_ui->input_x3->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_y3->setMaximum(m_loadedSpriteSheet.height());
+    m_ui->input_x4->setMaximum(m_loadedSpriteSheet.width());
+    m_ui->input_y4->setMaximum(m_loadedSpriteSheet.height());
 
-    updateImageDisplay();
+    updateFields();
 }
 
 void SpritesWidget::updateImageDisplay()
@@ -142,12 +258,40 @@ void SpritesWidget::updateImageDisplay()
         p.setPen(QColor(0, 0, 0, 150));
         p.drawLines(lines);
     }
-    // Selection rectangle
-    if (! m_activeRect.isNull()) {
-        QRect scaledRect(scaled(m_activeRect.x()), scaled(m_activeRect.y()), //
-                         scaled(m_activeRect.width()) - 1, scaled(m_activeRect.height()) - 1);
 
-        p.setPen(Qt::red);
+    const auto* s = m_loadedProject->spriteAt(m_currSpriteId);
+    if (s == nullptr)
+        return; // ???
+
+    // Selection rectangle
+    std::vector<std::pair<QRect, QColor>> toDraw;
+    for (uint8_t fr = 0; fr < s->nbFrames; ++fr) {
+        toDraw.push_back({QRect(s->x + fr * s->width, s->y, s->width, s->height), fr == 0 ? Qt::red : Qt::magenta});
+        if (s->has4Directions)
+            toDraw.push_back({QRect(s->x + fr * s->width, s->y + s->height, s->width, s->height * 3), Qt::magenta});
+    }
+    for (uint8_t fr = 0; fr < s->nbFrames2; ++fr) {
+        toDraw.push_back({QRect(s->x2 + fr * s->width, s->y2, s->width, s->height), Qt::magenta});
+        if (s->has4Directions)
+            toDraw.push_back({QRect(s->x2 + fr * s->width, s->y2 + s->height, s->width, s->height * 3), Qt::magenta});
+    }
+    for (uint8_t fr = 0; fr < s->nbFrames3; ++fr) {
+        toDraw.push_back({QRect(s->x3 + fr * s->width, s->y3, s->width, s->height), Qt::magenta});
+        if (s->has4Directions)
+            toDraw.push_back({QRect(s->x3 + fr * s->width, s->y3 + s->height, s->width, s->height * 3), Qt::magenta});
+    }
+    for (uint8_t fr = 0; fr < s->nbFrames4; ++fr) {
+        toDraw.push_back({QRect(s->x4 + fr * s->width, s->y4, s->width, s->height), Qt::magenta});
+        if (s->has4Directions)
+            toDraw.push_back({QRect(s->x4 + fr * s->width, s->y4 + s->height, s->width, s->height * 3), Qt::magenta});
+    }
+
+    for (auto& pair : toDraw) {
+        auto& rec   = pair.first;
+        auto& color = pair.second;
+        QRect scaledRect(scaled(rec.x()), scaled(rec.y()), scaled(rec.width()) - 1, scaled(rec.height()) - 1);
+
+        p.setPen(color);
         p.drawRect(scaledRect);
     }
 
@@ -177,37 +321,6 @@ void SpritesWidget::loadSpritesList()
     }
     m_ui->list_sprites->blockSignals(false);
     m_ui->list_sprites->setCurrentRow(selectedRow);
-}
-
-void SpritesWidget::setRect(const QRect& rect)
-{
-    m_activeRect = rect.normalized();
-
-    // block signals
-    m_ui->input_x->blockSignals(true);
-    m_ui->input_y->blockSignals(true);
-    m_ui->input_width->blockSignals(true);
-    m_ui->input_height->blockSignals(true);
-
-    // And set the new values
-    m_ui->input_x->setValue(rect.x());
-    m_ui->input_y->setValue(rect.y());
-    m_ui->input_width->setValue(rect.width());
-    m_ui->input_height->setValue(rect.height());
-
-    m_ui->input_x->blockSignals(false);
-    m_ui->input_y->blockSignals(false);
-    m_ui->input_width->blockSignals(false);
-    m_ui->input_height->blockSignals(false);
-
-    auto* pSprite = m_loadedProject->spriteAt(m_currSpriteId);
-    if (pSprite != nullptr) {
-        pSprite->x      = static_cast<uint16_t>(rect.x());
-        pSprite->y      = static_cast<uint16_t>(rect.y());
-        pSprite->width  = static_cast<uint16_t>(rect.width());
-        pSprite->height = static_cast<uint16_t>(rect.height());
-    }
-    updateImageDisplay();
 }
 
 void SpritesWidget::zoomIn()
@@ -295,29 +408,135 @@ void SpritesWidget::on_list_sprites_currentRowChanged(int row)
     setCurrentSprite(static_cast<Dummy::sprite_id>(row));
 }
 
-void SpritesWidget::on_check_useMultiDir_clicked(bool checked) {}
-
-void SpritesWidget::on_check_useAnimation_clicked(bool checked) {}
-
-void SpritesWidget::on_input_x_valueChanged(int val)
+void SpritesWidget::on_check_useMultiDir_clicked(bool checked)
 {
-    m_activeRect.setX(val);
-    setRect(m_activeRect);
+    m_loadedProject->spriteAt(m_currSpriteId)->has4Directions = checked;
+    m_loadedProject->changed();
+    updateImageDisplay();
 }
-void SpritesWidget::on_input_y_valueChanged(int val)
-{
-    m_activeRect.setY(val);
-    setRect(m_activeRect);
-}
+
 void SpritesWidget::on_input_width_valueChanged(int val)
 {
-    m_activeRect.setWidth(val);
-    setRect(m_activeRect);
+    m_loadedProject->spriteAt(m_currSpriteId)->width = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
 }
 void SpritesWidget::on_input_height_valueChanged(int val)
 {
-    m_activeRect.setHeight(val);
-    setRect(m_activeRect);
+    m_loadedProject->spriteAt(m_currSpriteId)->height = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
 }
+///////////////////////////////////////////////////////////////////////////////
+// Animation 1
+void SpritesWidget::on_check_anim1_clicked(bool checked)
+{
+    uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount1->value(), 1));
 
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = checked ? val : 0;
+    m_loadedProject->changed();
+    updateFields();
+}
+void SpritesWidget::on_input_frameCount1_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = static_cast<uint8_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_x1_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->x = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_y1_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->y = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+///////////////////////////////////////////////////////////////////////////////
+// Animation 2
+void SpritesWidget::on_check_anim2_clicked(bool checked)
+{
+    uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount2->value(), 1));
+
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = checked ? val : 0;
+    m_loadedProject->changed();
+    updateFields();
+}
+void SpritesWidget::on_input_frameCount2_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = static_cast<uint8_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_x2_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->x2 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_y2_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->y2 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+///////////////////////////////////////////////////////////////////////////////
+// Animation 3
+void SpritesWidget::on_check_anim3_clicked(bool checked)
+{
+    uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount3->value(), 1));
+
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = checked ? val : 0;
+    m_loadedProject->changed();
+    updateFields();
+}
+void SpritesWidget::on_input_frameCount3_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = static_cast<uint8_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_x3_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->x3 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_y3_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->y3 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+///////////////////////////////////////////////////////////////////////////////
+// Animation 4
+void SpritesWidget::on_check_anim4_clicked(bool checked)
+{
+    uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount4->value(), 1));
+
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = checked ? val : 0;
+    m_loadedProject->changed();
+    updateFields();
+}
+void SpritesWidget::on_input_frameCount4_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = static_cast<uint8_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_x4_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->x4 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
+void SpritesWidget::on_input_y4_valueChanged(int val)
+{
+    m_loadedProject->spriteAt(m_currSpriteId)->y4 = static_cast<uint16_t>(val);
+    m_loadedProject->changed();
+    updateImageDisplay();
+}
 } // namespace Editor
