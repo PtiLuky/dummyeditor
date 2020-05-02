@@ -7,8 +7,8 @@
 
 #include "dummyrpg/dummy_types.hpp"
 
-static const float ZOOM_MAX = 16.f;
-static const float ZOOM_MIN = 0.5f;
+static const float ZOOM_MAX = 16.F;
+static const float ZOOM_MIN = 0.5F;
 
 namespace Editor {
 
@@ -249,10 +249,12 @@ void SpritesWidget::updateImageDisplay()
     if (m_showGrid) {
         QVector<QLine> lines;
         // vectical lines
-        for (int x = 0; x < displayImg.width(); x += scaled(Dummy::TILE_SIZE))
+        const int imgW = displayImg.width();
+        for (int x = 0; x < imgW; x += scaled(Dummy::TILE_SIZE))
             lines.push_back({{x, 0}, {x, displayImg.height()}});
         // Horizontal lines
-        for (int y = 0; y < displayImg.height(); y += scaled(Dummy::TILE_SIZE))
+        const int imgH = displayImg.height();
+        for (int y = 0; y < imgH; y += scaled(Dummy::TILE_SIZE))
             lines.push_back({{0, y}, {displayImg.width(), y}});
 
         p.setPen(QColor(0, 0, 0, 150));
@@ -286,9 +288,9 @@ void SpritesWidget::updateImageDisplay()
             toDraw.push_back({QRect(s->x4 + fr * s->width, s->y4 + s->height, s->width, s->height * 3), Qt::magenta});
     }
 
-    for (auto& pair : toDraw) {
-        auto& rec   = pair.first;
-        auto& color = pair.second;
+    for (const auto& pair : toDraw) {
+        const auto& rec   = pair.first;
+        const auto& color = pair.second;
         QRect scaledRect(scaled(rec.x()), scaled(rec.y()), scaled(rec.width()) - 1, scaled(rec.height()) - 1);
 
         p.setPen(color);
@@ -325,13 +327,13 @@ void SpritesWidget::loadSpritesList()
 
 void SpritesWidget::zoomIn()
 {
-    m_zoom = std::min(m_zoom * 2.f, ZOOM_MAX);
+    m_zoom = std::min(m_zoom * 2.F, ZOOM_MAX);
     updateImageDisplay();
 }
 
 void SpritesWidget::zoomOut()
 {
-    m_zoom = std::max(m_zoom / 2.f, ZOOM_MIN);
+    m_zoom = std::max(m_zoom / 2.F, ZOOM_MIN);
     updateImageDisplay();
 }
 
