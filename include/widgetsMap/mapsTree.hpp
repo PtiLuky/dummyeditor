@@ -6,7 +6,7 @@
 #include <QTreeView>
 
 #include "editor/project.hpp"
-#include "widgets/mapEditDialog.hpp"
+#include "widgetsMap/mapEditDialog.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration

@@ -6,9 +6,9 @@
 
 #include "editor/project.hpp"
 #include "utils/logger.hpp"
-#include "widgets/chipsetGraphicsScene.hpp"
-#include "widgets/mapGraphicsScene.hpp"
 #include "widgets/mapTools.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
+#include "widgetsMap/mapGraphicsScene.hpp"
 
 namespace Ui {
 class GeneralWindow;
@@ -39,7 +39,9 @@ private slots:
     void on_actionPlay_triggered();
     void on_mapsList_doubleClicked(const QModelIndex& selectedIndex);
     void on_btnSwapBackground_clicked(bool isDown);
+    void on_btn_refreshTileset_clicked();
     void on_toggleGridChipset_clicked(bool isDown);
+    void on_panels_tabs_currentChanged(int);
 
     void on_actionEraser_triggered();
     void on_actionPen_triggered();

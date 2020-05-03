@@ -27,8 +27,11 @@ GeneralWindow::GeneralWindow(QWidget* parent)
     m_ui->graphicsViewMap->setBackgroundBrush(QColor("#969696"));
 
     // Set default sizes of movable splitters between panels
-    QList<int> horiCoef = {width() / 4, width() - (width() / 4)};
-    QList<int> vertCoef = {width() / 4, width() - (width() / 4)};
+
+    int minWidth        = width() / 4;
+    int minHeight       = height() / 3;
+    QList<int> horiCoef = {minWidth, 3 * minWidth};
+    QList<int> vertCoef = {minHeight, 2 * minHeight};
     m_ui->splitter_map->setSizes(horiCoef);
     m_ui->splitter_chipset->setSizes(vertCoef);
 
@@ -150,6 +153,7 @@ void GeneralWindow::updateProjectView()
     }
 
     // update tabs content
+    m_ui->tab_sprites->setProject(m_loadedProject);
     updateMapsAndFloorsList();
     updateChipsetsTab();
 
@@ -232,15 +236,15 @@ void GeneralWindow::on_actionNew_triggered()
 
 void GeneralWindow::on_actionOpen_triggered()
 {
-    // Close current project
-    bool projectClosed = closeProject();
-    if (! projectClosed)
-        return;
-
     // Ask where new is
     QString projectFile =
         QFileDialog::getOpenFileName(this, tr("Choose an existing project file"), "", tr("Dummy Project (*.xml)"));
     if (projectFile == "")
+        return;
+
+    // Close current project
+    bool projectClosed = closeProject();
+    if (! projectClosed)
         return;
 
     // Open new
@@ -323,9 +327,25 @@ void GeneralWindow::on_btnSwapBackground_clicked(bool isDown)
     m_chipsetScene.setDarkBackground(isDown);
 }
 
+void GeneralWindow::on_btn_refreshTileset_clicked()
+{
+    const auto* map = m_loadedProject->currMap();
+    if (map == nullptr)
+        return;
+
+    m_chipsetScene.refreshChipsets();
+    m_mapScene.updateTilesets(m_chipsetScene.chipsets(), map->chipsetsUsed());
+}
+
 void GeneralWindow::on_toggleGridChipset_clicked(bool isDown)
 {
     m_chipsetScene.setGridVisible(isDown);
+}
+
+void GeneralWindow::on_panels_tabs_currentChanged(int currentIdx)
+{
+    if (currentIdx == 1)
+        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isEnabled());
 }
 
 void GeneralWindow::activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_t layerIdx)
@@ -386,7 +406,11 @@ void GeneralWindow::on_actionSelection_triggered()
 
 void GeneralWindow::on_actionToggleGrid_triggered()
 {
-    m_mapTools.updateGridDisplay();
+    if (m_ui->panels_tabs->currentIndex() == 0)
+        m_mapTools.updateGridDisplay();
+
+    else if (m_ui->panels_tabs->currentIndex() == 1)
+        m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isChecked());
 }
 
 void GeneralWindow::on_actionCut_triggered()
@@ -413,21 +437,34 @@ void GeneralWindow::on_actionRedo_triggered()
 }
 void GeneralWindow::on_actionZoomIn_triggered()
 {
-    m_ui->graphicsViewMap->scale(2.0, 2.0);
+    if (m_ui->panels_tabs->currentIndex() == 0)
+        m_ui->graphicsViewMap->scale(2.0, 2.0);
+
+    else if (m_ui->panels_tabs->currentIndex() == 1)
+        m_ui->tab_sprites->zoomIn();
 }
 void GeneralWindow::on_actionZoomOut_triggered()
 {
-    m_ui->graphicsViewMap->scale(0.5, 0.5);
+    if (m_ui->panels_tabs->currentIndex() == 0)
+        m_ui->graphicsViewMap->scale(0.5, 0.5);
+
+    else if (m_ui->panels_tabs->currentIndex() == 1)
+        m_ui->tab_sprites->zoomOut();
 }
 void GeneralWindow::on_actionResize_triggered()
 {
-    if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
-        return;
+    if (m_ui->panels_tabs->currentIndex() == 0) {
+        if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
+            return;
 
-    qreal minScale = std::min(m_ui->graphicsViewMap->height() / m_mapScene.height(),
-                              m_ui->graphicsViewMap->width() / m_mapScene.width());
-    m_ui->graphicsViewMap->resetTransform();
-    m_ui->graphicsViewMap->scale(minScale, minScale);
+        qreal minScale = std::min(m_ui->graphicsViewMap->height() / m_mapScene.height(),
+                                  m_ui->graphicsViewMap->width() / m_mapScene.width());
+        m_ui->graphicsViewMap->resetTransform();
+        m_ui->graphicsViewMap->scale(minScale, minScale);
+
+    } else if (m_ui->panels_tabs->currentIndex() == 1) {
+        m_ui->tab_sprites->zoomOne();
+    }
 }
 
 void GeneralWindow::mapZoomTriggered(MapGraphicsScene::eZoom zoom)

@@ -1,4 +1,4 @@
-#include "widgets/chipsetGraphicsScene.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 
@@ -96,12 +96,19 @@ void ChipsetGraphicsScene::setDarkBackground(bool dark)
         setBackgroundBrush(QColor(240, 240, 240));
 }
 
+void ChipsetGraphicsScene::refreshChipsets()
+{
+    setChipset(m_chipPaths, m_chipIds);
+}
+
 void ChipsetGraphicsScene::setChipset(const std::vector<QString>& chipsetPaths,
                                       const std::vector<Dummy::chip_id>& chipsetIds)
 {
     clear();
 
     // TODO handle several chipsets
+    m_chipPaths = chipsetPaths;
+    m_chipIds   = chipsetIds;
 
     m_chipset = QPixmap(chipsetPaths[0]);
     m_currId  = chipsetIds[0];

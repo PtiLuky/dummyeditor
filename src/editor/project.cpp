@@ -7,7 +7,7 @@
 
 #include "dummyrpg/serialize.hpp"
 #include "utils/logger.hpp"
-#include "widgets/mapsTree.hpp"
+#include "widgetsMap/mapsTree.hpp"
 
 using std::make_shared;
 using std::make_unique;
@@ -51,8 +51,9 @@ Project::Project(const QString& projectFile)
     }
 
     m_mapsModel   = std::move(mapsTree);
-    m_game        = newGameData;
+    m_game        = std::move(newGameData);
     m_projectPath = fileInfo.path();
+    m_game.setGameDataPath(m_projectPath.toStdString());
 }
 
 const QString& Project::projectPath() const
@@ -61,6 +62,11 @@ const QString& Project::projectPath() const
 }
 
 const Dummy::GameStatic& Project::game() const
+{
+    return m_game;
+}
+
+Dummy::GameStatic& Project::game()
 {
     return m_game;
 }
@@ -93,10 +99,12 @@ void Project::changed()
 
 void Project::testMap()
 {
-    if (m_currMapName.isNull())
+    if (m_currMapName.isNull()) {
+        Log::error(tr("Impossible to play: no map loaded"));
         return;
+    }
 
-    saveCurrMap();
+    saveProject();
 #ifdef _WIN32
     QString playerProgram = "player.exe";
 #else
@@ -174,7 +182,7 @@ bool Project::saveCurrMap()
 {
     if (m_currMap == nullptr) {
         Log::error("No current map to save");
-        return false;
+        return true;
     }
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
@@ -294,6 +302,24 @@ bool Project::renameCurrMap(const QString& newName)
     saveProject();
 
     return true;
+}
+
+void Project::createSprite()
+{
+    const size_t nbsprites = m_game.sprites.size();
+    if (nbsprites >= std::numeric_limits<Dummy::sprite_id>::max())
+        return;
+
+    m_game.sprites.push_back(Dummy::AnimatedSprite());
+    changed();
+}
+
+Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
+{
+    if (id >= m_game.sprites.size())
+        return nullptr;
+
+    return &m_game.sprites[id];
 }
 
 QString Project::sanitizeMapName(const QString& unsafeName)

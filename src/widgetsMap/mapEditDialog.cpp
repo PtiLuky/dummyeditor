@@ -1,4 +1,4 @@
-#include "widgets/mapEditDialog.hpp"
+#include "widgetsMap/mapEditDialog.hpp"
 #include "ui_mapeditdialog.h"
 
 #include <QFileDialog>

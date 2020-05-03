@@ -1,4 +1,4 @@
-#include "widgets/mapGraphicsScene.hpp"
+#include "widgetsMap/mapGraphicsScene.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 
@@ -78,6 +78,14 @@ void MapGraphicsScene::drawGrid(quint16 width, quint16 height, unsigned int unit
         m_gridItems.push_back(std::unique_ptr<QGraphicsItem>(item));
     }
 }
+void MapGraphicsScene::updateTilesets(const std::vector<QPixmap>& tilesets,
+                                      const std::vector<Dummy::chip_id>& chipsetIds)
+{
+    for (const auto& layerGraph : m_visibleLayers)
+        layerGraph->updateTilesets(tilesets, chipsetIds);
+    update();
+}
+
 void MapGraphicsScene::clear()
 {
     clearPreview();
