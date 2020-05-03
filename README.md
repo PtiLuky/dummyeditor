@@ -20,6 +20,7 @@ And a game preview:
 `¯\_(ツ)_/¯`
 
 * [x] Draw a map, a floor
+* [x] Select a sprite on a sprite sheet
 * [ ] Set the position of the player
 * [ ] Create the Non-player characters
 * [ ] Create dialogs with NPC
@@ -33,20 +34,30 @@ from this Editor yet.
 
 ## How to try DummyRPG?
 
-For the moment you will have to build it from sources, see below "Install from sources".
+You can find a .zip to extract and execute for **Windows only**:
+* [Go to the Releases page](https://github.com/PtiLuky/dummyeditor/releases/) to find the last release. Download **dummyEditorWindows.zip**.
+* Extract it somewhere
+* Run dummyeditor.exe
+  * If an error occures, try install VC runtime by running **vc_redist.x64.exe** before and then try again to run dummyeditor.exe
+
+
+For other platerforms you will have to build it from sources, see below "Install from sources".
 |  Platerform | build from source  | install from exe  |
 |:-:|:-:|:-:|
 | Linux  |  **Yes** |  not planned |
-| Windows  | **Yes**  |  soon |
+| Windows  | **Yes**  |  **Yes** |
 | Mac  |  (Unknown) | not planned  |
 
 
 ## How to contribute and what to do?
 
 Check out the [Contributing guide](https://github.com/PtiLuky/dummyRPG/blob/master/doc/contributing.md).
-Don't hesistate to come on our [Discord server](https://discord.gg/2KmsVp) !
+Don't hesistate to come on our [Discord server](https://discord.gg/qzx4AjT) !
 
 All help is welcome :)
+
+Some technical documents can be found in /docs to help you handle the code.  
+Eg. <img src="docs/Classes-GameData.png" width="64">, <img src="docs/Classes-Editor-UI.png" width="64"> ...
 
 ## Install from sources
 
@@ -56,4 +67,4 @@ Tools:
 * CMake (for building)
 
 An [installation guide](docs/Installation_Windows-en.md) (available in [french](docs/Installation_Windows-fr.md)) has been written. Procedure for Linux is
-quite similar. Please tell us on [Discord](https://discord.gg/2KmsVp) if you need help for Linux installation.
+quite similar. Please tell us on [Discord](https://discord.gg/qzx4AjT) if you need help for Linux installation.

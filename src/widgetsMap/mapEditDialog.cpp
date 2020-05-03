@@ -1,9 +1,10 @@
-#include "widgets/mapEditDialog.hpp"
+#include "widgetsMap/mapEditDialog.hpp"
 #include "ui_mapeditdialog.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "dummyrpg/layer.hpp"
 
 MapEditDialog::MapEditDialog(QWidget* parent)
     : QDialog(parent)
@@ -14,16 +15,15 @@ MapEditDialog::MapEditDialog(QWidget* parent)
 
 MapEditDialog::~MapEditDialog() {}
 
-void MapEditDialog::setup(const Editor::Project& project, const Dummy::Map* map)
+void MapEditDialog::setup(const Editor::Project& project, const Dummy::Map* map, const QString& mapName)
 {
     if (map != nullptr) {
-        // m_ui->lineEditMapName->setText(map.);
-        // m_ui->lineEditChipset->setText(QString::fromStdString(map->chipset()));
-        // m_ui->lineEditMusic->setText(QString::fromStdString(map->music()));
+        m_ui->lineEditMapName->setText(mapName);
+        m_ui->lineEditChipset->setEnabled(false); // For the moment we disable possibilty to change widget
+        m_ui->pushButtonBrowseChipset->setEnabled(false);
         m_ui->spinBoxMapHeight->setValue(map->height());
         m_ui->spinBoxMapWidth->setValue(map->width());
     }
-
 
     // cleanPath() uses slashes, remove weird paths as "folder/../folder"
     m_chipsetPath = QDir::cleanPath(project.projectPath() + "/images");
@@ -56,30 +56,26 @@ QString MapEditDialog::getMusic() const
 
 bool MapEditDialog::inputsAreValid(QString* errorMessage)
 {
-    if (m_ui->lineEditMapName->text().isEmpty()) {
+    QString msg;
+    if (m_ui->lineEditMapName->text().isEmpty())
+        msg = tr("You must enter a map name.");
+    else if (m_ui->lineEditChipset->text().isEmpty() && m_ui->lineEditChipset->isEnabled())
+        msg = tr("You must enter a tileset filename.");
+    else if (m_ui->spinBoxMapHeight->value() < 1) // should not happen
+        msg = tr("The map's height must be above or equal to 1.");
+    else if (m_ui->spinBoxMapWidth->value() < 1) // should not happen
+        msg = tr("The map's width must be above or equal to 1.");
+    else if (m_ui->spinBoxMapHeight->value() > Dummy::MAX_LAYER_BORDER_SIZE) // should not happen
+        msg = tr("The map's height must be above or equal to 1.");
+    else if (m_ui->spinBoxMapWidth->value() > Dummy::MAX_LAYER_BORDER_SIZE) // should not happen
+        msg = tr("The map's width must be above or equal to 1.");
+
+    if (! msg.isNull()) {
         if (errorMessage != nullptr)
-            *errorMessage = tr("You must enter a map name.");
-
-        return false;
-
-    } else if (m_ui->lineEditChipset->text().isEmpty()) {
-        if (errorMessage != nullptr)
-            *errorMessage = tr("You must enter a tileset filename.");
-
-        return false;
-
-    } else if (m_ui->spinBoxMapHeight->value() < 1) { // should not happen
-        if (errorMessage != nullptr)
-            *errorMessage = tr("The map's height must be above or equal to 1.");
-
-        return false;
-
-    } else if (m_ui->spinBoxMapWidth->value() < 1) { // should not happen
-        if (errorMessage != nullptr)
-            *errorMessage = tr("The map's width must be above or equal to 1.");
-
+            *errorMessage = msg;
         return false;
     }
+
     return true;
 }
 
@@ -92,13 +88,12 @@ void MapEditDialog::on_pushButtonBrowseChipset_clicked()
 
     // If user has selected several files, we only use the first one
 
-    QString selectedChipset     = QDir::cleanPath(dlg.selectedFiles().at(0));
-    int indexOfFileNameInString = selectedChipset.indexOf(QDir::cleanPath(m_chipsetPath));
-    if (indexOfFileNameInString < 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Please select a tileset inside the 'images' folder."));
-    } else {
-        m_ui->lineEditChipset->setText(selectedChipset.mid(indexOfFileNameInString + 1 + m_chipsetPath.size()));
+    QFileInfo tilesetFile(dlg.selectedFiles().at(0));
+    QDir imgDir(m_chipsetPath);
+    if (tilesetFile.dir() != imgDir) {
+        QFile::copy(tilesetFile.filePath(), m_chipsetPath + "/" + tilesetFile.fileName());
     }
+    m_ui->lineEditChipset->setText(tilesetFile.fileName());
 }
 
 void MapEditDialog::on_pushButtonOK_clicked()

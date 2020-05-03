@@ -30,6 +30,8 @@ public:
 public slots:
     void clear();
     void setGridVisible(bool visible = true);
+    void setDarkBackground(bool dark = true);
+    void refreshChipsets();
 
 private:
     void drawGrid();
@@ -43,6 +45,9 @@ private:
     bool m_isSelecting = false;
     QRect m_currentSelection;
     QPoint m_selectionStart;
+
+    std::vector<QString> m_chipPaths;
+    std::vector<Dummy::chip_id> m_chipIds;
 };
 
 #endif // CHIPSETGRAPHICSCENE_H

@@ -30,8 +30,10 @@ public:
 
     const QString& projectPath() const;
     const Dummy::GameStatic& game() const;
+    Dummy::GameStatic& game();
     MapsTreeModel* mapsModel() const;
     const Dummy::Map* currMap() const;
+    Dummy::Map* currMap();
     bool isModified() const;
 
     void testMap();
@@ -42,6 +44,10 @@ public:
     void createMap(const tMapInfo& mapInfo, QStandardItem& parent);
     bool loadMap(const QString& mapName);
     bool mapExists(const QString& mapName);
+    bool renameCurrMap(const QString& newName);
+
+    void createSprite();
+    Dummy::AnimatedSprite* spriteAt(Dummy::sprite_id);
 
     static QString sanitizeMapName(const QString& unsafeName);
 

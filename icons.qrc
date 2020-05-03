@@ -36,5 +36,7 @@
         <file>icons/icon_zoom_in.png</file>
         <file>icons/icon_zoom_out.png</file>
         <file>icons/icon_resize.png</file>
+        <file>icons/icon_black_white.png</file>
+        <file>icons/icon_refresh.png</file>
     </qresource>
 </RCC>

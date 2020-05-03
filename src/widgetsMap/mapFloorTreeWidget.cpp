@@ -1,4 +1,4 @@
-#include "widgets/mapFloorTreeWidget.hpp"
+#include "widgetsMap/mapFloorTreeWidget.hpp"
 #include "ui_mapFloorTreeWidget.h"
 
 namespace Editor {

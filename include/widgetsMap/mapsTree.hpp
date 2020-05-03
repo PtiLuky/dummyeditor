@@ -6,7 +6,7 @@
 #include <QTreeView>
 
 #include "editor/project.hpp"
-#include "widgets/mapEditDialog.hpp"
+#include "widgetsMap/mapEditDialog.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration
@@ -42,6 +42,7 @@ public slots:
 
 signals:
     void chipsetMapChanged(QString);
+    void mapChanged(const QString& mapName);
 
 private:
     std::shared_ptr<Project> m_project;
@@ -51,7 +52,6 @@ private:
     MapEditDialog* m_newMapDialog = nullptr;
     MapEditDialog* m_editDialog   = nullptr;
     QModelIndex m_selectedIndex;
-    uint16_t m_editedMapIdx;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,7 @@ class MapsTreeModel : public QStandardItemModel
 public:
     explicit MapsTreeModel(const QDomNode& mapsNode);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    void renameNode(const QString& oldName, const QString& newName);
 
 private:
     void XmlMapToQItem(const QDomNode& mapsNode, QStandardItem* parent);

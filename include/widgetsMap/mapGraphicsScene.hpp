@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "dummyrpg/map.hpp"
-#include "widgets/layerItems.hpp"
+#include "widgetsMap/layerItems.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration
@@ -36,6 +36,7 @@ public:
     void setSelectRect(const QRect& selectionRect);
     void drawGrid(quint16 width, quint16 height, unsigned int unit);
     void linkToolSet(MapTools* tools) { m_tools = tools; }
+    void updateTilesets(const std::vector<QPixmap>& chipsets, const std::vector<Dummy::chip_id>& chipsetIds);
 
     QRectF selectionRect();
 

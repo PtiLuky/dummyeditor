@@ -7,7 +7,7 @@
 
 #include "dummyrpg/serialize.hpp"
 #include "utils/logger.hpp"
-#include "widgets/mapsTree.hpp"
+#include "widgetsMap/mapsTree.hpp"
 
 using std::make_shared;
 using std::make_unique;
@@ -51,8 +51,9 @@ Project::Project(const QString& projectFile)
     }
 
     m_mapsModel   = std::move(mapsTree);
-    m_game        = newGameData;
+    m_game        = std::move(newGameData);
     m_projectPath = fileInfo.path();
+    m_game.setGameDataPath(m_projectPath.toStdString());
 }
 
 const QString& Project::projectPath() const
@@ -65,12 +66,22 @@ const Dummy::GameStatic& Project::game() const
     return m_game;
 }
 
+Dummy::GameStatic& Project::game()
+{
+    return m_game;
+}
+
 MapsTreeModel* Project::mapsModel() const
 {
     return m_mapsModel.get();
 }
 
 const Dummy::Map* Project::currMap() const
+{
+    return m_currMap.get();
+}
+
+Dummy::Map* Project::currMap()
 {
     return m_currMap.get();
 }
@@ -88,10 +99,12 @@ void Project::changed()
 
 void Project::testMap()
 {
-    if (m_currMapName.isNull())
+    if (m_currMapName.isNull()) {
+        Log::error(tr("Impossible to play: no map loaded"));
         return;
+    }
 
-    saveCurrMap();
+    saveProject();
 #ifdef _WIN32
     QString playerProgram = "player.exe";
 #else
@@ -121,6 +134,9 @@ std::shared_ptr<Project> Project::create(const QString& projectRootPath)
     projectDir.mkdir("images");
     projectDir.mkdir("fonts");
     projectDir.mkdir("sounds");
+
+    // Copy first default tilesheet
+    QFile::copy("Resources/images/ClassicRPG_Sheet.png", projectRootPath + "/images/ClassicRPG_Sheet.png");
 
     // Create DummyRPG Editor project file
     QFile projectFile(projectDir.filePath(PROJECT_FILE_NAME));
@@ -156,7 +172,7 @@ void Project::saveProject()
 
     bRes = saveCurrMap();
     if (bRes) {
-        m_isModified = true;
+        m_isModified = false;
         emit saveStatusChanged(true);
     } else
         Log::error("Error while saving the map...");
@@ -166,7 +182,7 @@ bool Project::saveCurrMap()
 {
     if (m_currMap == nullptr) {
         Log::error("No current map to save");
-        return false;
+        return true;
     }
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
@@ -258,6 +274,52 @@ bool Project::mapExists(const QString& mapName)
 {
     std::string strName = mapName.toStdString();
     return m_mapNameToId.find(strName) != m_mapNameToId.end();
+}
+
+bool Project::renameCurrMap(const QString& newName)
+{
+    if (mapExists(newName)) {
+        Log::error(tr("A map with this name already exists"));
+        return false;
+    }
+
+    // Change in our id-mapping
+    std::string strOldName = m_currMapName.toStdString();
+    std::string strNewName = newName.toStdString();
+    m_mapNameToId.insert({strNewName, m_mapNameToId.at(strOldName)});
+    m_mapNameToId.erase(strOldName);
+
+    // Change in file name
+    QFile::rename(m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT,
+                  m_projectPath + "/maps/" + newName + MAP_FILE_EXT);
+
+    // Change in map architecture
+    if (m_mapsModel)
+        m_mapsModel->renameNode(m_currMapName, newName);
+
+    m_currMapName = newName;
+    m_isModified  = true;
+    saveProject();
+
+    return true;
+}
+
+void Project::createSprite()
+{
+    const size_t nbsprites = m_game.sprites.size();
+    if (nbsprites >= std::numeric_limits<Dummy::sprite_id>::max())
+        return;
+
+    m_game.sprites.push_back(Dummy::AnimatedSprite());
+    changed();
+}
+
+Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
+{
+    if (id >= m_game.sprites.size())
+        return nullptr;
+
+    return &m_game.sprites[id];
 }
 
 QString Project::sanitizeMapName(const QString& unsafeName)

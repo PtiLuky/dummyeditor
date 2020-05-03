@@ -28,6 +28,7 @@ set(FORM_FILES
     forms/GeneralWindow.ui
     forms/mapeditdialog.ui
     forms/mapFloorTreeWidget.ui
+    forms/spritesWidget.ui
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS forms)
@@ -36,43 +37,46 @@ add_executable(dummyeditor
     include/editor/project.hpp
     include/utils/definitions.hpp
     include/utils/logger.hpp
-    include/widgets/chipsetGraphicsScene.hpp
     include/widgets/cinematicsWidget.hpp
     include/widgets/generalWindow.hpp
-    include/widgets/graphicItem.hpp
-    include/widgets/layerItems.hpp
-    include/widgets/mapEditDialog.hpp
-    include/widgets/mapFloorTreeModel.hpp
-    include/widgets/mapFloorTreeWidget.hpp
-    include/widgets/mapGraphicsScene.hpp
-    include/widgets/mapsTree.hpp
     include/widgets/mapTools.hpp
+    include/widgets/spritesWidget.hpp
+    include/widgetsMap/chipsetGraphicsScene.hpp
+    include/widgetsMap/graphicItem.hpp
+    include/widgetsMap/layerItems.hpp
+    include/widgetsMap/mapEditDialog.hpp
+    include/widgetsMap/mapFloorTreeModel.hpp
+    include/widgetsMap/mapFloorTreeWidget.hpp
+    include/widgetsMap/mapGraphicsScene.hpp
+    include/widgetsMap/mapsTree.hpp
 
     src/main.cpp
     src/editor/project.cpp
     src/utils/logger.cpp
-    src/widgets/chipsetGraphicsScene.cpp
     src/widgets/cinematicsWidget.cpp
     src/widgets/generalWindow.cpp
-    src/widgets/graphicItem.cpp
-    src/widgets/layerItems.cpp
-    src/widgets/mapEditDialog.cpp
-    src/widgets/mapFloorTreeModel.cpp
-    src/widgets/mapFloorTreeWidget.cpp
-    src/widgets/mapGraphicsScene.cpp
-    src/widgets/mapsTree.cpp
     src/widgets/mapTools.cpp
+    src/widgets/spritesWidget.cpp
+    src/widgetsMap/chipsetGraphicsScene.cpp
+    src/widgetsMap/graphicItem.cpp
+    src/widgetsMap/layerItems.cpp
+    src/widgetsMap/mapEditDialog.cpp
+    src/widgetsMap/mapFloorTreeModel.cpp
+    src/widgetsMap/mapFloorTreeWidget.cpp
+    src/widgetsMap/mapGraphicsScene.cpp
+    src/widgetsMap/mapsTree.cpp
 
     "${FORM_FILES}"
      icons.qrc
 )
 
-source_group(_ REGULAR_EXPRESSION "(src|include)/*")
+source_group(_ REGULAR_EXPRESSION "(src|include|forms)/*")
 source_group(editor REGULAR_EXPRESSION "(src|include)/editor/*")
 source_group(widgets REGULAR_EXPRESSION "(src|include)/widgets/*")
+source_group(widgetsMap REGULAR_EXPRESSION "(src|include)/widgetsMap/*")
 source_group(utils REGULAR_EXPRESSION "(src|include)/utils/*")
 
-target_include_directories(dummyeditor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(dummyeditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(dummyeditor
     Qt5::Core
     Qt5::Gui

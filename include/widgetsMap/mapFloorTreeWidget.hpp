@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <memory>
 
-#include "widgets/mapFloorTreeModel.hpp"
+#include "widgetsMap/mapFloorTreeModel.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 //  forward declaration

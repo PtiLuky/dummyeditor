@@ -1,4 +1,4 @@
-#include "widgets/chipsetGraphicsScene.hpp"
+#include "widgetsMap/chipsetGraphicsScene.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 
@@ -6,7 +6,9 @@
 
 ChipsetGraphicsScene::ChipsetGraphicsScene(QObject* parent)
     : QGraphicsScene(parent)
-{}
+{
+    setDarkBackground(false);
+}
 
 void ChipsetGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
@@ -16,10 +18,14 @@ void ChipsetGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
     m_isSelecting    = true;
     m_selectionStart = mouseEvent->scenePos().toPoint();
 
-    if (m_selectionStart.x() >= width() || m_selectionStart.x() < 0 || m_selectionStart.y() >= height()
-        || m_selectionStart.y() < 0) {
-        return;
-    }
+    if (m_selectionStart.x() >= m_chipset.width())
+        m_selectionStart.setX(m_chipset.width() - 1);
+    if (m_selectionStart.x() < 0)
+        m_selectionStart.setX(0);
+    if (m_selectionStart.y() >= m_chipset.height())
+        m_selectionStart.setY(m_chipset.height() - 1);
+    if (m_selectionStart.y() < 0)
+        m_selectionStart.setY(0);
 
     // Add a square
     int x = m_selectionStart.x() - (m_selectionStart.x() % CELL_W);
@@ -33,6 +39,14 @@ void ChipsetGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
         return;
 
     QPoint pt = mouseEvent->scenePos().toPoint();
+    if (pt.x() >= m_chipset.width())
+        pt.setX(m_chipset.width() - 1);
+    if (m_selectionStart.x() < 0)
+        pt.setX(0);
+    if (pt.y() >= m_chipset.height())
+        pt.setY(m_chipset.height() - 1);
+    if (pt.y() < 0)
+        pt.setY(0);
 
     // normalize selection rectangle in order accept any direction of selection
     QRect realRect = QRect(m_selectionStart, pt).normalized();
@@ -74,12 +88,27 @@ void ChipsetGraphicsScene::setGridVisible(bool visible)
         m_gridItems.clear();
 }
 
+void ChipsetGraphicsScene::setDarkBackground(bool dark)
+{
+    if (dark)
+        setBackgroundBrush(QColor(20, 20, 20));
+    else
+        setBackgroundBrush(QColor(240, 240, 240));
+}
+
+void ChipsetGraphicsScene::refreshChipsets()
+{
+    setChipset(m_chipPaths, m_chipIds);
+}
+
 void ChipsetGraphicsScene::setChipset(const std::vector<QString>& chipsetPaths,
                                       const std::vector<Dummy::chip_id>& chipsetIds)
 {
     clear();
 
     // TODO handle several chipsets
+    m_chipPaths = chipsetPaths;
+    m_chipIds   = chipsetIds;
 
     m_chipset = QPixmap(chipsetPaths[0]);
     m_currId  = chipsetIds[0];
@@ -118,4 +147,5 @@ void ChipsetGraphicsScene::setSelectRect(const QRect& rect)
     m_selectionRectItem->setBrush(brush);
     m_selectionRectItem->setOpacity(0.5);
     addItem(m_selectionRectItem.get());
+    update();
 }

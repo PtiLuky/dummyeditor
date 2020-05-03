@@ -1,4 +1,4 @@
-#include "widgets/graphicItem.hpp"
+#include "widgetsMap/graphicItem.hpp"
 
 #include <QPainter>
 

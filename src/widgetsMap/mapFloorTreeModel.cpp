@@ -1,4 +1,4 @@
-#include "widgets/mapFloorTreeModel.hpp"
+#include "widgetsMap/mapFloorTreeModel.hpp"
 
 #include "dummyrpg/floor.hpp"
 
