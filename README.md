@@ -56,8 +56,8 @@ Don't hesistate to come on our [Discord server](https://discord.gg/qzx4AjT) !
 
 All help is welcome :)
 
-Some technical documents can be found in /docs to help you handle the code.
-<img src="docs/Classes-GameData.png" width="64">  <img src="docs/Classes-Editor-UI.png" width="64">
+Some technical documents can be found in /docs to help you handle the code.  
+Eg. <img src="docs/Classes-GameData.png" width="64">, <img src="docs/Classes-Editor-UI.png" width="64"> ...
 
 ## Install from sources
 
