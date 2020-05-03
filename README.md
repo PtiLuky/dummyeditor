@@ -20,6 +20,7 @@ And a game preview:
 `¯\_(ツ)_/¯`
 
 * [x] Draw a map, a floor
+* [x] Select a sprite on a sprite sheet
 * [ ] Set the position of the player
 * [ ] Create the Non-player characters
 * [ ] Create dialogs with NPC
@@ -54,6 +55,9 @@ Check out the [Contributing guide](https://github.com/PtiLuky/dummyRPG/blob/mast
 Don't hesistate to come on our [Discord server](https://discord.gg/qzx4AjT) !
 
 All help is welcome :)
+
+Some technical documents can be found in /docs to help you handle the code.
+<img src="docs/Classes-GameData.png" width="64">  <img src="docs/Classes-Editor-UI.png" width="64">
 
 ## Install from sources
 

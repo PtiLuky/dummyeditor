@@ -76,7 +76,7 @@ source_group(widgets REGULAR_EXPRESSION "(src|include)/widgets/*")
 source_group(widgetsMap REGULAR_EXPRESSION "(src|include)/widgetsMap/*")
 source_group(utils REGULAR_EXPRESSION "(src|include)/utils/*")
 
-target_include_directories(dummyeditor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(dummyeditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(dummyeditor
     Qt5::Core
     Qt5::Gui
