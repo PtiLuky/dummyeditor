@@ -298,7 +298,7 @@ void GeneralWindow::loadMap(const QString& mapName)
     // update chipset scene
     std::vector<QString> chipsets;
     for (Dummy::chip_id chipId : map->chipsetsUsed()) {
-        QString chipFile = QString::fromStdString(m_loadedProject->game().tileSets[chipId]);
+      QString chipFile = QString::fromStdString(m_loadedProject->game().tileset(chipId));
         QString chipPath = QDir::cleanPath(m_loadedProject->projectPath() + "/images/" + chipFile);
         chipsets.push_back(chipPath);
     }

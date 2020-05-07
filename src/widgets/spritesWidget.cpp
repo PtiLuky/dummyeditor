@@ -109,10 +109,12 @@ void SpritesWidget::wheelEvent(QWheelEvent* e)
 
 void SpritesWidget::updateFields()
 {
-    const auto& sprites = m_loadedProject->game().sprites;
-    if (m_currSpriteId >= sprites.size())
+    if (m_loadedProject == nullptr)
         return;
-    const auto& sprite = sprites[m_currSpriteId];
+    const auto* pSprite = m_loadedProject->game().sprite(m_currSpriteId);
+    if (pSprite == nullptr)
+        return;
+    const auto& sprite = *pSprite;
 
     // Block signal to avoid redundant signals
     m_ui->check_anim1->blockSignals(true);
@@ -202,24 +204,23 @@ void SpritesWidget::updateFields()
 
 void SpritesWidget::updateImage()
 {
-    const auto& spritesSheets = m_loadedProject->game().spriteSheets;
-    const auto& sprites       = m_loadedProject->game().sprites;
-    if (m_currSpriteId >= sprites.size())
+    const auto* sprite = m_loadedProject->game().sprite(m_currSpriteId);
+    if (sprite == nullptr)
         return;
 
-    const auto& sprite = sprites[m_currSpriteId];
     // Set the image and its name
-    if (sprite.spriteSheetId < spritesSheets.size()) {
-        QString sheetName   = QString::fromStdString(spritesSheets[sprite.spriteSheetId]);
-        QString sheetPath   = QString::fromStdString(m_loadedProject->game().spriteSheetPath(sprite.spriteSheetId));
-        m_loadedSpriteSheet = QPixmap(sheetPath);
-        m_ui->label->setText(QString::number(m_currSpriteId) + " - " + sheetName);
-    } else {
+    const auto& spritesSheet = m_loadedProject->game().spriteSheet(sprite->spriteSheetId);
+    if (spritesSheet.empty()) {
         m_ui->label->setText(QString::number(m_currSpriteId) + " - " + tr("Undefined"));
         m_ui->image_center->setText(tr("Select a sprite sheet"));
         m_ui->image_center->setEnabled(false);
         m_loadedSpriteSheet = QPixmap();
         return;
+    } else {
+        QString sheetName   = QString::fromStdString(spritesSheet);
+        QString sheetPath   = QString::fromStdString(m_loadedProject->game().spriteSheetPath(sprite->spriteSheetId));
+        m_loadedSpriteSheet = QPixmap(sheetPath);
+        m_ui->label->setText(QString::number(m_currSpriteId) + " - " + sheetName);
     }
 
     m_ui->input_width->setMaximum(m_loadedSpriteSheet.width());
@@ -312,10 +313,10 @@ void SpritesWidget::loadSpritesList()
     m_ui->list_sprites->blockSignals(true);
     m_ui->list_sprites->clear();
 
-    const auto& spritesSheets = m_loadedProject->game().spriteSheets;
-    const size_t nbSprites    = m_loadedProject->game().sprites.size();
+    const auto& spritesSheets = m_loadedProject->game().spriteSheets();
+    const size_t nbSprites    = m_loadedProject->game().sprites().size();
     for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto& sprite = m_loadedProject->game().sprites[i];
+        const auto& sprite = m_loadedProject->game().sprites()[i];
 
         QString spritesheet = tr("Undefined");
         if (sprite.spriteSheetId < spritesSheets.size())

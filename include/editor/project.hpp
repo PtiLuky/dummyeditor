@@ -46,8 +46,8 @@ public:
     bool mapExists(const QString& mapName);
     bool renameCurrMap(const QString& newName);
 
-    void createSprite();
-    void createCharacter();
+    Dummy::sprite_id createSprite();
+    Dummy::char_id createCharacter();
     Dummy::AnimatedSprite* spriteAt(Dummy::sprite_id);
 
     static QString sanitizeMapName(const QString& unsafeName);
@@ -62,7 +62,6 @@ signals:
 
 private:
     void dumpToXmlNode(QDomDocument& document, QDomElement& xmlNode, const QStandardItem* modelItem);
-    void registerMaps(const QDomNode& mapsNode);
 
 private:
     Dummy::GameStatic m_game;
@@ -71,7 +70,6 @@ private:
     QString m_projectPath;
     QString m_currMapName;
     std::unique_ptr<MapsTreeModel> m_mapsModel;
-    std::unordered_map<std::string, uint16_t> m_mapNameToId;
     std::shared_ptr<Dummy::Map> m_currMap;
 };
 

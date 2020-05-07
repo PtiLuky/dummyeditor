@@ -30,8 +30,8 @@ void CharactersWidget::setCurrCharacter(Dummy::char_id id)
     m_currCharacterId = id;
 
     const Dummy::Character* chara = nullptr;
-    if (m_loadedProject != nullptr && id < m_loadedProject->game().characters.size())
-        chara = &m_loadedProject->game().characters[id];
+    if (m_loadedProject != nullptr)
+        chara = m_loadedProject->game().character(id);
 
     m_ui->panel_properties->setEnabled(chara != nullptr);
     m_ui->panel_apparitions->setEnabled(chara != nullptr);
@@ -64,9 +64,9 @@ void CharactersWidget::loadCharactersList()
     m_ui->list_characters->blockSignals(true);
     m_ui->list_characters->clear();
 
-    const size_t nbChars = m_loadedProject->game().characters.size();
+    const size_t nbChars = m_loadedProject->game().characters().size();
     for (Dummy::sprite_id i = 0; i < nbChars; ++i) {
-        const auto& charac = m_loadedProject->game().characters[i];
+        const auto& charac = m_loadedProject->game().characters()[i];
 
         m_ui->list_characters->addItem(QString::number(i) + " - " + QString::fromStdString(charac.name()));
     }
@@ -76,26 +76,27 @@ void CharactersWidget::loadCharactersList()
 
 void CharactersWidget::updateSpritePreview()
 {
-    Dummy::AnimatedSprite* sprite = nullptr;
-    auto& charas                  = m_loadedProject->game().characters;
-    auto& sprites                 = m_loadedProject->game().sprites;
+    if (m_loadedProject == nullptr)
+        return;
 
-    if (m_loadedProject != nullptr                                //
-        && m_currCharacterId < charas.size()                      //
-        && charas[m_currCharacterId].spriteId() < sprites.size()) //
-        sprite = &sprites[charas[m_currCharacterId].spriteId()];
+    Dummy::Character* chara       = m_loadedProject->game().character(m_currCharacterId);
+    Dummy::AnimatedSprite* sprite = nullptr;
+
+    if (chara != nullptr)
+        sprite = m_loadedProject->game().sprite(chara->spriteId());
 
     if (sprite == nullptr) {
         m_ui->lbl_spriteName->setText(tr("Undefined"));
         m_ui->img_preview->setPixmap(QPixmap());
     } else {
-        if (sprite->spriteSheetId < m_loadedProject->game().spriteSheets.size()) {
-            QString sheetName = QString::fromStdString(m_loadedProject->game().spriteSheets[sprite->spriteSheetId]);
-            m_ui->lbl_spriteName->setText(QString("%1 - ").arg(sprite->spriteSheetId) + sheetName);
-            // TODO m_ui->img_preview->setPixmap();
-        } else {
+        std::string spriteSheet = m_loadedProject->game().spriteSheet(sprite->spriteSheetId);
+        if (spriteSheet.empty()) {
             m_ui->lbl_spriteName->setText(tr("%1 - No spritesheet").arg(sprite->spriteSheetId));
             m_ui->img_preview->setPixmap(QPixmap());
+        } else {
+            QString sheetName = QString::fromStdString(spriteSheet);
+            m_ui->lbl_spriteName->setText(QString("%1 - ").arg(sprite->spriteSheetId) + sheetName);
+            // TODO m_ui->img_preview->setPixmap();
         }
     }
 }
