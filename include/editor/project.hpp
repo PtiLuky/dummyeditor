@@ -47,6 +47,7 @@ public:
     bool renameCurrMap(const QString& newName);
 
     void createSprite();
+    void createCharacter();
     Dummy::AnimatedSprite* spriteAt(Dummy::sprite_id);
 
     static QString sanitizeMapName(const QString& unsafeName);

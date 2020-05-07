@@ -303,8 +303,10 @@ void SpritesWidget::updateImageDisplay()
 
 void SpritesWidget::loadSpritesList()
 {
-    if (m_loadedProject == nullptr)
+    if (m_loadedProject == nullptr) {
+        m_ui->list_sprites->clear();
         return;
+    }
 
     int selectedRow = m_ui->list_sprites->currentRow();
     m_ui->list_sprites->blockSignals(true);

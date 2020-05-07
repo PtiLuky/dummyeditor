@@ -266,9 +266,9 @@
         <string>Sprites</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_object">
+      <widget class="Editor::CharactersWidget" name="tab_chars">
        <attribute name="title">
-        <string>Objects</string>
+        <string>Characters</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_monsters">
@@ -603,6 +603,12 @@
    <class>Editor::SpritesWidget</class>
    <extends>QWidget</extends>
    <header>widgets/spritesWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Editor::CharactersWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/charactersWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

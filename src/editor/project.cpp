@@ -314,6 +314,16 @@ void Project::createSprite()
     changed();
 }
 
+void Project::createCharacter()
+{
+    const size_t nbchars = m_game.characters.size();
+    if (nbchars >= std::numeric_limits<Dummy::char_id>::max())
+        return;
+
+    m_game.characters.push_back(Dummy::Character("Unnamed", Dummy::undefSprite));
+    changed();
+}
+
 Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
 {
     if (id >= m_game.sprites.size())

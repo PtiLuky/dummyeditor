@@ -311,7 +311,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim1">
             <property name="text">
-             <string>Animation 1</string>
+             <string>Walk animation</string>
             </property>
            </widget>
           </item>
@@ -418,7 +418,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim2">
             <property name="text">
-             <string>Animation 2</string>
+             <string>Attack animation</string>
             </property>
            </widget>
           </item>
@@ -525,7 +525,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim3">
             <property name="text">
-             <string>Animation 3</string>
+             <string>Death animation</string>
             </property>
            </widget>
           </item>
@@ -632,7 +632,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim4">
             <property name="text">
-             <string>Animation 4</string>
+             <string>Joker animation</string>
             </property>
            </widget>
           </item>

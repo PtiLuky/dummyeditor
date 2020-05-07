@@ -154,6 +154,7 @@ void GeneralWindow::updateProjectView()
 
     // update tabs content
     m_ui->tab_sprites->setProject(m_loadedProject);
+    m_ui->tab_chars->setProject(m_loadedProject);
     updateMapsAndFloorsList();
     updateChipsetsTab();
 

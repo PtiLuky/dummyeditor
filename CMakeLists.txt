@@ -19,11 +19,13 @@ find_package(Qt5Widgets REQUIRED)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/exe)
 
 # enable a sub-cmake
-add_subdirectory("submodules/dummyRPG")
+add_subdirectory(submodules/dummyRPG/dummyRPG) 	# lib and tests
+add_subdirectory(submodules/dummyRPG/player)	# player and UI
 
 ###############################################################################
 
 set(FORM_FILES
+    forms/charactersWidget.ui
     forms/CinematicsWidget.ui
     forms/GeneralWindow.ui
     forms/mapeditdialog.ui
@@ -38,6 +40,7 @@ add_executable(dummyeditor
     include/utils/definitions.hpp
     include/utils/logger.hpp
     include/widgets/cinematicsWidget.hpp
+    include/widgets/charactersWidget.hpp
     include/widgets/generalWindow.hpp
     include/widgets/mapTools.hpp
     include/widgets/spritesWidget.hpp
@@ -54,6 +57,7 @@ add_executable(dummyeditor
     src/editor/project.cpp
     src/utils/logger.cpp
     src/widgets/cinematicsWidget.cpp
+    src/widgets/charactersWidget.cpp
     src/widgets/generalWindow.cpp
     src/widgets/mapTools.cpp
     src/widgets/spritesWidget.cpp
