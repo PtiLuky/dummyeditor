@@ -1,4 +1,5 @@
 #include "widgets/spritesWidget.hpp"
+#include "ui_spriteSelectionDialog.h"
 #include "ui_spritesWidget.h"
 
 #include <QFileDialog>
@@ -12,6 +13,7 @@ static const float ZOOM_MIN = 0.5F;
 
 namespace Editor {
 
+///////////////////////////////////////////////////////////////////////////////
 
 SpritesWidget::SpritesWidget(QWidget* parent)
     : QWidget(parent)
@@ -313,14 +315,13 @@ void SpritesWidget::loadSpritesList()
     m_ui->list_sprites->blockSignals(true);
     m_ui->list_sprites->clear();
 
-    const auto& spritesSheets = m_loadedProject->game().spriteSheets();
-    const size_t nbSprites    = m_loadedProject->game().sprites().size();
+    const size_t nbSprites = m_loadedProject->game().sprites().size();
     for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
         const auto& sprite = m_loadedProject->game().sprites()[i];
 
-        QString spritesheet = tr("Undefined");
-        if (sprite.spriteSheetId < spritesSheets.size())
-            spritesheet = QString::fromStdString(spritesSheets[sprite.spriteSheetId]);
+        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite.spriteSheetId));
+        if (spritesheet.isEmpty())
+            spritesheet = tr("Undefined");
 
         m_ui->list_sprites->addItem(QString::number(i) + " - " + spritesheet);
     }
@@ -544,4 +545,73 @@ void SpritesWidget::on_input_y4_valueChanged(int val)
     m_loadedProject->changed();
     updateImageDisplay();
 }
+///////////////////////////////////////////////////////////////////////////////
+
+SpriteSelectionDialog::SpriteSelectionDialog(std::shared_ptr<Editor::Project> project, QWidget* parent)
+    : QDialog(parent)
+    , m_ui(new Ui::spriteSelectionDialog)
+    , m_loadedProject(project)
+{
+    m_ui->setupUi(this);
+    loadSpritesList();
+}
+
+SpriteSelectionDialog::~SpriteSelectionDialog() {}
+
+void SpriteSelectionDialog::setCurrentSprite(Dummy::sprite_id id)
+{
+    if (m_loadedProject == nullptr)
+        return;
+
+    const auto& game = m_loadedProject->game();
+
+    m_currSpriteId     = id;
+    const auto* sprite = game.sprite(id);
+    if (sprite == nullptr) {
+        m_ui->lbl_spriteName->setText(tr("Select a sprite"));
+        m_ui->list_sprites->blockSignals(true);
+        m_ui->list_sprites->setCurrentRow(-1);
+        m_ui->list_sprites->blockSignals(false);
+    } else {
+        QString spritesheet = QString::fromStdString(game.spriteSheet(sprite->spriteSheetId));
+        if (spritesheet.isEmpty())
+            spritesheet = tr("Undefined");
+
+        m_ui->lbl_spriteName->setText(QString::number(id) + " - " + spritesheet);
+        m_ui->list_sprites->blockSignals(true);
+        m_ui->list_sprites->setCurrentRow(id);
+        m_ui->list_sprites->blockSignals(false);
+    }
+}
+
+void SpriteSelectionDialog::loadSpritesList()
+{
+    if (m_loadedProject == nullptr) {
+        m_ui->list_sprites->clear();
+        return;
+    }
+
+    int selectedRow = m_ui->list_sprites->currentRow();
+    m_ui->list_sprites->blockSignals(true);
+    m_ui->list_sprites->clear();
+
+    const size_t nbSprites = m_loadedProject->game().sprites().size();
+    for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
+        const auto& sprite = m_loadedProject->game().sprites()[i];
+
+        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite.spriteSheetId));
+        if (spritesheet.isEmpty())
+            spritesheet = tr("Undefined");
+
+        m_ui->list_sprites->addItem(QString::number(i) + " - " + spritesheet);
+    }
+    m_ui->list_sprites->blockSignals(false);
+    m_ui->list_sprites->setCurrentRow(selectedRow);
+}
+
+void SpriteSelectionDialog::on_list_sprites_clicked(const QModelIndex& index)
+{
+    setCurrentSprite(static_cast<Dummy::sprite_id>(index.row()));
+}
+
 } // namespace Editor

@@ -31,6 +31,7 @@ set(FORM_FILES
     forms/mapeditdialog.ui
     forms/mapFloorTreeWidget.ui
     forms/spritesWidget.ui
+    forms/spriteSelectionDialog.ui
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS forms)
