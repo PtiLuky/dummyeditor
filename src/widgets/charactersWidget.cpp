@@ -79,8 +79,8 @@ void CharactersWidget::updateSpritePreview()
     if (m_loadedProject == nullptr)
         return;
 
-    Dummy::Character* chara       = m_loadedProject->game().character(m_currCharacterId);
-    Dummy::AnimatedSprite* sprite = nullptr;
+    const auto* chara                   = m_loadedProject->game().character(m_currCharacterId);
+    const Dummy::AnimatedSprite* sprite = nullptr;
 
     if (chara != nullptr)
         sprite = m_loadedProject->game().sprite(chara->spriteId());

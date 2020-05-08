@@ -41,7 +41,7 @@ Project::Project(const QString& projectFile)
     }
 
 
-    Dummy::GameStatic newGameData;
+    Dummy::GameStatic newGameData(fileInfo.path().toStdString());
     std::ifstream gameDataFile((fileInfo.path() + "/" + DATA_FILE_NAME).toStdString(), std::ios::binary);
     if (gameDataFile.good()) {
         bool bRes = Dummy::Serializer::parseGameFromFile(gameDataFile, newGameData);
@@ -52,7 +52,6 @@ Project::Project(const QString& projectFile)
     m_mapsModel   = std::move(mapsTree);
     m_game        = std::move(newGameData);
     m_projectPath = fileInfo.path();
-    m_game.setGameDataPath(m_projectPath.toStdString());
 }
 
 const QString& Project::projectPath() const
