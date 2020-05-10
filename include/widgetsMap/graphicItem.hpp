@@ -14,9 +14,9 @@ class GraphicItem : public QGraphicsItem
 public:
     enum class eGraphicItemType
     {
-        eBlockingCross,
         eBlockingSquare,
-        eEvent
+        eEvent,
+        eCharacter,
     };
 
     explicit GraphicItem(eGraphicItemType type);

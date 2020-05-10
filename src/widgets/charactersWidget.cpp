@@ -112,8 +112,10 @@ void CharactersWidget::on_btn_newCharacter_clicked()
 {
     if (m_loadedProject == nullptr)
         return;
-    m_loadedProject->createCharacter();
+    auto id = m_loadedProject->createCharacter();
+
     loadCharactersList();
+    setCurrCharacter(id);
 }
 
 void CharactersWidget::on_input_charName_textChanged(const QString& name)
@@ -149,6 +151,11 @@ void CharactersWidget::on_btn_changeSprite_clicked()
 
 void CharactersWidget::on_list_occurences_doubleClicked(const QModelIndex& index) {}
 
-void CharactersWidget::on_btn_addToCurrMap_clicked() {}
+void CharactersWidget::on_btn_addToCurrMap_clicked()
+{
+    if (m_loadedProject != nullptr //
+        && m_loadedProject->game().character(m_currCharacterId) != nullptr)
+        emit requestAddChar(m_currCharacterId);
+}
 
 } // namespace Editor

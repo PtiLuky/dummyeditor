@@ -405,8 +405,9 @@ void SpritesWidget::on_btn_newSprite_clicked()
     if (m_loadedProject == nullptr)
         return;
 
-    m_loadedProject->createSprite();
+    auto id = m_loadedProject->createSprite();
     loadSpritesList();
+    setCurrentSprite(id);
 }
 
 void SpritesWidget::on_list_sprites_currentRowChanged(int row)

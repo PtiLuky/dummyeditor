@@ -33,6 +33,9 @@ private slots:
     void on_list_occurences_doubleClicked(const QModelIndex& index);
     void on_btn_addToCurrMap_clicked();
 
+signals:
+    void requestAddChar(Dummy::char_id);
+
 private:
     void loadCharactersList();
     void updateSpritePreview();

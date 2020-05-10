@@ -198,9 +198,6 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_addToCurrMap">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="text">
           <string>Add to current Map</string>
          </property>
