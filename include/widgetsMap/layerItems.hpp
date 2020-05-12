@@ -3,7 +3,7 @@
 
 #include <QGraphicsItemGroup>
 
-#include "dummyrpg/layer.hpp"
+#include "dummyrpg/floor.hpp"
 #include "utils/definitions.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69,6 +69,20 @@ public:
 
 private:
     Dummy::BlockingLayer& m_blockingLayer;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class LayerObjectItems : public MapSceneLayer
+{
+public:
+    explicit LayerObjectItems(Dummy::Floor& floor, int zIndex);
+
+    const Dummy::Floor& floor();
+    void addChar(Dummy::char_id, const Dummy::Coord&);
+
+private:
+    Dummy::Floor& m_floor;
 };
 
 } // namespace Editor

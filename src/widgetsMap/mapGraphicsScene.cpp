@@ -31,6 +31,7 @@ void MapGraphicsScene::setMap(const Dummy::Map& map, const std::vector<QPixmap>&
     // Clear the loaded layers
     m_visibleLayers.clear();
     m_blockingLayers.clear();
+    m_objectsLayers.clear();
 
     int zindex            = 0;
     const size_t nbFloors = map.floors().size();
@@ -54,7 +55,7 @@ void MapGraphicsScene::setPreview(const QPixmap& previewPix, const QPoint& pos)
 }
 void MapGraphicsScene::setLocationCharacter(const QPoint& p, Dummy::char_id id)
 {
-    m_locationIndicatorItem = std::make_unique<GraphicItem>(GraphicItem::eGraphicItemType::eCharacter);
+    m_locationIndicatorItem = std::make_unique<GraphicItem>(GraphicItem::eGraphicItemType::Cell);
     m_locationIndicatorItem->setZValue(Z_PREVIEW);
     m_locationIndicatorItem->setPos(p);
     addItem(m_locationIndicatorItem.get());
@@ -144,6 +145,14 @@ void MapGraphicsScene::instantiateFloor(Dummy::Floor& floor, const std::vector<Q
         addItem(pBlockingLayer->graphicItems());
         m_blockingLayers.push_back(std::move(pBlockingLayer));
     }
+
+    // Add 1 objects/event layer
+    {
+        ++zindex;
+        auto pObjectsLayer = std::make_unique<LayerObjectItems>(floor, zindex);
+        addItem(pObjectsLayer->graphicItems());
+        m_objectsLayers.push_back(std::move(pObjectsLayer));
+    }
 }
 
 Dummy::Coord MapGraphicsScene::scenePosToCoord(const QPoint& p) const
@@ -187,6 +196,7 @@ void MapGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
     if (m_toolMode == eMode::AddChar && m_locationIndicatorItem != nullptr && e->button() == Qt::LeftButton) {
         Dummy::Coord mouseCoord = scenePosToCoord(e->scenePos().toPoint());
         emit characterPlacedOnFloor(m_charBeingAdded, mouseCoord, m_activeFloor);
+        m_objectsLayers[m_activeFloor]->addChar(m_charBeingAdded, mouseCoord);
         clearLocationIndicator();
     } else if (m_toolMode == eMode::Tool && m_tools != nullptr) {
         QPoint otherClick = e->scenePos().toPoint();

@@ -71,6 +71,7 @@ private:
     // Layers
     vec_uniq<LayerGraphicItems> m_visibleLayers;
     vec_uniq<LayerBlockingItems> m_blockingLayers;
+    vec_uniq<LayerObjectItems> m_objectsLayers;
 
     // Tools
     enum class eMode
