@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "dummyrpg/map.hpp"
+#include "editor/project.hpp"
 #include "widgetsMap/graphicItem.hpp"
 #include "widgetsMap/layerItems.hpp"
 
@@ -32,7 +33,7 @@ public:
     explicit MapGraphicsScene(QObject* parent = nullptr);
     virtual ~MapGraphicsScene() override;
 
-    void setMap(const Dummy::Map&, const std::vector<QPixmap>& chipsets);
+    void setMap(std::shared_ptr<Project> p, const Dummy::Map&, const std::vector<QPixmap>& chipsets);
     void setCurrFloor(uint8_t); // doesn't visually set the layer but only prepare the link for "add charac" action
     void setPreview(const QPixmap& previewPix, const QPoint& pos);
     void setSelectRect(const QRect& selectionRect);
@@ -67,6 +68,7 @@ private:
     void instantiateFloor(Dummy::Floor&, const std::vector<QPixmap>& chips,
                           const std::vector<Dummy::chip_id>& chipsetIds, uint8_t floorId, int& zIdxInOut);
     Dummy::Coord scenePosToCoord(const QPoint& p) const;
+    Dummy::CharacterInstance* npcAt(Dummy::Coord);
 
     // Layers
     vec_uniq<LayerGraphicItems> m_visibleLayers;
@@ -85,6 +87,7 @@ private:
     eMode m_toolMode                = eMode::None;
     Dummy::char_id m_charBeingAdded = Dummy::undefChar;
     uint8_t m_activeFloor           = 0;
+    std::shared_ptr<Project> m_loadedProject;
 
     // QGraphicsScene deletes those
     vec_uniq<QGraphicsItem> m_gridItems;

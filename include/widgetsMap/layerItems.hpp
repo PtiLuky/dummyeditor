@@ -78,8 +78,9 @@ class LayerObjectItems : public MapSceneLayer
 public:
     explicit LayerObjectItems(Dummy::Floor& floor, int zIndex);
 
-    const Dummy::Floor& floor();
+    Dummy::Floor& floor();
     void addChar(Dummy::char_id, const Dummy::Coord&);
+    void update();
 
 private:
     Dummy::Floor& m_floor;

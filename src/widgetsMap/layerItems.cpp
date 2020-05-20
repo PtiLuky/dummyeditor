@@ -176,6 +176,12 @@ LayerObjectItems::LayerObjectItems(Dummy::Floor& floor, int zIndex)
     : MapSceneLayer(0, 0, zIndex)
     , m_floor(floor)
 {
+    update();
+}
+
+void LayerObjectItems::update()
+{
+    clear();
     for (auto& chara : m_floor.npcs()) {
         addChar(chara.characterId(), chara.pos().coord);
     }
@@ -188,8 +194,7 @@ void LayerObjectItems::addChar(Dummy::char_id, const Dummy::Coord& coord)
     graphicItems()->addToGroup(indexedItems().back());
 }
 
-
-const Dummy::Floor& LayerObjectItems::floor()
+Dummy::Floor& LayerObjectItems::floor()
 {
     return m_floor;
 }

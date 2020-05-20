@@ -6,6 +6,7 @@ project(dummyeditor)
 set(CMAKE_CXX_STANDARD 17)
 
 # Qt pre-compilation activation
+# Bugged ? Using qt5_wrap_ui() as work-around ?
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -25,6 +26,7 @@ add_subdirectory(submodules/dummyRPG/player)	# player and UI
 ###############################################################################
 
 set(FORM_FILES
+    forms/characterInstanceWidget.ui
     forms/charactersWidget.ui
     forms/CinematicsWidget.ui
     forms/GeneralWindow.ui
@@ -41,6 +43,7 @@ add_executable(dummyeditor
     include/utils/definitions.hpp
     include/utils/logger.hpp
     include/widgets/cinematicsWidget.hpp
+    include/widgets/characterInstanceWidget.hpp
     include/widgets/charactersWidget.hpp
     include/widgets/generalWindow.hpp
     include/widgets/mapTools.hpp
@@ -58,6 +61,7 @@ add_executable(dummyeditor
     src/editor/project.cpp
     src/utils/logger.cpp
     src/widgets/cinematicsWidget.cpp
+    src/widgets/characterInstanceWidget.cpp
     src/widgets/charactersWidget.cpp
     src/widgets/generalWindow.cpp
     src/widgets/mapTools.cpp
@@ -71,8 +75,8 @@ add_executable(dummyeditor
     src/widgetsMap/mapGraphicsScene.cpp
     src/widgetsMap/mapsTree.cpp
 
-    "${FORM_FILES}"
-     icons.qrc
+    ${FORM_FILES}
+    icons.qrc
 )
 
 source_group(_ REGULAR_EXPRESSION "(src|include|forms)/*")

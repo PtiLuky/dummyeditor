@@ -107,7 +107,6 @@ bool GeneralWindow::loadProject(const QString& path)
 
     // Update the view
     updateProjectView();
-
     return true;
 }
 
@@ -310,7 +309,7 @@ void GeneralWindow::loadMap(const QString& mapName)
     m_ui->graphicsViewChipset->viewport()->update();
 
     // update map scene
-    m_mapScene.setMap(*map, m_chipsetScene.chipsets());
+    m_mapScene.setMap(m_loadedProject, *map, m_chipsetScene.chipsets());
     m_ui->graphicsViewMap->setSceneRect(QRect(0, 0, map->width() * CELL_W, map->height() * CELL_H));
 
     // update floor list
@@ -340,7 +339,7 @@ void GeneralWindow::addCharToFloor(Dummy::char_id id, Dummy::Coord coord, uint8_
 {
     if (m_loadedProject == nullptr)
         return;
-    auto* map = m_loadedProject->currMap();
+    const auto* map = m_loadedProject->currMap();
     if (map == nullptr)
         return;
     auto* floor = map->floorAt(floorIdx);
