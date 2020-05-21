@@ -6,7 +6,7 @@
 namespace Editor {
 
 
-CharacterInstanceWidget::CharacterInstanceWidget(std::shared_ptr<Editor::Project> loadedProject, Dummy::Floor& floor,
+CharacterInstanceWidget::CharacterInstanceWidget(std::shared_ptr<Project> loadedProject, Dummy::Floor& floor,
                                                  Dummy::CharacterInstance& charaInst, QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::CharacterInstanceWidget)
@@ -19,14 +19,16 @@ CharacterInstanceWidget::CharacterInstanceWidget(std::shared_ptr<Editor::Project
     if (m_loadedProject == nullptr)
         return;
 
-    auto* chara = m_loadedProject->game().character(m_charInst.characterId());
+    const auto* chara = m_loadedProject->game().character(m_charInst.characterId());
     if (chara == nullptr)
         return;
 
     // Set name
     m_ui->lbl_name->setText(QString::fromStdString(chara->name()));
     // Set event
-    // TODO
+    m_ui->panel_events->setProject(m_loadedProject);
+    m_ui->panel_events->setCurrentEvent(m_charInst.characterId(), m_charInst.eventId());
+    connect(m_ui->panel_events, &EditEventWidget::rootEventChanged, this, &CharacterInstanceWidget::onEventChanged);
     // Set direction
     if (m_charInst.pos().dir == Dummy::Direction::Top)
         m_ui->choice_up->setChecked(true);
@@ -76,6 +78,12 @@ void CharacterInstanceWidget::on_choice_down_clicked()
     auto pos = m_charInst.pos();
     pos.dir  = Dummy::Direction::Bottom;
     m_charInst.setPos(pos);
+    m_loadedProject->changed();
+}
+
+void CharacterInstanceWidget::onEventChanged(Dummy::event_id id)
+{
+    m_charInst.setEvent(id);
     m_loadedProject->changed();
 }
 

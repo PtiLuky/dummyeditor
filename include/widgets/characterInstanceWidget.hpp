@@ -17,9 +17,9 @@ class CharacterInstanceWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit CharacterInstanceWidget(std::shared_ptr<Editor::Project> loadedProject, Dummy::Floor&,
-                                     Dummy::CharacterInstance&, QWidget* parent);
-    ~CharacterInstanceWidget();
+    explicit CharacterInstanceWidget(std::shared_ptr<Project> loadedProject, Dummy::Floor&, Dummy::CharacterInstance&,
+                                     QWidget* parent);
+    virtual ~CharacterInstanceWidget();
 
 private slots:
     void on_btn_delete_clicked();
@@ -28,9 +28,11 @@ private slots:
     void on_choice_right_clicked();
     void on_choice_down_clicked();
 
+    void onEventChanged(Dummy::event_id);
+
 private:
     std::unique_ptr<Ui::CharacterInstanceWidget> m_ui;
-    std::shared_ptr<Editor::Project> m_loadedProject;
+    std::shared_ptr<Project> m_loadedProject;
     Dummy::Floor& m_floor;
     Dummy::CharacterInstance& m_charInst;
 };

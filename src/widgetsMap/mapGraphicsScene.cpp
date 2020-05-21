@@ -173,17 +173,16 @@ Dummy::Coord MapGraphicsScene::scenePosToCoord(const QPoint& p) const
 
 Dummy::CharacterInstance* MapGraphicsScene::npcAt(Dummy::Coord coord)
 {
-    Dummy::CharacterInstance* c = nullptr;
-    size_t nbLayers             = m_objectsLayers.size();
-    for (size_t i = 0; i < nbLayers && c == nullptr; ++i) {
+    size_t nbLayers = m_objectsLayers.size();
+    for (size_t i = 0; i < nbLayers; ++i) {
         size_t nbNpc = m_objectsLayers[i]->floor().npcs().size();
-        for (size_t j = 0; j < nbNpc && c == nullptr; ++j) {
+        for (size_t j = 0; j < nbNpc; ++j) {
             auto& chara = m_objectsLayers[i]->floor().npc(static_cast<Dummy::char_id>(j));
             if (chara.pos().coord == coord)
-                c = &chara;
+                return &chara;
         }
     }
-    return c;
+    return nullptr;
 }
 
 void MapGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* e)
@@ -199,7 +198,7 @@ void MapGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* e)
         if (c != nullptr) {
             CharacterInstanceWidget editCharDialog(m_loadedProject, m_objectsLayers[0]->floor(), *c, nullptr);
             editCharDialog.exec();
-            for (auto& objLay : m_objectsLayers)
+            for (const auto& objLay : m_objectsLayers)
                 objLay->update();
         }
     } else if (m_tools != nullptr && e->button() == Qt::LeftButton) {

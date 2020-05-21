@@ -19,7 +19,7 @@ public:
     explicit CharactersWidget(QWidget* parent = nullptr);
     virtual ~CharactersWidget();
 
-    void setProject(std::shared_ptr<Editor::Project> loadedProject);
+    void setProject(std::shared_ptr<Project> loadedProject);
     void setCurrCharacter(Dummy::char_id id);
 
 protected:
@@ -42,7 +42,7 @@ private:
 
 private:
     std::unique_ptr<Ui::CharactersWidget> m_ui;
-    std::shared_ptr<Editor::Project> m_loadedProject;
+    std::shared_ptr<Project> m_loadedProject;
     Dummy::char_id m_currCharacterId = Dummy::undefChar;
 };
 } // namespace Editor

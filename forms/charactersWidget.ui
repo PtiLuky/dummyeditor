@@ -188,6 +188,9 @@
        </item>
        <item>
         <widget class="QListWidget" name="list_occurences">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>

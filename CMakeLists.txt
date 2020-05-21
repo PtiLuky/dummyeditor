@@ -45,6 +45,7 @@ add_executable(dummyeditor
     include/widgets/cinematicsWidget.hpp
     include/widgets/characterInstanceWidget.hpp
     include/widgets/charactersWidget.hpp
+    include/widgets/editEventWidget.hpp
     include/widgets/generalWindow.hpp
     include/widgets/mapTools.hpp
     include/widgets/spritesWidget.hpp
@@ -63,6 +64,7 @@ add_executable(dummyeditor
     src/widgets/cinematicsWidget.cpp
     src/widgets/characterInstanceWidget.cpp
     src/widgets/charactersWidget.cpp
+    src/widgets/editEventWidget.cpp
     src/widgets/generalWindow.cpp
     src/widgets/mapTools.cpp
     src/widgets/spritesWidget.cpp
