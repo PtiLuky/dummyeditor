@@ -107,13 +107,13 @@ DialogEventWidget::DialogEventWidget(std::shared_ptr<Project> p, Dummy::event_id
 {
     if (m_loadedProject == nullptr)
         return;
-    auto* e = m_loadedProject->game().event(id);
+    const auto* e = m_loadedProject->game().event(id);
     if (e == nullptr || e->type != Dummy::EventType::Dialog)
         return;
-    auto* d = m_loadedProject->game().dialog(e->idxPerType);
+    const auto* d = m_loadedProject->game().dialog(e->idxPerType);
     if (d == nullptr)
         return;
-    auto* c = m_loadedProject->game().character(d->speakerId());
+    const auto* c = m_loadedProject->game().character(d->speakerId());
     if (c == nullptr)
         return;
 
@@ -140,7 +140,7 @@ void DialogEventWidget::setNextEvent(Dummy::event_id id)
     auto* nextE = m_loadedProject->game().event(id);
 
     // Set data
-    auto* e = m_loadedProject->game().event(m_id);
+    const auto* e = m_loadedProject->game().event(m_id);
     if (e == nullptr || e->type != Dummy::EventType::Dialog)
         return;
     auto* d = m_loadedProject->game().dialog(e->idxPerType);
@@ -167,10 +167,10 @@ void DialogEventWidget::setNewNextEvent(Dummy::EventType type)
 {
     if (m_loadedProject == nullptr)
         return;
-    auto* e = m_loadedProject->game().event(m_id);
+    const auto* e = m_loadedProject->game().event(m_id);
     if (e == nullptr || e->type != Dummy::EventType::Dialog)
         return;
-    auto* d = m_loadedProject->game().dialog(e->idxPerType);
+    const auto* d = m_loadedProject->game().dialog(e->idxPerType);
     if (d == nullptr)
         return;
 
@@ -190,7 +190,7 @@ void DialogEventWidget::setNewNextEvent(Dummy::EventType type)
 
 void DialogEventWidget::currTextChanged(const QString& txt)
 {
-    auto* e = m_loadedProject->game().event(m_id);
+    const auto* e = m_loadedProject->game().event(m_id);
     if (e == nullptr || e->type != Dummy::EventType::Dialog)
         return;
     auto* d = m_loadedProject->game().dialog(e->idxPerType);

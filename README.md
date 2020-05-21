@@ -21,9 +21,9 @@ And a game preview:
 
 * [x] Draw a map, a floor
 * [x] Select a sprite on a sprite sheet
-* [ ] Set the position of the player
-* [ ] Create the Non-player characters
-* [ ] Create dialogs with NPC
+* [X] Set the position of the player
+* [X] Create the Non-player characters
+* [X] Create dialogs with NPC
 * [ ] Spawn monsters
 * [ ] Fights monsters
 * [ ] Items management
