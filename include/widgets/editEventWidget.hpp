@@ -17,6 +17,8 @@ public:
 
     void setProject(std::shared_ptr<Project>);
     void setCurrentEvent(Dummy::char_id, Dummy::event_id);
+    static QWidget* createWidgetEvent(const Dummy::Event&, Dummy::char_id, Dummy::event_id, std::shared_ptr<Project>,
+                                      QWidget* parent);
 
 private:
     std::shared_ptr<Project> m_loadedProject;
@@ -24,7 +26,7 @@ private:
     Dummy::char_id m_currChar = Dummy::undefChar;
 
 private slots:
-    void setNewRoot(Dummy::EventType);
+    void setNewRoot(Dummy::event_id);
 
 signals:
     void rootEventChanged(Dummy::event_id);
@@ -36,10 +38,12 @@ class AddEventButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit AddEventButton(QWidget* parent = nullptr);
+    explicit AddEventButton(Dummy::char_id, std::shared_ptr<Project>, QWidget* parent = nullptr);
 
 private:
     std::unique_ptr<QDialog> m_dlg;
+    std::shared_ptr<Project> m_loadedProject;
+    Dummy::char_id m_currChar = Dummy::undefChar;
 
 private slots:
     void btnClicked();
@@ -47,7 +51,7 @@ private slots:
     void btnNewChoiceClicked();
 
 signals:
-    void AddedEvent(Dummy::EventType);
+    void AddedEvent(Dummy::event_id);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,16 +62,59 @@ class DialogEventWidget : public QWidget
 public:
     explicit DialogEventWidget(std::shared_ptr<Project>, Dummy::event_id, QWidget* parent = nullptr);
 
-    void setNextEvent(Dummy::event_id);
-
 private:
     std::shared_ptr<Project> m_loadedProject;
     std::unique_ptr<QWidget> m_nextContent;
     Dummy::event_id m_id = Dummy::undefEvent;
 
 private slots:
-    void setNewNextEvent(Dummy::EventType);
+    void setNextEvent(Dummy::event_id);
     void currTextChanged(const QString&);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class ChoiceEventWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ChoiceEventWidget(std::shared_ptr<Project>, Dummy::char_id, Dummy::event_id, QWidget* parent = nullptr);
+
+private:
+    void updateOptionEvents();
+    template <typename Func1, typename Func2, typename Func3>
+    void createOptionWidget(std::unique_ptr<QWidget>& place, const Dummy::DialogChoice&, uint8_t optionIdx, Func1,
+                            Func2, Func3);
+    void activateOption(uint8_t choiceIdx, bool);
+    void setNextEvent(uint8_t choiceIdx, Dummy::event_id next);
+    void setText(uint8_t choiceIdx, const std::string&);
+
+    std::shared_ptr<Project> m_loadedProject;
+    std::unique_ptr<QWidget> m_optionContent1;
+    std::unique_ptr<QWidget> m_optionContent2;
+    std::unique_ptr<QWidget> m_optionContent3;
+    std::unique_ptr<QWidget> m_optionContent4;
+    Dummy::event_id m_id    = Dummy::undefEvent;
+    Dummy::char_id m_charId = Dummy::undefChar;
+
+private slots:
+    void questionChanged(const QString&);
+
+    void option1Activated(bool);
+    void option1Changed(const QString&);
+    void setNextEvent1(Dummy::event_id);
+
+    void option2Activated(bool);
+    void option2Changed(const QString&);
+    void setNextEvent2(Dummy::event_id);
+
+    void option3Activated(bool);
+    void option3Changed(const QString&);
+    void setNextEvent3(Dummy::event_id);
+
+    void option4Activated(bool);
+    void setNextEvent4(Dummy::event_id);
+    void option4Changed(const QString&);
 };
 
 } // namespace Editor
