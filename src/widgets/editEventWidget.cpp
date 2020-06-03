@@ -126,8 +126,8 @@ DialogEventWidget::DialogEventWidget(std::shared_ptr<Project> p, Dummy::event_id
     , m_loadedProject(p)
     , m_id(id)
 {
-    auto* d       = m_loadedProject ? m_loadedProject->game().dialog(m_id) : nullptr;
-    const auto* c = d ? m_loadedProject->game().character(d->speakerId()) : nullptr;
+    const auto* d = m_loadedProject ? m_loadedProject->game().dialog(m_id) : nullptr;
+    const auto* c = d != nullptr ? m_loadedProject->game().character(d->speakerId()) : nullptr;
     if (c == nullptr)
         return;
 

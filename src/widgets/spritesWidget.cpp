@@ -264,7 +264,7 @@ void SpritesWidget::updateImageDisplay()
         p.drawLines(lines);
     }
 
-    const auto* s = m_loadedProject->spriteAt(m_currSpriteId);
+    const auto* s = m_loadedProject->game().sprite(m_currSpriteId);
     if (s == nullptr)
         return; // ???
 
@@ -392,7 +392,7 @@ void SpritesWidget::on_btn_loadImage_clicked()
         QFile::copy(spritesheetFile.filePath(), imagesDir + "/" + spritesheetFile.fileName());
     }
 
-    auto* pSprite = m_loadedProject->spriteAt(m_currSpriteId);
+    auto* pSprite = m_loadedProject->game().sprite(m_currSpriteId);
     if (pSprite != nullptr) {
         std::string filename   = spritesheetFile.fileName().toStdString();
         pSprite->spriteSheetId = m_loadedProject->game().registerSpriteSheet(filename);
@@ -405,7 +405,8 @@ void SpritesWidget::on_btn_newSprite_clicked()
     if (m_loadedProject == nullptr)
         return;
 
-    auto id = m_loadedProject->createSprite();
+    auto id = m_loadedProject->game().registerSprite();
+    m_loadedProject->changed();
     loadSpritesList();
     setCurrentSprite(id);
 }
@@ -417,20 +418,20 @@ void SpritesWidget::on_list_sprites_currentRowChanged(int row)
 
 void SpritesWidget::on_check_useMultiDir_clicked(bool checked)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->has4Directions = checked;
+    m_loadedProject->game().sprite(m_currSpriteId)->has4Directions = checked;
     m_loadedProject->changed();
     updateImageDisplay();
 }
 
 void SpritesWidget::on_input_width_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->width = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->width = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_height_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->height = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->height = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -440,25 +441,25 @@ void SpritesWidget::on_check_anim1_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount1->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -468,25 +469,25 @@ void SpritesWidget::on_check_anim2_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount2->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames2 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames2 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x2 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x2 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y2 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y2 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -496,25 +497,25 @@ void SpritesWidget::on_check_anim3_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount3->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames3 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames3 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x3 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x3 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y3 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y3 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -524,25 +525,25 @@ void SpritesWidget::on_check_anim4_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount4->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames4 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames4 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x4 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x4 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y4 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y4 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }

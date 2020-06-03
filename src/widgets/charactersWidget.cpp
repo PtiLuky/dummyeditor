@@ -112,7 +112,8 @@ void CharactersWidget::on_btn_newCharacter_clicked()
 {
     if (m_loadedProject == nullptr)
         return;
-    auto id = m_loadedProject->createCharacter();
+    auto id = m_loadedProject->game().registerCharacter(tr("Unnamed").toStdString());
+    m_loadedProject->changed();
 
     loadCharactersList();
     setCurrCharacter(id);

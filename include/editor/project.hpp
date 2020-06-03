@@ -46,10 +46,6 @@ public:
     bool mapExists(const QString& mapName);
     bool renameCurrMap(const QString& newName);
 
-    Dummy::sprite_id createSprite();
-    Dummy::char_id createCharacter();
-    Dummy::AnimatedSprite* spriteAt(Dummy::sprite_id);
-
     static QString sanitizeMapName(const QString& unsafeName);
 
     static std::shared_ptr<Project> create(const QString& projectRootPath);

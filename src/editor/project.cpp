@@ -288,26 +288,6 @@ bool Project::renameCurrMap(const QString& newName)
     return true;
 }
 
-Dummy::sprite_id Project::createSprite()
-{
-    auto id = m_game.registerSprite();
-    if (id != Dummy::undefSprite)
-        changed();
-    return id;
-}
-
-Dummy::char_id Project::createCharacter()
-{
-    auto id = m_game.registerCharacter(tr("Unnamed").toStdString());
-    changed();
-    return id;
-}
-
-Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
-{
-    return m_game.sprite(id);
-}
-
 QString Project::sanitizeMapName(const QString& unsafeName)
 {
     QString safeName = unsafeName;
