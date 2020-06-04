@@ -25,8 +25,8 @@ void MapEditDialog::setup(const Editor::Project& project, const Dummy::Map* map,
         m_ui->spinBoxMapWidth->setValue(map->width());
     } else {
         m_ui->lineEditMapName->setText("");
-        m_ui->lineEditChipset->setEnabled(true); // For the moment we disable possibilty to change widget
-        m_ui->pushButtonBrowseChipset->setEnabled(false);
+        m_ui->lineEditChipset->setEnabled(true);
+        m_ui->pushButtonBrowseChipset->setEnabled(true);
     }
 
     // cleanPath() uses slashes, remove weird paths as "folder/../folder"

@@ -317,9 +317,11 @@ void SpritesWidget::loadSpritesList()
 
     const size_t nbSprites = m_loadedProject->game().sprites().size();
     for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto& sprite = m_loadedProject->game().sprites()[i];
+        const auto* sprite = m_loadedProject->game().sprite(i);
+        if (sprite == nullptr)
+            continue;
 
-        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite.spriteSheetId));
+        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite->spriteSheetId));
         if (spritesheet.isEmpty())
             spritesheet = tr("Undefined");
 
@@ -599,9 +601,11 @@ void SpriteSelectionDialog::loadSpritesList()
 
     const size_t nbSprites = m_loadedProject->game().sprites().size();
     for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto& sprite = m_loadedProject->game().sprites()[i];
+        const auto* sprite = m_loadedProject->game().sprite(i);
+        if (sprite == nullptr)
+            continue;
 
-        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite.spriteSheetId));
+        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite->spriteSheetId));
         if (spritesheet.isEmpty())
             spritesheet = tr("Undefined");
 

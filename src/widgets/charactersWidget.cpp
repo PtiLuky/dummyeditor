@@ -68,9 +68,11 @@ void CharactersWidget::loadCharactersList()
 
     const size_t nbChars = m_loadedProject->game().characters().size();
     for (Dummy::sprite_id i = 0; i < nbChars; ++i) {
-        const auto& charac = m_loadedProject->game().characters()[i];
+        const auto* charac = m_loadedProject->game().character(i);
+        if (charac == nullptr)
+            continue;
 
-        m_ui->list_characters->addItem(QString::number(i) + " - " + QString::fromStdString(charac.name()));
+        m_ui->list_characters->addItem(QString::number(i) + " - " + QString::fromStdString(charac->name()));
     }
     m_ui->list_characters->blockSignals(false);
     m_ui->list_characters->setCurrentRow(selectedRow);
