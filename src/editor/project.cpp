@@ -14,7 +14,6 @@ using std::make_unique;
 
 static const char* const PROJECT_FILE_NAME = "dummy-rpg-project.xml";
 static const char* const DATA_FILE_NAME    = "game-data.gdummy";
-static const char* const MAP_FILE_EXT      = ".mdummy";
 
 namespace Editor {
 
@@ -163,17 +162,20 @@ void Project::saveProject()
     const int indent = 4;
     doc.save(stream, indent);
 
-    std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
-    bool bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
-    if (! bRes)
-        Log::error("Error while saving the game data...");
-
-    bRes = saveCurrMap();
+    // Save opened map
+    bool bRes = saveCurrMap();
     if (bRes) {
         m_isModified = false;
         emit saveStatusChanged(true);
     } else
         Log::error("Error while saving the map...");
+
+    // Save game file
+    m_game.cleanupUnused();
+    std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
+    bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
+    if (! bRes)
+        Log::error("Error while saving the game data...");
 }
 
 bool Project::saveCurrMap()
@@ -184,7 +186,8 @@ bool Project::saveCurrMap()
     }
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
-    std::ofstream mapDataFile(mapPath.toStdString(), std::ios::binary);
+    auto tmp        = mapPath.toStdString();
+    std::ofstream mapDataFile(mapPath.toStdWString(), std::ios::binary);
     bool bRes = Dummy::Serializer::serializeMapToFile(*m_currMap, mapDataFile);
 
     return bRes;
@@ -244,7 +247,7 @@ bool Project::loadMap(const QString& mapName)
     m_currMapName = mapName;
 
     QString mapPath = m_projectPath + "/maps/" + mapName + MAP_FILE_EXT;
-    std::ifstream mapDataFile(mapPath.toStdString(), std::ios::binary);
+    std::ifstream mapDataFile(mapPath.toStdWString(), std::ios::binary);
     bool bRes = Dummy::Serializer::parseMapFromFile(mapDataFile, *m_currMap);
     if (! bRes)
         Log::error(QObject::tr("Error while loading the map %1").arg(mapPath));
@@ -291,7 +294,7 @@ bool Project::renameCurrMap(const QString& newName)
 QString Project::sanitizeMapName(const QString& unsafeName)
 {
     QString safeName = unsafeName;
-    safeName.remove(QRegularExpression(QString::fromUtf8(R"([`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
+    safeName.remove(QRegularExpression(QString::fromUtf8(R"([ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
     if (safeName.isNull())
         safeName = "new_map";
     return safeName;
