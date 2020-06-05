@@ -30,6 +30,7 @@ private slots:
     void on_btn_newCharacter_clicked();
     void on_input_charName_textChanged(const QString& arg1);
     void on_btn_changeSprite_clicked();
+    void on_btn_delete_clicked();
     void on_list_occurences_doubleClicked(const QModelIndex& index);
     void on_btn_addToCurrMap_clicked();
 
@@ -43,6 +44,7 @@ private:
 private:
     std::unique_ptr<Ui::CharactersWidget> m_ui;
     std::shared_ptr<Project> m_loadedProject;
+    std::vector<Dummy::char_id> m_ids;
     Dummy::char_id m_currCharacterId = Dummy::undefChar;
 };
 } // namespace Editor

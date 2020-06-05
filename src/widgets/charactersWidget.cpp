@@ -3,6 +3,8 @@
 
 #include "widgets/spritesWidget.hpp"
 
+#include <QMessageBox>
+
 namespace Editor {
 
 
@@ -66,14 +68,13 @@ void CharactersWidget::loadCharactersList()
     m_ui->list_characters->blockSignals(true);
     m_ui->list_characters->clear();
 
-    const size_t nbChars = m_loadedProject->game().characters().size();
-    for (Dummy::sprite_id i = 0; i < nbChars; ++i) {
-        const auto* charac = m_loadedProject->game().character(i);
-        if (charac == nullptr)
-            continue;
-
-        m_ui->list_characters->addItem(QString::number(i) + " - " + QString::fromStdString(charac->name()));
+    m_ids.clear();
+    for (const auto& chara : m_loadedProject->game().characters()) {
+        m_ui->list_characters->addItem(QString::number(chara.second.id()) + " - "
+                                       + QString::fromStdString(chara.second.name()));
+        m_ids.push_back(chara.second.id());
     }
+
     m_ui->list_characters->blockSignals(false);
     m_ui->list_characters->setCurrentRow(selectedRow);
 }
@@ -107,7 +108,9 @@ void CharactersWidget::updateSpritePreview()
 
 void CharactersWidget::on_list_characters_currentRowChanged(int currentRow)
 {
-    setCurrCharacter(static_cast<Dummy::char_id>(currentRow));
+    size_t idx = static_cast<size_t>(currentRow);
+    if (idx < m_ids.size())
+        setCurrCharacter(m_ids[idx]);
 }
 
 void CharactersWidget::on_btn_newCharacter_clicked()
@@ -132,6 +135,7 @@ void CharactersWidget::on_input_charName_textChanged(const QString& name)
 
     chara->setName(name.toStdString());
     m_loadedProject->changed();
+    loadCharactersList();
 }
 
 void CharactersWidget::on_btn_changeSprite_clicked()
@@ -150,6 +154,27 @@ void CharactersWidget::on_btn_changeSprite_clicked()
         updateSpritePreview();
         m_loadedProject->changed();
     }
+}
+
+void CharactersWidget::on_btn_delete_clicked()
+{
+    if (m_loadedProject == nullptr)
+        return;
+
+    auto btn = QMessageBox::question(
+        this, tr("Confirmation"), tr("You are about to delete this character and all its occurences. Are you sure?"));
+    if (btn != QMessageBox::Yes)
+        return;
+
+    auto* openedMap = m_loadedProject->currMap();
+    if (openedMap)
+        openedMap->unregisterCharacter(m_currCharacterId);
+
+    m_loadedProject->game().unregisterCharacter(m_currCharacterId);
+
+    loadCharactersList();
+    setCurrCharacter(Dummy::undefChar);
+    m_loadedProject->changed();
 }
 
 void CharactersWidget::on_list_occurences_doubleClicked(const QModelIndex& index) {}
