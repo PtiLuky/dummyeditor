@@ -167,8 +167,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>292</width>
-               <height>466</height>
+               <width>282</width>
+               <height>437</height>
               </rect>
              </property>
              <property name="styleSheet">
@@ -204,6 +204,13 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_delete">
+         <property name="text">
+          <string>Delete sprite</string>
+         </property>
         </widget>
        </item>
       </layout>

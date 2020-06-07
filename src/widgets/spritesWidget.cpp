@@ -3,6 +3,7 @@
 #include "ui_spritesWidget.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -32,7 +33,7 @@ SpritesWidget::~SpritesWidget() {}
 void SpritesWidget::setProject(std::shared_ptr<Editor::Project> loadedProject)
 {
     m_loadedProject = loadedProject;
-    loadSpritesList();
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
 }
 
 void SpritesWidget::setCurrentSprite(Dummy::sprite_id id)
@@ -40,10 +41,15 @@ void SpritesWidget::setCurrentSprite(Dummy::sprite_id id)
     if (m_loadedProject == nullptr)
         return;
 
-    // Enable panels
-    m_ui->panel_drawSprite->setEnabled(true);
-    m_ui->panel_preview->setEnabled(true);
+    int idx      = -1;
+    size_t nbIdx = m_ids.size();
+    for (size_t i = 0; i < nbIdx; ++i)
+        if (m_ids[i] == id) {
+            idx = static_cast<int>(i);
+            break;
+        }
 
+    m_ui->list_sprites->setCurrentRow(idx);
     m_currSpriteId = id;
     updateImage();
 }
@@ -116,6 +122,7 @@ void SpritesWidget::updateFields()
     const auto* pSprite = m_loadedProject->game().sprite(m_currSpriteId);
     if (pSprite == nullptr)
         return;
+
     const auto& sprite = *pSprite;
 
     // Block signal to avoid redundant signals
@@ -207,6 +214,10 @@ void SpritesWidget::updateFields()
 void SpritesWidget::updateImage()
 {
     const auto* sprite = m_loadedProject->game().sprite(m_currSpriteId);
+    // Enable panels
+    m_ui->panel_drawSprite->setEnabled(sprite != nullptr);
+    m_ui->panel_preview->setEnabled(sprite != nullptr);
+
     if (sprite == nullptr)
         return;
 
@@ -304,31 +315,27 @@ void SpritesWidget::updateImageDisplay()
     m_ui->image_center->setPixmap(displayImg);
 }
 
-void SpritesWidget::loadSpritesList()
+void SpritesWidget::loadSpritesList(const Editor::Project* p, QListWidget* list, std::vector<Dummy::sprite_id> ids)
 {
-    if (m_loadedProject == nullptr) {
-        m_ui->list_sprites->clear();
+    if (p == nullptr) {
+        list->clear();
         return;
     }
 
-    int selectedRow = m_ui->list_sprites->currentRow();
-    m_ui->list_sprites->blockSignals(true);
-    m_ui->list_sprites->clear();
+    list->blockSignals(true);
+    list->clear();
 
-    const size_t nbSprites = m_loadedProject->game().sprites().size();
-    for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto* sprite = m_loadedProject->game().sprite(i);
-        if (sprite == nullptr)
-            continue;
-
-        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite->spriteSheetId));
+    ids.clear();
+    for (const auto& sprite : p->game().sprites()) {
+        QString spritesheet = QString::fromStdString(p->game().spriteSheet(sprite.second.spriteSheetId));
         if (spritesheet.isEmpty())
             spritesheet = tr("Undefined");
+        list->addItem(QString::number(sprite.second.id) + " - " + spritesheet);
 
-        m_ui->list_sprites->addItem(QString::number(i) + " - " + spritesheet);
+        ids.push_back(sprite.second.id);
     }
-    m_ui->list_sprites->blockSignals(false);
-    m_ui->list_sprites->setCurrentRow(selectedRow);
+
+    list->blockSignals(false);
 }
 
 void SpritesWidget::zoomIn()
@@ -399,7 +406,7 @@ void SpritesWidget::on_btn_loadImage_clicked()
         std::string filename   = spritesheetFile.fileName().toStdString();
         pSprite->spriteSheetId = m_loadedProject->game().registerSpriteSheet(filename);
     }
-    loadSpritesList();
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
 }
 
 void SpritesWidget::on_btn_newSprite_clicked()
@@ -409,13 +416,34 @@ void SpritesWidget::on_btn_newSprite_clicked()
 
     auto id = m_loadedProject->game().registerSprite();
     m_loadedProject->changed();
-    loadSpritesList();
+
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
     setCurrentSprite(id);
+    m_loadedProject->changed();
+}
+
+void SpritesWidget::on_btn_delete_clicked()
+{
+    if (m_loadedProject == nullptr)
+        return;
+
+    auto btn =
+        QMessageBox::question(this, tr("Confirmation"), tr("You are about to delete this sprite. Are you sure?"));
+    if (btn != QMessageBox::Yes)
+        return;
+
+    m_loadedProject->game().unregisterSprite(m_currSpriteId);
+
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
+    setCurrentSprite(Dummy::undefSprite);
+    m_loadedProject->changed();
 }
 
 void SpritesWidget::on_list_sprites_currentRowChanged(int row)
 {
-    setCurrentSprite(static_cast<Dummy::sprite_id>(row));
+    size_t idx = static_cast<size_t>(row);
+    if (idx < m_ids.size())
+        setCurrentSprite(m_ids[idx]);
 }
 
 void SpritesWidget::on_check_useMultiDir_clicked(bool checked)
@@ -557,7 +585,7 @@ SpriteSelectionDialog::SpriteSelectionDialog(std::shared_ptr<Editor::Project> pr
     , m_loadedProject(project)
 {
     m_ui->setupUi(this);
-    loadSpritesList();
+    SpritesWidget::loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
 }
 
 SpriteSelectionDialog::~SpriteSelectionDialog() {}
@@ -588,36 +616,11 @@ void SpriteSelectionDialog::setCurrentSprite(Dummy::sprite_id id)
     }
 }
 
-void SpriteSelectionDialog::loadSpritesList()
-{
-    if (m_loadedProject == nullptr) {
-        m_ui->list_sprites->clear();
-        return;
-    }
-
-    int selectedRow = m_ui->list_sprites->currentRow();
-    m_ui->list_sprites->blockSignals(true);
-    m_ui->list_sprites->clear();
-
-    const size_t nbSprites = m_loadedProject->game().sprites().size();
-    for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto* sprite = m_loadedProject->game().sprite(i);
-        if (sprite == nullptr)
-            continue;
-
-        QString spritesheet = QString::fromStdString(m_loadedProject->game().spriteSheet(sprite->spriteSheetId));
-        if (spritesheet.isEmpty())
-            spritesheet = tr("Undefined");
-
-        m_ui->list_sprites->addItem(QString::number(i) + " - " + spritesheet);
-    }
-    m_ui->list_sprites->blockSignals(false);
-    m_ui->list_sprites->setCurrentRow(selectedRow);
-}
-
 void SpriteSelectionDialog::on_list_sprites_clicked(const QModelIndex& index)
 {
-    setCurrentSprite(static_cast<Dummy::sprite_id>(index.row()));
+    size_t idx = static_cast<size_t>(index.row());
+    if (idx < m_ids.size())
+        setCurrentSprite(m_ids[idx]);
 }
 
 } // namespace Editor

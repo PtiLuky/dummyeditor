@@ -33,6 +33,14 @@ void CharactersWidget::setCurrCharacter(Dummy::char_id id)
 {
     m_currCharacterId = id;
 
+    int idx      = -1;
+    size_t nbIdx = m_ids.size();
+    for (size_t i = 0; i < nbIdx; ++i)
+        if (m_ids[i] == id) {
+            idx = static_cast<int>(i);
+            break;
+        }
+
     const Dummy::Character* chara = nullptr;
     if (m_loadedProject != nullptr)
         chara = m_loadedProject->game().character(id);
@@ -49,8 +57,6 @@ void CharactersWidget::setCurrCharacter(Dummy::char_id id)
 
 void CharactersWidget::showEvent(QShowEvent* event)
 {
-    loadCharactersList();
-
     if (m_loadedProject != nullptr)
         m_ui->btn_addToCurrMap->setEnabled(m_loadedProject->currMap() != nullptr);
 
@@ -64,7 +70,6 @@ void CharactersWidget::loadCharactersList()
         return;
     }
 
-    int selectedRow = m_ui->list_characters->currentRow();
     m_ui->list_characters->blockSignals(true);
     m_ui->list_characters->clear();
 
@@ -76,7 +81,6 @@ void CharactersWidget::loadCharactersList()
     }
 
     m_ui->list_characters->blockSignals(false);
-    m_ui->list_characters->setCurrentRow(selectedRow);
 }
 
 void CharactersWidget::updateSpritePreview()
