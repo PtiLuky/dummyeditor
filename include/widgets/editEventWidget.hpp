@@ -9,6 +9,8 @@
 
 namespace Editor {
 
+class EventWidget;
+
 class EditEventWidget : public QWidget
 {
     Q_OBJECT
@@ -17,8 +19,8 @@ public:
 
     void setProject(std::shared_ptr<Project>);
     void setCurrentEvent(Dummy::char_id, Dummy::event_id);
-    static QWidget* createWidgetEvent(const Dummy::Event&, Dummy::char_id, Dummy::event_id, std::shared_ptr<Project>,
-                                      QWidget* parent);
+    static EventWidget* createWidgetEvent(const Dummy::Event&, Dummy::char_id, Dummy::event_id,
+                                          std::shared_ptr<Project>, QWidget* parent);
 
 private:
     std::shared_ptr<Project> m_loadedProject;
@@ -56,25 +58,40 @@ signals:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class DialogEventWidget : public QWidget
+class EventWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    EventWidget(std::shared_ptr<Project>, Dummy::event_id, QWidget* parent = nullptr);
+
+signals:
+    void replaceBy(Dummy::event_id);
+
+protected:
+    std::shared_ptr<Project> m_loadedProject;
+    Dummy::event_id m_id = Dummy::undefEvent;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class DialogEventWidget : public EventWidget
 {
     Q_OBJECT
 public:
     explicit DialogEventWidget(std::shared_ptr<Project>, Dummy::event_id, QWidget* parent = nullptr);
 
 private:
-    std::shared_ptr<Project> m_loadedProject;
     std::unique_ptr<QWidget> m_nextContent;
-    Dummy::event_id m_id = Dummy::undefEvent;
 
 private slots:
+    void btnDeleteClicked();
     void setNextEvent(Dummy::event_id);
     void currTextChanged(const QString&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ChoiceEventWidget : public QWidget
+class ChoiceEventWidget : public EventWidget
 {
     Q_OBJECT
 public:
@@ -89,15 +106,14 @@ private:
     void setNextEvent(uint8_t choiceIdx, Dummy::event_id next);
     void setText(uint8_t choiceIdx, const std::string&);
 
-    std::shared_ptr<Project> m_loadedProject;
     std::unique_ptr<QWidget> m_optionContent1;
     std::unique_ptr<QWidget> m_optionContent2;
     std::unique_ptr<QWidget> m_optionContent3;
     std::unique_ptr<QWidget> m_optionContent4;
-    Dummy::event_id m_id    = Dummy::undefEvent;
     Dummy::char_id m_charId = Dummy::undefChar;
 
 private slots:
+    void btnDeleteClicked();
     void questionChanged(const QString&);
 
     void option1Activated(bool);

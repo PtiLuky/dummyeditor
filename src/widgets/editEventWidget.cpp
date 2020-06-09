@@ -35,14 +35,16 @@ void EditEventWidget::setCurrentEvent(Dummy::char_id charId, Dummy::event_id id)
         m_content = std::move(btn);
         layout()->addWidget(m_content.get());
     } else {
-        m_content.reset(createWidgetEvent(*e, m_currChar, id, m_loadedProject, this));
+        auto* eWidget = createWidgetEvent(*e, m_currChar, id, m_loadedProject, this);
+        m_content.reset(eWidget);
+        connect(eWidget, &EventWidget::replaceBy, this, &EditEventWidget::setNewRoot);
     }
 }
 
-QWidget* EditEventWidget::createWidgetEvent(const Dummy::Event& e, Dummy::char_id charId, Dummy::event_id id,
-                                            std::shared_ptr<Project> p, QWidget* parent)
+EventWidget* EditEventWidget::createWidgetEvent(const Dummy::Event& e, Dummy::char_id charId, Dummy::event_id id,
+                                                std::shared_ptr<Project> p, QWidget* parent)
 {
-    QWidget* ptr = nullptr;
+    EventWidget* ptr = nullptr;
     if (e.type == Dummy::EventType::Dialog) {
         ptr = new DialogEventWidget(p, id, parent);
     } else if (e.type == Dummy::EventType::Choice) {
@@ -120,11 +122,14 @@ void AddEventButton::btnNewChoiceClicked()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-DialogEventWidget::DialogEventWidget(std::shared_ptr<Project> p, Dummy::event_id id, QWidget* parent)
+EventWidget::EventWidget(std::shared_ptr<Project> p, Dummy::event_id id, QWidget* parent)
     : QWidget(parent)
     , m_loadedProject(p)
     , m_id(id)
+{}
+
+DialogEventWidget::DialogEventWidget(std::shared_ptr<Project> p, Dummy::event_id id, QWidget* parent)
+    : EventWidget(p, id, parent)
 {
     const auto* d = m_loadedProject ? m_loadedProject->game().dialog(m_id) : nullptr;
     const auto* c = d != nullptr ? m_loadedProject->game().character(d->speakerId()) : nullptr;
@@ -142,11 +147,24 @@ DialogEventWidget::DialogEventWidget(std::shared_ptr<Project> p, Dummy::event_id
     connect(input, &QLineEdit::textChanged, this, &DialogEventWidget::currTextChanged);
     textLine->layout()->addWidget(input);
 
+    QPushButton* btnDel = new QPushButton(tr("Delete"), this);
+    connect(btnDel, &QAbstractButton::clicked, this, &DialogEventWidget::btnDeleteClicked);
+    textLine->layout()->addWidget(btnDel);
+
+
     setLayout(new QVBoxLayout());
     layout()->addWidget(textLine);
     layout()->setMargin(0);
 
     setNextEvent(d->nextEvent());
+}
+
+void DialogEventWidget::btnDeleteClicked()
+{
+    auto btn = QMessageBox::question(this, tr("Confirmation"),
+                                     tr("You are about to delete this event and all its following. Are you sure?"));
+    if (btn == QMessageBox::Yes)
+        emit replaceBy(Dummy::undefEvent);
 }
 
 void DialogEventWidget::setNextEvent(Dummy::event_id id)
@@ -167,7 +185,9 @@ void DialogEventWidget::setNextEvent(Dummy::event_id id)
         layout()->addWidget(m_nextContent.get());
 
     } else {
-        m_nextContent.reset(EditEventWidget::createWidgetEvent(*nextE, d->speakerId(), id, m_loadedProject, this));
+        auto* eWidget = EditEventWidget::createWidgetEvent(*nextE, d->speakerId(), id, m_loadedProject, this);
+        m_nextContent.reset(eWidget);
+        connect(eWidget, &EventWidget::replaceBy, this, &DialogEventWidget::setNextEvent);
     }
 }
 
@@ -183,9 +203,7 @@ void DialogEventWidget::currTextChanged(const QString& txt)
 
 ChoiceEventWidget::ChoiceEventWidget(std::shared_ptr<Project> p, Dummy::char_id charId, Dummy::event_id id,
                                      QWidget* parent)
-    : QWidget(parent)
-    , m_loadedProject(p)
-    , m_id(id)
+    : EventWidget(p, id, parent)
     , m_charId(charId)
 {
     const auto* c = m_loadedProject ? m_loadedProject->game().choice(m_id) : nullptr;
@@ -202,6 +220,10 @@ ChoiceEventWidget::ChoiceEventWidget(std::shared_ptr<Project> p, Dummy::char_id 
     QLineEdit* input = new QLineEdit(QString::fromStdString(c->question()), textLine);
     connect(input, &QLineEdit::textChanged, this, &ChoiceEventWidget::questionChanged);
     textLine->layout()->addWidget(input);
+
+    QPushButton* btnDel = new QPushButton(tr("Delete"), this);
+    connect(btnDel, &QAbstractButton::clicked, this, &ChoiceEventWidget::btnDeleteClicked);
+    textLine->layout()->addWidget(btnDel);
 
     setLayout(new QVBoxLayout());
     layout()->addWidget(textLine);
@@ -291,7 +313,8 @@ void ChoiceEventWidget::createOptionWidget(std::unique_ptr<QWidget>& place, cons
         btn->setEnabled(optionIdx < choice.nbOptions());
         place->layout()->addWidget(btn);
     } else {
-        EditEventWidget::createWidgetEvent(*nextEvent, m_charId, nextId, m_loadedProject, place.get());
+        auto* eWidget = EditEventWidget::createWidgetEvent(*nextEvent, m_charId, nextId, m_loadedProject, place.get());
+        connect(eWidget, &EventWidget::replaceBy, this, slotNext);
     }
 }
 
@@ -336,6 +359,14 @@ void ChoiceEventWidget::setText(uint8_t choiceIdx, const std::string& txt)
     opt.option = txt;
     c->setOption(opt, choiceIdx);
     m_loadedProject->changed();
+}
+
+void ChoiceEventWidget::btnDeleteClicked()
+{
+    auto btn = QMessageBox::question(this, tr("Confirmation"),
+                                     tr("You are about to delete this event and all its following. Are you sure?"));
+    if (btn == QMessageBox::Yes)
+        emit replaceBy(Dummy::undefEvent);
 }
 
 void ChoiceEventWidget::questionChanged(const QString& txt)
