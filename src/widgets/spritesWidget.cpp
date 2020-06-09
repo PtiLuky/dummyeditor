@@ -315,7 +315,7 @@ void SpritesWidget::updateImageDisplay()
     m_ui->image_center->setPixmap(displayImg);
 }
 
-void SpritesWidget::loadSpritesList(const Editor::Project* p, QListWidget* list, std::vector<Dummy::sprite_id> ids)
+void SpritesWidget::loadSpritesList(const Editor::Project* p, QListWidget* list, std::vector<Dummy::sprite_id>& ids)
 {
     if (p == nullptr) {
         list->clear();

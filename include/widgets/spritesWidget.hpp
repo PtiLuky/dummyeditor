@@ -28,7 +28,7 @@ public:
 
     void setProject(std::shared_ptr<Editor::Project> project);
     void setCurrentSprite(Dummy::sprite_id);
-    static void loadSpritesList(const Editor::Project*, QListWidget* list, std::vector<Dummy::sprite_id> ids);
+    static void loadSpritesList(const Editor::Project*, QListWidget* list, std::vector<Dummy::sprite_id>& ids);
 
     void mousePressEvent(QMouseEvent*) override;
     void mouseMoveEvent(QMouseEvent*) override;

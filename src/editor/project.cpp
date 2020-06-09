@@ -187,7 +187,7 @@ bool Project::saveCurrMap()
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
     auto tmp        = mapPath.toStdString();
-    std::ofstream mapDataFile(mapPath.toStdWString(), std::ios::binary);
+    std::ofstream mapDataFile(mapPath.toStdString(), std::ios::binary);
     bool bRes = Dummy::Serializer::serializeMapToFile(*m_currMap, mapDataFile);
 
     return bRes;
@@ -247,7 +247,7 @@ bool Project::loadMap(const QString& mapName)
     m_currMapName = mapName;
 
     QString mapPath = m_projectPath + "/maps/" + mapName + MAP_FILE_EXT;
-    std::ifstream mapDataFile(mapPath.toStdWString(), std::ios::binary);
+    std::ifstream mapDataFile(mapPath.toStdString(), std::ios::binary);
     bool bRes = Dummy::Serializer::parseMapFromFile(mapDataFile, *m_currMap);
     if (! bRes)
         Log::error(QObject::tr("Error while loading the map %1").arg(mapPath));
@@ -294,7 +294,8 @@ bool Project::renameCurrMap(const QString& newName)
 QString Project::sanitizeMapName(const QString& unsafeName)
 {
     QString safeName = unsafeName;
-    safeName.remove(QRegularExpression(QString::fromUtf8(R"([ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
+    safeName.remove(QRegularExpression(QString::fromUtf8(
+        R"([ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
     if (safeName.isNull())
         safeName = "new_map";
     return safeName;
