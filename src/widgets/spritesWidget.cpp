@@ -1,7 +1,9 @@
 #include "widgets/spritesWidget.hpp"
+#include "ui_spriteSelectionDialog.h"
 #include "ui_spritesWidget.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 
@@ -12,6 +14,7 @@ static const float ZOOM_MIN = 0.5F;
 
 namespace Editor {
 
+///////////////////////////////////////////////////////////////////////////////
 
 SpritesWidget::SpritesWidget(QWidget* parent)
     : QWidget(parent)
@@ -30,7 +33,7 @@ SpritesWidget::~SpritesWidget() {}
 void SpritesWidget::setProject(std::shared_ptr<Editor::Project> loadedProject)
 {
     m_loadedProject = loadedProject;
-    loadSpritesList();
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
 }
 
 void SpritesWidget::setCurrentSprite(Dummy::sprite_id id)
@@ -38,10 +41,15 @@ void SpritesWidget::setCurrentSprite(Dummy::sprite_id id)
     if (m_loadedProject == nullptr)
         return;
 
-    // Enable panels
-    m_ui->panel_drawSprite->setEnabled(true);
-    m_ui->panel_preview->setEnabled(true);
+    int idx      = -1;
+    size_t nbIdx = m_ids.size();
+    for (size_t i = 0; i < nbIdx; ++i)
+        if (m_ids[i] == id) {
+            idx = static_cast<int>(i);
+            break;
+        }
 
+    m_ui->list_sprites->setCurrentRow(idx);
     m_currSpriteId = id;
     updateImage();
 }
@@ -109,10 +117,13 @@ void SpritesWidget::wheelEvent(QWheelEvent* e)
 
 void SpritesWidget::updateFields()
 {
-    const auto& sprites = m_loadedProject->game().sprites;
-    if (m_currSpriteId >= sprites.size())
+    if (m_loadedProject == nullptr)
         return;
-    const auto& sprite = sprites[m_currSpriteId];
+    const auto* pSprite = m_loadedProject->game().sprite(m_currSpriteId);
+    if (pSprite == nullptr)
+        return;
+
+    const auto& sprite = *pSprite;
 
     // Block signal to avoid redundant signals
     m_ui->check_anim1->blockSignals(true);
@@ -202,24 +213,27 @@ void SpritesWidget::updateFields()
 
 void SpritesWidget::updateImage()
 {
-    const auto& spritesSheets = m_loadedProject->game().spriteSheets;
-    const auto& sprites       = m_loadedProject->game().sprites;
-    if (m_currSpriteId >= sprites.size())
+    const auto* sprite = m_loadedProject->game().sprite(m_currSpriteId);
+    // Enable panels
+    m_ui->panel_drawSprite->setEnabled(sprite != nullptr);
+    m_ui->panel_preview->setEnabled(sprite != nullptr);
+
+    if (sprite == nullptr)
         return;
 
-    const auto& sprite = sprites[m_currSpriteId];
     // Set the image and its name
-    if (sprite.spriteSheetId < spritesSheets.size()) {
-        QString sheetName   = QString::fromStdString(spritesSheets[sprite.spriteSheetId]);
-        QString sheetPath   = QString::fromStdString(m_loadedProject->game().spriteSheetPath(sprite.spriteSheetId));
-        m_loadedSpriteSheet = QPixmap(sheetPath);
-        m_ui->label->setText(QString::number(m_currSpriteId) + " - " + sheetName);
-    } else {
+    const auto& spritesSheet = m_loadedProject->game().spriteSheet(sprite->spriteSheetId);
+    if (spritesSheet.empty()) {
         m_ui->label->setText(QString::number(m_currSpriteId) + " - " + tr("Undefined"));
         m_ui->image_center->setText(tr("Select a sprite sheet"));
         m_ui->image_center->setEnabled(false);
         m_loadedSpriteSheet = QPixmap();
         return;
+    } else {
+        QString sheetName   = QString::fromStdString(spritesSheet);
+        QString sheetPath   = QString::fromStdString(m_loadedProject->game().spriteSheetPath(sprite->spriteSheetId));
+        m_loadedSpriteSheet = QPixmap(sheetPath);
+        m_ui->label->setText(QString::number(m_currSpriteId) + " - " + sheetName);
     }
 
     m_ui->input_width->setMaximum(m_loadedSpriteSheet.width());
@@ -261,7 +275,7 @@ void SpritesWidget::updateImageDisplay()
         p.drawLines(lines);
     }
 
-    const auto* s = m_loadedProject->spriteAt(m_currSpriteId);
+    const auto* s = m_loadedProject->game().sprite(m_currSpriteId);
     if (s == nullptr)
         return; // ???
 
@@ -301,28 +315,27 @@ void SpritesWidget::updateImageDisplay()
     m_ui->image_center->setPixmap(displayImg);
 }
 
-void SpritesWidget::loadSpritesList()
+void SpritesWidget::loadSpritesList(const Editor::Project* p, QListWidget* list, std::vector<Dummy::sprite_id>& ids)
 {
-    if (m_loadedProject == nullptr)
+    if (p == nullptr) {
+        list->clear();
         return;
-
-    int selectedRow = m_ui->list_sprites->currentRow();
-    m_ui->list_sprites->blockSignals(true);
-    m_ui->list_sprites->clear();
-
-    const auto& spritesSheets = m_loadedProject->game().spriteSheets;
-    const size_t nbSprites    = m_loadedProject->game().sprites.size();
-    for (Dummy::sprite_id i = 0; i < nbSprites; ++i) {
-        const auto& sprite = m_loadedProject->game().sprites[i];
-
-        QString spritesheet = tr("Undefined");
-        if (sprite.spriteSheetId < spritesSheets.size())
-            spritesheet = QString::fromStdString(spritesSheets[sprite.spriteSheetId]);
-
-        m_ui->list_sprites->addItem(QString::number(i) + " - " + spritesheet);
     }
-    m_ui->list_sprites->blockSignals(false);
-    m_ui->list_sprites->setCurrentRow(selectedRow);
+
+    list->blockSignals(true);
+    list->clear();
+
+    ids.clear();
+    for (const auto& sprite : p->game().sprites()) {
+        QString spritesheet = QString::fromStdString(p->game().spriteSheet(sprite.second.spriteSheetId));
+        if (spritesheet.isEmpty())
+            spritesheet = tr("Undefined");
+        list->addItem(QString::number(sprite.second.id) + " - " + spritesheet);
+
+        ids.push_back(sprite.second.id);
+    }
+
+    list->blockSignals(false);
 }
 
 void SpritesWidget::zoomIn()
@@ -388,12 +401,12 @@ void SpritesWidget::on_btn_loadImage_clicked()
         QFile::copy(spritesheetFile.filePath(), imagesDir + "/" + spritesheetFile.fileName());
     }
 
-    auto* pSprite = m_loadedProject->spriteAt(m_currSpriteId);
+    auto* pSprite = m_loadedProject->game().sprite(m_currSpriteId);
     if (pSprite != nullptr) {
         std::string filename   = spritesheetFile.fileName().toStdString();
         pSprite->spriteSheetId = m_loadedProject->game().registerSpriteSheet(filename);
     }
-    loadSpritesList();
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
 }
 
 void SpritesWidget::on_btn_newSprite_clicked()
@@ -401,31 +414,54 @@ void SpritesWidget::on_btn_newSprite_clicked()
     if (m_loadedProject == nullptr)
         return;
 
-    m_loadedProject->createSprite();
-    loadSpritesList();
+    auto id = m_loadedProject->game().registerSprite();
+    m_loadedProject->changed();
+
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
+    setCurrentSprite(id);
+    m_loadedProject->changed();
+}
+
+void SpritesWidget::on_btn_delete_clicked()
+{
+    if (m_loadedProject == nullptr)
+        return;
+
+    auto btn =
+        QMessageBox::question(this, tr("Confirmation"), tr("You are about to delete this sprite. Are you sure?"));
+    if (btn != QMessageBox::Yes)
+        return;
+
+    m_loadedProject->game().unregisterSprite(m_currSpriteId);
+
+    loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
+    setCurrentSprite(Dummy::undefSprite);
+    m_loadedProject->changed();
 }
 
 void SpritesWidget::on_list_sprites_currentRowChanged(int row)
 {
-    setCurrentSprite(static_cast<Dummy::sprite_id>(row));
+    size_t idx = static_cast<size_t>(row);
+    if (idx < m_ids.size())
+        setCurrentSprite(m_ids[idx]);
 }
 
 void SpritesWidget::on_check_useMultiDir_clicked(bool checked)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->has4Directions = checked;
+    m_loadedProject->game().sprite(m_currSpriteId)->has4Directions = checked;
     m_loadedProject->changed();
     updateImageDisplay();
 }
 
 void SpritesWidget::on_input_width_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->width = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->width = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_height_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->height = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->height = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -435,25 +471,25 @@ void SpritesWidget::on_check_anim1_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount1->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y1_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -463,25 +499,25 @@ void SpritesWidget::on_check_anim2_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount2->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames2 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames2 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames2 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x2 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x2 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y2_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y2 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y2 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -491,25 +527,25 @@ void SpritesWidget::on_check_anim3_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount3->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames3 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames3 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames3 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x3 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x3 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y3_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y3 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y3 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
@@ -519,26 +555,72 @@ void SpritesWidget::on_check_anim4_clicked(bool checked)
 {
     uint8_t val = static_cast<uint8_t>(std::min(m_ui->input_frameCount4->value(), 1));
 
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = checked ? val : 0;
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames4 = checked ? val : 0;
     m_loadedProject->changed();
     updateFields();
 }
 void SpritesWidget::on_input_frameCount4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->nbFrames4 = static_cast<uint8_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->nbFrames4 = static_cast<uint8_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_x4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->x4 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->x4 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
 void SpritesWidget::on_input_y4_valueChanged(int val)
 {
-    m_loadedProject->spriteAt(m_currSpriteId)->y4 = static_cast<uint16_t>(val);
+    m_loadedProject->game().sprite(m_currSpriteId)->y4 = static_cast<uint16_t>(val);
     m_loadedProject->changed();
     updateImageDisplay();
 }
+///////////////////////////////////////////////////////////////////////////////
+
+SpriteSelectionDialog::SpriteSelectionDialog(std::shared_ptr<Editor::Project> project, QWidget* parent)
+    : QDialog(parent)
+    , m_ui(new Ui::spriteSelectionDialog)
+    , m_loadedProject(project)
+{
+    m_ui->setupUi(this);
+    SpritesWidget::loadSpritesList(m_loadedProject.get(), m_ui->list_sprites, m_ids);
+}
+
+SpriteSelectionDialog::~SpriteSelectionDialog() {}
+
+void SpriteSelectionDialog::setCurrentSprite(Dummy::sprite_id id)
+{
+    if (m_loadedProject == nullptr)
+        return;
+
+    const auto& game = m_loadedProject->game();
+
+    m_currSpriteId     = id;
+    const auto* sprite = game.sprite(id);
+    if (sprite == nullptr) {
+        m_ui->lbl_spriteName->setText(tr("Select a sprite"));
+        m_ui->list_sprites->blockSignals(true);
+        m_ui->list_sprites->setCurrentRow(-1);
+        m_ui->list_sprites->blockSignals(false);
+    } else {
+        QString spritesheet = QString::fromStdString(game.spriteSheet(sprite->spriteSheetId));
+        if (spritesheet.isEmpty())
+            spritesheet = tr("Undefined");
+
+        m_ui->lbl_spriteName->setText(QString::number(id) + " - " + spritesheet);
+        m_ui->list_sprites->blockSignals(true);
+        m_ui->list_sprites->setCurrentRow(id);
+        m_ui->list_sprites->blockSignals(false);
+    }
+}
+
+void SpriteSelectionDialog::on_list_sprites_clicked(const QModelIndex& index)
+{
+    size_t idx = static_cast<size_t>(index.row());
+    if (idx < m_ids.size())
+        setCurrentSprite(m_ids[idx]);
+}
+
 } // namespace Editor

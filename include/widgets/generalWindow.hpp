@@ -61,6 +61,8 @@ private slots:
     void layerVisibilityChanged(bool newVisibility, eLayerType type, uint8_t floorIdx, uint8_t layerIdx);
 
     void loadMap(const QString& mapName);
+    void placeCharToScene(Dummy::char_id);
+    void addCharToFloor(Dummy::char_id, Dummy::Coord, uint8_t);
 
     void saveStatusChanged(bool isSaved);
 

@@ -6,6 +6,7 @@ project(dummyeditor)
 set(CMAKE_CXX_STANDARD 17)
 
 # Qt pre-compilation activation
+# Bugged ? Using qt5_wrap_ui() as work-around ?
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -19,16 +20,20 @@ find_package(Qt5Widgets REQUIRED)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/exe)
 
 # enable a sub-cmake
-add_subdirectory("submodules/dummyRPG")
+add_subdirectory(submodules/dummyRPG/dummyRPG) 	# lib and tests
+add_subdirectory(submodules/dummyRPG/player)	# player and UI
 
 ###############################################################################
 
 set(FORM_FILES
+    forms/characterInstanceWidget.ui
+    forms/charactersWidget.ui
     forms/CinematicsWidget.ui
     forms/GeneralWindow.ui
     forms/mapeditdialog.ui
     forms/mapFloorTreeWidget.ui
     forms/spritesWidget.ui
+    forms/spriteSelectionDialog.ui
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS forms)
@@ -38,6 +43,9 @@ add_executable(dummyeditor
     include/utils/definitions.hpp
     include/utils/logger.hpp
     include/widgets/cinematicsWidget.hpp
+    include/widgets/characterInstanceWidget.hpp
+    include/widgets/charactersWidget.hpp
+    include/widgets/editEventWidget.hpp
     include/widgets/generalWindow.hpp
     include/widgets/mapTools.hpp
     include/widgets/spritesWidget.hpp
@@ -54,6 +62,9 @@ add_executable(dummyeditor
     src/editor/project.cpp
     src/utils/logger.cpp
     src/widgets/cinematicsWidget.cpp
+    src/widgets/characterInstanceWidget.cpp
+    src/widgets/charactersWidget.cpp
+    src/widgets/editEventWidget.cpp
     src/widgets/generalWindow.cpp
     src/widgets/mapTools.cpp
     src/widgets/spritesWidget.cpp
@@ -66,8 +77,8 @@ add_executable(dummyeditor
     src/widgetsMap/mapGraphicsScene.cpp
     src/widgetsMap/mapsTree.cpp
 
-    "${FORM_FILES}"
-     icons.qrc
+    ${FORM_FILES}
+    icons.qrc
 )
 
 source_group(_ REGULAR_EXPRESSION "(src|include|forms)/*")

@@ -167,8 +167,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>292</width>
-               <height>466</height>
+               <width>282</width>
+               <height>437</height>
               </rect>
              </property>
              <property name="styleSheet">
@@ -204,6 +204,13 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_delete">
+         <property name="text">
+          <string>Delete sprite</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -311,7 +318,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim1">
             <property name="text">
-             <string>Animation 1</string>
+             <string>Walk animation</string>
             </property>
            </widget>
           </item>
@@ -418,7 +425,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim2">
             <property name="text">
-             <string>Animation 2</string>
+             <string>Attack animation</string>
             </property>
            </widget>
           </item>
@@ -525,7 +532,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim3">
             <property name="text">
-             <string>Animation 3</string>
+             <string>Death animation</string>
             </property>
            </widget>
           </item>
@@ -632,7 +639,7 @@
           <item>
            <widget class="QCheckBox" name="check_anim4">
             <property name="text">
-             <string>Animation 4</string>
+             <string>Joker animation</string>
             </property>
            </widget>
           </item>

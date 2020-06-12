@@ -1,14 +1,16 @@
 #ifndef SPRITESWIDGET_H
 #define SPRITESWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
+#include <QListWidget>
 #include <memory>
 
 #include "editor/project.hpp"
 
 namespace Ui {
 class spritesWidget;
-}
+class spriteSelectionDialog;
+} // namespace Ui
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -24,8 +26,9 @@ public:
     explicit SpritesWidget(QWidget* parent = nullptr);
     virtual ~SpritesWidget();
 
-    void setProject(std::shared_ptr<Editor::Project> loadedProject);
+    void setProject(std::shared_ptr<Editor::Project> project);
     void setCurrentSprite(Dummy::sprite_id);
+    static void loadSpritesList(const Editor::Project*, QListWidget* list, std::vector<Dummy::sprite_id>& ids);
 
     void mousePressEvent(QMouseEvent*) override;
     void mouseMoveEvent(QMouseEvent*) override;
@@ -40,6 +43,7 @@ public slots:
 
     void on_btn_loadImage_clicked();
     void on_btn_newSprite_clicked();
+    void on_btn_delete_clicked();
     void on_list_sprites_currentRowChanged(int);
 
     void on_check_useMultiDir_clicked(bool checked);
@@ -67,7 +71,6 @@ public slots:
     void on_input_y4_valueChanged(int);
 
 private:
-    void loadSpritesList();
     void updateFields();
     void updateImage();        ///< fetch and update image
     void updateImageDisplay(); ///< update only elments drawn over the image
@@ -78,6 +81,7 @@ private:
 private:
     std::unique_ptr<Ui::spritesWidget> m_ui;
     std::shared_ptr<Editor::Project> m_loadedProject;
+    std::vector<Dummy::sprite_id> m_ids;
 
     QPixmap m_loadedSpriteSheet;
     Dummy::sprite_id m_currSpriteId = Dummy::undefSprite;
@@ -85,6 +89,30 @@ private:
     float m_zoom    = 4.F;
     bool m_showGrid = false;
     QPoint m_firstClick;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class SpriteSelectionDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit SpriteSelectionDialog(std::shared_ptr<Editor::Project> project, QWidget* parent = nullptr);
+    virtual ~SpriteSelectionDialog();
+
+    void setCurrentSprite(Dummy::sprite_id);
+    Dummy::sprite_id currentSprite() const { return m_currSpriteId; }
+
+public slots:
+    void on_list_sprites_clicked(const QModelIndex& index);
+
+private:
+    std::unique_ptr<Ui::spriteSelectionDialog> m_ui;
+    std::shared_ptr<Editor::Project> m_loadedProject;
+    std::vector<Dummy::sprite_id> m_ids;
+
+    Dummy::sprite_id m_currSpriteId = Dummy::undefSprite;
 };
 } // namespace Editor
 

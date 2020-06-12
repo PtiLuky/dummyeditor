@@ -157,7 +157,7 @@ void LayerBlockingItems::setTile(Dummy::Coord coord, bool isBlock)
     }
 
     if (isBlock) {
-        indexedItems()[index] = new GraphicItem(GraphicItem::eGraphicItemType::eBlockingSquare);
+        indexedItems()[index] = new GraphicItem(GraphicItem::eGraphicItemType::BlockingSquare);
         indexedItems()[index]->setPos(QPointF(coord.x * CELL_W, coord.y * CELL_H));
         graphicItems()->addToGroup(indexedItems()[index]);
     }
@@ -170,4 +170,34 @@ const Dummy::BlockingLayer& LayerBlockingItems::layer()
     return m_blockingLayer;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+LayerObjectItems::LayerObjectItems(Dummy::Floor& floor, int zIndex)
+    : MapSceneLayer(0, 0, zIndex)
+    , m_floor(floor)
+{
+    update();
+}
+
+void LayerObjectItems::update()
+{
+    clear();
+    for (auto& chara : m_floor.npcs()) {
+        addChar(chara.characterId(), chara.pos().coord);
+    }
+}
+
+void LayerObjectItems::addChar(Dummy::char_id, const Dummy::Coord& coord)
+{
+    indexedItems().push_back(new GraphicItem(GraphicItem::eGraphicItemType::Character));
+    indexedItems().back()->setPos(QPointF(coord.x * CELL_W, coord.y * CELL_H));
+    graphicItems()->addToGroup(indexedItems().back());
+}
+
+Dummy::Floor& LayerObjectItems::floor()
+{
+    return m_floor;
+}
+
 } // namespace Editor
+;

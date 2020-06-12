@@ -23,6 +23,7 @@ GeneralWindow::GeneralWindow(QWidget* parent)
     m_ui->graphicsViewChipset->scale(2.0, 2.0);
 
     m_ui->graphicsViewMap->setScene(&m_mapScene);
+    m_ui->graphicsViewMap->setMouseTracking(true);
     m_ui->graphicsViewMap->scale(2.0, 2.0);
     m_ui->graphicsViewMap->setBackgroundBrush(QColor("#969696"));
 
@@ -69,9 +70,9 @@ GeneralWindow::GeneralWindow(QWidget* parent)
 
     // connect ui items
     connect(m_ui->btnNewMap, &QPushButton::clicked, m_ui->mapsList, &MapsTreeView::addMapAtRoot);
-    // connect(m_ui->mapsList, &MapsTreeView::chipsetMapChanged, &m_chipsetScene, &ChipsetGraphicsScene::setChipset);
     connect(m_ui->mapsList, &MapsTreeView::mapChanged, this, &GeneralWindow::loadMap);
     connect(&m_mapScene, &MapGraphicsScene::zooming, this, &GeneralWindow::mapZoomTriggered);
+    connect(m_ui->tab_chars, &CharactersWidget::requestAddChar, this, &GeneralWindow::placeCharToScene);
 }
 
 GeneralWindow::~GeneralWindow()
@@ -106,7 +107,6 @@ bool GeneralWindow::loadProject(const QString& path)
 
     // Update the view
     updateProjectView();
-
     return true;
 }
 
@@ -154,6 +154,7 @@ void GeneralWindow::updateProjectView()
 
     // update tabs content
     m_ui->tab_sprites->setProject(m_loadedProject);
+    m_ui->tab_chars->setProject(m_loadedProject);
     updateMapsAndFloorsList();
     updateChipsetsTab();
 
@@ -297,7 +298,7 @@ void GeneralWindow::loadMap(const QString& mapName)
     // update chipset scene
     std::vector<QString> chipsets;
     for (Dummy::chip_id chipId : map->chipsetsUsed()) {
-        QString chipFile = QString::fromStdString(m_loadedProject->game().tileSets[chipId]);
+        QString chipFile = QString::fromStdString(m_loadedProject->game().tileset(chipId));
         QString chipPath = QDir::cleanPath(m_loadedProject->projectPath() + "/images/" + chipFile);
         chipsets.push_back(chipPath);
     }
@@ -308,7 +309,7 @@ void GeneralWindow::loadMap(const QString& mapName)
     m_ui->graphicsViewChipset->viewport()->update();
 
     // update map scene
-    m_mapScene.setMap(*map, m_chipsetScene.chipsets());
+    m_mapScene.setMap(m_loadedProject, *map, m_chipsetScene.chipsets());
     m_ui->graphicsViewMap->setSceneRect(QRect(0, 0, map->width() * CELL_W, map->height() * CELL_H));
 
     // update floor list
@@ -316,15 +317,37 @@ void GeneralWindow::loadMap(const QString& mapName)
     const auto* floorTree = m_ui->layer_list_tab->model();
     connect(floorTree, &MapFloorTreeModel::activeLayerChanged, this, &GeneralWindow::activeLayerChanged);
     connect(floorTree, &MapFloorTreeModel::layerVisibilityChanged, this, &GeneralWindow::layerVisibilityChanged);
+    connect(&m_mapScene, &MapGraphicsScene::characterPlacedOnFloor, this, &GeneralWindow::addCharToFloor);
     m_ui->layer_list_tab->selectFirstVisLayer();
 
     // update layer list
     m_ui->maps_panel->setCurrentIndex(1);
 }
 
+void GeneralWindow::placeCharToScene(Dummy::char_id id)
+{
+    m_ui->panels_tabs->setCurrentWidget(m_ui->tab_map);
+    m_mapScene.setLocationCharacter({0, 0}, id);
+}
+
 void GeneralWindow::on_btnSwapBackground_clicked(bool isDown)
 {
     m_chipsetScene.setDarkBackground(isDown);
+}
+
+void GeneralWindow::addCharToFloor(Dummy::char_id id, Dummy::Coord coord, uint8_t floorIdx)
+{
+    if (m_loadedProject == nullptr)
+        return;
+    const auto* map = m_loadedProject->currMap();
+    if (map == nullptr)
+        return;
+    auto* floor = map->floorAt(floorIdx);
+    if (floor == nullptr)
+        return;
+
+    Dummy::PositionChar pos {coord, Dummy::Direction::Bottom, Dummy::CharState::Idle};
+    floor->registerNPC(id, pos);
 }
 
 void GeneralWindow::on_btn_refreshTileset_clicked()
@@ -365,6 +388,7 @@ void GeneralWindow::activeLayerChanged(eLayerType type, uint8_t floorIdx, uint8_
     } else {
         m_ui->toolbar_mapTools->setEnabled(false);
     }
+    m_mapScene.setCurrFloor(floorIdx);
 }
 
 void GeneralWindow::layerVisibilityChanged(bool newVisibility, eLayerType type, uint8_t floorIdx, uint8_t layerIdx)
@@ -406,10 +430,10 @@ void GeneralWindow::on_actionSelection_triggered()
 
 void GeneralWindow::on_actionToggleGrid_triggered()
 {
-    if (m_ui->panels_tabs->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentWidget() == m_ui->tab_map)
         m_mapTools.updateGridDisplay();
 
-    else if (m_ui->panels_tabs->currentIndex() == 1)
+    else if (m_ui->panels_tabs->currentWidget() == m_ui->tab_sprites)
         m_ui->tab_sprites->setGrid(m_ui->actionToggleGrid->isChecked());
 }
 
@@ -437,23 +461,23 @@ void GeneralWindow::on_actionRedo_triggered()
 }
 void GeneralWindow::on_actionZoomIn_triggered()
 {
-    if (m_ui->panels_tabs->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentWidget() == m_ui->tab_map)
         m_ui->graphicsViewMap->scale(2.0, 2.0);
 
-    else if (m_ui->panels_tabs->currentIndex() == 1)
+    else if (m_ui->panels_tabs->currentWidget() == m_ui->tab_sprites)
         m_ui->tab_sprites->zoomIn();
 }
 void GeneralWindow::on_actionZoomOut_triggered()
 {
-    if (m_ui->panels_tabs->currentIndex() == 0)
+    if (m_ui->panels_tabs->currentWidget() == m_ui->tab_map)
         m_ui->graphicsViewMap->scale(0.5, 0.5);
 
-    else if (m_ui->panels_tabs->currentIndex() == 1)
+    else if (m_ui->panels_tabs->currentWidget() == m_ui->tab_sprites)
         m_ui->tab_sprites->zoomOut();
 }
 void GeneralWindow::on_actionResize_triggered()
 {
-    if (m_ui->panels_tabs->currentIndex() == 0) {
+    if (m_ui->panels_tabs->currentWidget() == m_ui->tab_map) {
         if (m_mapScene.height() < 1 || m_mapScene.width() < 1)
             return;
 
@@ -462,7 +486,7 @@ void GeneralWindow::on_actionResize_triggered()
         m_ui->graphicsViewMap->resetTransform();
         m_ui->graphicsViewMap->scale(minScale, minScale);
 
-    } else if (m_ui->panels_tabs->currentIndex() == 1) {
+    } else if (m_ui->panels_tabs->currentWidget() == m_ui->tab_sprites) {
         m_ui->tab_sprites->zoomOne();
     }
 }

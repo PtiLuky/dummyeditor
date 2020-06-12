@@ -4,6 +4,25 @@
 #include <QDir>
 #include <iostream>
 
+#include "dummyrpg/dummy_types.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of Dummy log
+void Dummy::Log(const std::string& msg)
+{
+    Editor::Log::print(msg, Editor::eLogType::LOG);
+}
+void Dummy::LogWarn(const std::string& msg)
+{
+    Editor::Log::print(msg, Editor::eLogType::DEBUG);
+}
+void Dummy::LogErr(const std::string& msg)
+{
+    Editor::Log::print(msg, Editor::eLogType::ERROR);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 namespace Editor {
 
 std::vector<std::shared_ptr<Logger>> Logger::gLoggers;

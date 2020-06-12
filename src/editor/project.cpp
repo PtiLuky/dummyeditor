@@ -14,7 +14,6 @@ using std::make_unique;
 
 static const char* const PROJECT_FILE_NAME = "dummy-rpg-project.xml";
 static const char* const DATA_FILE_NAME    = "game-data.gdummy";
-static const char* const MAP_FILE_EXT      = ".mdummy";
 
 namespace Editor {
 
@@ -35,14 +34,13 @@ Project::Project(const QString& projectFile)
     if (mapsNodes.length() > 0) {
         auto mapsNode = mapsNodes.at(0);
         mapsTree      = make_unique<MapsTreeModel>(mapsNode);
-        registerMaps(mapsNode);
     } else {
         QDomNode fakeMapsList;
         mapsTree = make_unique<MapsTreeModel>(fakeMapsList);
     }
 
 
-    Dummy::GameStatic newGameData;
+    Dummy::GameStatic newGameData(fileInfo.path().toStdString());
     std::ifstream gameDataFile((fileInfo.path() + "/" + DATA_FILE_NAME).toStdString(), std::ios::binary);
     if (gameDataFile.good()) {
         bool bRes = Dummy::Serializer::parseGameFromFile(gameDataFile, newGameData);
@@ -53,7 +51,6 @@ Project::Project(const QString& projectFile)
     m_mapsModel   = std::move(mapsTree);
     m_game        = std::move(newGameData);
     m_projectPath = fileInfo.path();
-    m_game.setGameDataPath(m_projectPath.toStdString());
 }
 
 const QString& Project::projectPath() const
@@ -165,17 +162,20 @@ void Project::saveProject()
     const int indent = 4;
     doc.save(stream, indent);
 
-    std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
-    bool bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
-    if (! bRes)
-        Log::error("Error while saving the game data...");
-
-    bRes = saveCurrMap();
+    // Save opened map
+    bool bRes = saveCurrMap();
     if (bRes) {
         m_isModified = false;
         emit saveStatusChanged(true);
     } else
         Log::error("Error while saving the map...");
+
+    // Save game file
+    m_game.cleanupUnused();
+    std::ofstream gameDataFile(m_projectPath.toStdString() + "/" + DATA_FILE_NAME, std::ios::binary);
+    bRes = Dummy::Serializer::serializeGameToFile(m_game, gameDataFile);
+    if (! bRes)
+        Log::error("Error while saving the game data...");
 }
 
 bool Project::saveCurrMap()
@@ -186,6 +186,7 @@ bool Project::saveCurrMap()
     }
 
     QString mapPath = m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT;
+    auto tmp        = mapPath.toStdString();
     std::ofstream mapDataFile(mapPath.toStdString(), std::ios::binary);
     bool bRes = Dummy::Serializer::serializeMapToFile(*m_currMap, mapDataFile);
 
@@ -207,23 +208,6 @@ void Project::dumpToXmlNode(QDomDocument& doc, QDomElement& xmlNode, const QStan
     }
 }
 
-void Project::registerMaps(const QDomNode& mapsNode)
-{
-    const auto& children = mapsNode.childNodes();
-    int nbChildren       = children.count();
-
-    for (int i = 0; i < nbChildren; ++i) {
-        const auto& n = children.at(i);
-
-        if (n.nodeName() == "map") {
-            std::string mapName = n.attributes().namedItem("name").nodeValue().toStdString();
-            m_mapNameToId.insert({mapName, static_cast<uint16_t>(m_game.mapsNames.size())});
-            m_game.mapsNames.push_back(mapName);
-            registerMaps(n);
-        }
-    }
-}
-
 void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
 {
     if (m_mapsModel == nullptr)
@@ -235,7 +219,7 @@ void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
     const uint16_t w            = mapInfo.m_width;
     const uint16_t h            = mapInfo.m_height;
     const QString mapName       = sanitizeMapName(QString::fromStdString(mapInfo.m_mapName));
-    const Dummy::char_id chipId = m_game.registerChipset(mapInfo.m_chispetPath);
+    const Dummy::char_id chipId = m_game.registerTileset(mapInfo.m_chispetPath);
 
     if (m_currMap != nullptr)
         saveCurrMap();
@@ -246,6 +230,7 @@ void Project::createMap(const tMapInfo& mapInfo, QStandardItem& parent)
     // Add the new map into the tree.
     QList<QStandardItem*> mapRow {new QStandardItem(mapName)};
     parent.appendRow(mapRow);
+    m_game.registerMap(mapName.toStdString());
 
     saveProject();
 }
@@ -273,7 +258,10 @@ bool Project::loadMap(const QString& mapName)
 bool Project::mapExists(const QString& mapName)
 {
     std::string strName = mapName.toStdString();
-    return m_mapNameToId.find(strName) != m_mapNameToId.end();
+    for (auto& name : m_game.mapNames())
+        if (name == strName)
+            return true;
+    return false;
 }
 
 bool Project::renameCurrMap(const QString& newName)
@@ -286,8 +274,7 @@ bool Project::renameCurrMap(const QString& newName)
     // Change in our id-mapping
     std::string strOldName = m_currMapName.toStdString();
     std::string strNewName = newName.toStdString();
-    m_mapNameToId.insert({strNewName, m_mapNameToId.at(strOldName)});
-    m_mapNameToId.erase(strOldName);
+    m_game.renameMap(strOldName, strNewName);
 
     // Change in file name
     QFile::rename(m_projectPath + "/maps/" + m_currMapName + MAP_FILE_EXT,
@@ -304,28 +291,11 @@ bool Project::renameCurrMap(const QString& newName)
     return true;
 }
 
-void Project::createSprite()
-{
-    const size_t nbsprites = m_game.sprites.size();
-    if (nbsprites >= std::numeric_limits<Dummy::sprite_id>::max())
-        return;
-
-    m_game.sprites.push_back(Dummy::AnimatedSprite());
-    changed();
-}
-
-Dummy::AnimatedSprite* Project::spriteAt(Dummy::sprite_id id)
-{
-    if (id >= m_game.sprites.size())
-        return nullptr;
-
-    return &m_game.sprites[id];
-}
-
 QString Project::sanitizeMapName(const QString& unsafeName)
 {
     QString safeName = unsafeName;
-    safeName.remove(QRegularExpression(QString::fromUtf8(R"([`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
+    safeName.remove(QRegularExpression(QString::fromUtf8(
+        R"([ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ`~!@#$%\^&*€”+=|:.;<>«»,?/{}'"\\])")));
     if (safeName.isNull())
         safeName = "new_map";
     return safeName;
